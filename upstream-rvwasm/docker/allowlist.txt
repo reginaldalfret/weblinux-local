@@ -1,0 +1,44 @@
+# The domains the machine may reach through the public relay (docker/net-allowlist.sh, docs/deploy.md).
+#
+# One domain per line; a domain also allows its subdomains (github.com includes api.github.com). Lines starting
+# with # and empty lines are ignored. The relay's DNS server answers for these names only, and the firewall lets the
+# machine connect, on TCP ports 80 and 443 only, to the addresses those answers had.
+#
+# After editing:   docker compose exec relay /opt/rvwasm/allowlist-reload.sh      (no restart; machines stay up)
+
+# Debian: packages (deb.debian.org redirects to Fastly's debian.map.fastly.net)
+deb.debian.org
+security.debian.org
+debian.map.fastly.net
+
+# Python
+pypi.org
+files.pythonhosted.org
+
+# npm
+registry.npmjs.org
+
+# GitHub (git clone, release downloads, raw files; release downloads are redirected to the second host)
+github.com
+codeload.github.com
+objects.githubusercontent.com
+release-assets.githubusercontent.com
+raw.githubusercontent.com
+
+# Rust
+crates.io
+static.crates.io
+index.crates.io
+
+# KDE: "Get New Stuff" (themes, widgets, wallpapers): the provider list (autoconfig.kde.org), the store's API
+# (api.kde-look.org) and its downloads and previews (Pling's file and image hosts); kde.org also covers invent.kde.org
+kde.org
+kde-look.org
+pling.com
+# KDE Store downloads (Pling files are served from DigitalOcean Spaces)
+digitaloceanspaces.com
+# Weather widgets (Seeua/Nori/SlateWeather): IP location, forecast, place names, day/night
+ip-api.com
+open-meteo.com
+nominatim.openstreetmap.org
+sunrise-sunset.org

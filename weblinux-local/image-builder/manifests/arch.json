@@ -1,0 +1,41 @@
+{
+  "id": "arch",
+  "name": "Arch Linux (RISC-V Port)",
+  "releaseVersion": "Rolling",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-6.1",
+  "defaultDesktop": "icewm",
+  "supportedDesktops": ["icewm"],
+  "packageManager": "pacman",
+  "filesystemLayout": {
+    "rootMount": "/arch",
+    "homeMount": "/home/alarm"
+  },
+  "imageSource": {
+    "baseUri": "/images/arch/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 8589934592,
+    "id": "arch-riscv64-candidate"
+  },
+  "integrity": {
+    "chunksCount": 8192
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 4096,
+    "recommendedMemoryMB": 8192,
+    "minCores": 4,
+    "recommendedCores": 8,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 1800
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Experimental rolling release port. Pacman hook and dynamic linker behavior under rv JIT validation."
+}

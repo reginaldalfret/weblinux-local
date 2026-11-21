@@ -1,0 +1,41 @@
+{
+  "id": "fedora",
+  "name": "Fedora Linux (RISC-V Port)",
+  "releaseVersion": "41",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-6.1",
+  "defaultDesktop": "icewm",
+  "supportedDesktops": ["icewm", "kde-plasma"],
+  "packageManager": "dnf",
+  "filesystemLayout": {
+    "rootMount": "/fedora",
+    "homeMount": "/home/fedora"
+  },
+  "imageSource": {
+    "baseUri": "/images/fedora/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 8589934592,
+    "id": "fedora-41-riscv64-candidate"
+  },
+  "integrity": {
+    "chunksCount": 8192
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 4096,
+    "recommendedMemoryMB": 8192,
+    "minCores": 4,
+    "recommendedCores": 8,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 2200
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later, Fedora Project Guidelines",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Experimental port. Fedora RISC-V minimal image undergoing userspace NOMMU testing."
+}

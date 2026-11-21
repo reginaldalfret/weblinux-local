@@ -1,0 +1,155 @@
+/* The prompt for a web address (or a file) from the machine (hostopen.js): the page's own box at the top of the page, over
+   the row of the bar and not part of the machine's screen, in the landing page's look and the top bar's (display.js barStyle):
+   Catppuccin Mocha, JetBrains Mono, surface borders, mauve for what can be clicked. */
+
+#rv-hostopen {
+  position: fixed;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  z-index: 50000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(760px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 10px 12px 10px 14px;
+  border: 1px solid #45475a;
+  border-left: 3px solid #cba6f7;
+  border-radius: 8px;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  font: 12px/1.45 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#rv-hostopen[data-kind="save"] {
+  border-left-color: #a6e3a1;
+}
+
+#rv-hostopen:focus {
+  outline: none;
+}
+
+#rv-hostopen:focus-visible,
+#rv-hostopen:focus-within {
+  border-color: #cba6f766;
+  border-left-color: #cba6f7;
+}
+
+#rv-hostopen[data-kind="save"]:focus-within {
+  border-left-color: #a6e3a1;
+}
+
+#rv-hostopen .rv-ho-title {
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#rv-hostopen .rv-ho-title b {
+  color: #cba6f7;
+  font-weight: 700;
+}
+
+#rv-hostopen[data-kind="save"] .rv-ho-title b {
+  color: #a6e3a1;
+}
+
+#rv-hostopen .rv-ho-dim {
+  color: #a6adc8;
+}
+
+/* The whole address, so that nothing is hidden: broken anywhere, with a limit for the very long ones (2048 characters at most). */
+#rv-hostopen .rv-ho-full {
+  max-height: 6.5em;
+  overflow: auto;
+  padding: 6px 8px;
+  border: 1px solid #313244;
+  border-radius: 4px;
+  background: #181825;
+  color: #bac2de;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+#rv-hostopen .rv-ho-full b {
+  color: #cba6f7;
+  font-weight: 700;
+}
+
+#rv-hostopen[data-kind="save"] .rv-ho-full b {
+  color: #a6e3a1;
+}
+
+#rv-hostopen .rv-ho-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+#rv-hostopen .rv-ho-count {
+  margin-right: auto;
+  color: #7f849c;
+}
+
+#rv-hostopen .rv-ho-count:empty {
+  display: none;
+}
+
+#rv-hostopen .rv-ho-btn {
+  height: 24px;
+  padding: 0 14px;
+  border: 1px solid #313244;
+  border-radius: 4px;
+  background: transparent;
+  color: #bac2de;
+  font: inherit;
+  cursor: pointer;
+  transition: color .15s, border-color .2s, background .2s;
+}
+
+#rv-hostopen .rv-ho-btn:hover {
+  border-color: #cba6f766;
+  color: #cba6f7;
+}
+
+#rv-hostopen .rv-ho-btn:active {
+  background: #313244;
+}
+
+#rv-hostopen .rv-ho-primary {
+  border-color: #cba6f7;
+  background: #cba6f7;
+  color: #11111b;
+  font-weight: 700;
+}
+
+#rv-hostopen .rv-ho-primary:hover {
+  border-color: #d9bdfa;
+  background: #d9bdfa;
+  color: #11111b;
+}
+
+#rv-hostopen[data-kind="save"] .rv-ho-primary {
+  border-color: #a6e3a1;
+  background: #a6e3a1;
+}
+
+#rv-hostopen[data-kind="save"] .rv-ho-primary:hover {
+  border-color: #bdeeba;
+  background: #bdeeba;
+}
+
+#rv-hostopen .rv-ho-btn:focus-visible {
+  outline: 2px solid #cba6f7;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #rv-hostopen .rv-ho-btn { transition: none; }
+}

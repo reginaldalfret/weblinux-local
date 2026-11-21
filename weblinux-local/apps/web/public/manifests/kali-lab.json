@@ -1,0 +1,41 @@
+{
+  "id": "kali-lab",
+  "name": "WebLinux Security Lab (Unofficial Debian/Kali Tools)",
+  "releaseVersion": "Lab 2026.1",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-6.1",
+  "defaultDesktop": "icewm",
+  "supportedDesktops": ["icewm", "kde-plasma"],
+  "packageManager": "apt",
+  "filesystemLayout": {
+    "rootMount": "/debian",
+    "homeMount": "/root"
+  },
+  "imageSource": {
+    "baseUri": "/images/kali-lab/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 8589934592,
+    "id": "kali-lab-riscv64-candidate"
+  },
+  "integrity": {
+    "chunksCount": 8192
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 4096,
+    "recommendedMemoryMB": 8192,
+    "minCores": 4,
+    "recommendedCores": 8,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 3000
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Unofficial custom security evaluation environment based on validated Debian RISC-V baseline with open-source security utilities. Not an official release of OffSec Services Limited."
+}

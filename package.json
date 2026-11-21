@@ -1,0 +1,14 @@
+{
+  "name": "weblinux-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "weblinux-local/apps/web"
+  ],
+  "scripts": {
+    "dev": "npm --prefix weblinux-local/apps/web run dev",
+    "build": "npm --prefix weblinux-local/apps/web run build",
+    "preview": "npm --prefix weblinux-local/apps/web run preview",
+    "test": "node weblinux-local/tests/manifest-validation.test.js"
+  }
+}

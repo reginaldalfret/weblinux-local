@@ -1,0 +1,46 @@
+{
+  "id": "debian",
+  "name": "Debian GNU/Linux (Trixie)",
+  "releaseVersion": "13 / trixie",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-6.1",
+  "defaultDesktop": "kde-plasma",
+  "supportedDesktops": ["kde-plasma", "icewm"],
+  "packageManager": "apt",
+  "filesystemLayout": {
+    "rootMount": "/debian",
+    "homeMount": "/root",
+    "sharedMount": "/opt/nq-shared"
+  },
+  "imageSource": {
+    "baseUri": "https://disk.plasmaontheweb.com/disk/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 8589934592,
+    "manifestUri": "https://plasmaontheweb.com/disk/release/manifest.json",
+    "id": "21dd6321337e178c4ac19c27d790403a"
+  },
+  "integrity": {
+    "kernelSha256": "vmlinux-wasm64_nommu.wasm",
+    "initrdSha256": "initramfs-wasm64_nommu.cpio.gz",
+    "chunksCount": 8192
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 4096,
+    "recommendedMemoryMB": 8192,
+    "minCores": 4,
+    "recommendedCores": 8,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresWebGPU": false,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 2048
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later, DFSG Compliant",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "validated",
+  "notes": "Primary validated tier. Pre-built native WebAssembly KDE Plasma 6 shell and Debian trixie riscv64 userspace."
+}

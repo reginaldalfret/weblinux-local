@@ -1,0 +1,41 @@
+{
+  "id": "ubuntu",
+  "name": "Ubuntu Noble Numbat (RISC-V Port)",
+  "releaseVersion": "24.04 LTS",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-6.1",
+  "defaultDesktop": "icewm",
+  "supportedDesktops": ["icewm", "kde-plasma"],
+  "packageManager": "apt",
+  "filesystemLayout": {
+    "rootMount": "/ubuntu",
+    "homeMount": "/home/ubuntu"
+  },
+  "imageSource": {
+    "baseUri": "/images/ubuntu/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 8589934592,
+    "id": "ubuntu-24-04-riscv64-candidate"
+  },
+  "integrity": {
+    "chunksCount": 8192
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 4096,
+    "recommendedMemoryMB": 8192,
+    "minCores": 4,
+    "recommendedCores": 8,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 2500
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later, Canonical Open Source",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Experimental port under development. Investigating Ubuntu RISC-V minimal rootfs compatibility with NOMMU memory model."
+}
