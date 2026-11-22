@@ -6,4 +6,5 @@ dist/
 .idea/
 .disk-cache/
 .test-user-data/
+.edge-live-profile/
 *.cache/

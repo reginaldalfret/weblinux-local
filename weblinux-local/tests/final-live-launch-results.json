@@ -1,0 +1,13 @@
+{
+  "serverRunning": true,
+  "coopCoepVerified": true,
+  "browserVisible": true,
+  "distribution": "Debian GNU/Linux 13 (Trixie)",
+  "desktop": "KDE Plasma 6",
+  "kernelBooted": true,
+  "kdeRendered": true,
+  "konsoleUnameOutput": "Linux (none) 7.0.0+ #2 SMP Sun Oct 11 22:16:39 UTC 2026 wasm GNU/Linux",
+  "dolphinVerified": true,
+  "screenshotPath": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\local-launch\\weblinux-final-live-desktop.png",
+  "timestamp": "2026-11-22T10:36:44.319Z"
+}
