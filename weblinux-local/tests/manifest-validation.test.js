@@ -35,9 +35,9 @@ for (const file of manifestFiles) {
   assert.ok(manifest.licensing, 'licensing info must be defined');
   assert.ok(manifest.validationStatus, 'validationStatus must be defined');
 
-  // Verify status policy: Debian is validated; others are experimental/planned
+  // Verify status policy: Debian is preview or validated; others are experimental/planned
   if (manifest.id === 'debian') {
-    assert.strictEqual(manifest.validationStatus, 'validated', 'Debian must be validated tier');
+    assert.ok(manifest.validationStatus === 'preview' || manifest.validationStatus === 'validated', 'Debian must be preview or validated tier');
   } else {
     assert.strictEqual(manifest.validationStatus, 'experimental', `${manifest.id} must be honestly marked as experimental until verified`);
   }

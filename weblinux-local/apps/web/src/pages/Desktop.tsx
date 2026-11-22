@@ -58,14 +58,27 @@ export const Desktop: React.FC<DesktopProps> = ({
     }
   };
 
-  const handleSendCommand = (e: React.FormEvent) => {
+  const handleSendCommand = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!terminalInput.trim()) return;
 
     const cmd = terminalInput.trim();
-    adapter.sendInput(cmd + '\r');
-    setCommandHistory(prev => [...prev, `$ ${cmd}`]);
     setTerminalInput('');
+    setCommandHistory(prev => [...prev, `$ ${cmd}`]);
+
+    try {
+      const res = await adapter.runCommand(cmd, 15000);
+      if (res.stdout) {
+        const outText = res.stdout;
+        setCommandHistory(prev => [...prev, outText]);
+      }
+      if (res.exitCode !== 0 && res.exitCode !== null) {
+        setCommandHistory(prev => [...prev, `[exit code: ${res.exitCode}]`]);
+      }
+    } catch (err: any) {
+      // Fallback to raw tty input if marker polling times out
+      adapter.sendInput(cmd + '\r');
+    }
   };
 
   const handlePointerLock = () => {

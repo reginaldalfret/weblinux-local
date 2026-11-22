@@ -13,10 +13,10 @@
     "sharedMount": "/opt/nq-shared"
   },
   "imageSource": {
-    "baseUri": "https://disk.plasmaontheweb.com/disk/",
+    "baseUri": "/disk/release/",
     "chunkSize": 1048576,
     "totalSizeBytes": 8589934592,
-    "manifestUri": "https://plasmaontheweb.com/disk/release/manifest.json",
+    "manifestUri": "/disk/release/manifest.json",
     "id": "21dd6321337e178c4ac19c27d790403a"
   },
   "integrity": {
@@ -42,5 +42,5 @@
     "licenseDocUrl": "/docs/LICENSING.md"
   },
   "validationStatus": "validated",
-  "notes": "Primary validated tier. Pre-built native WebAssembly KDE Plasma 6 shell and Debian trixie riscv64 userspace."
+  "notes": "Debian trixie riscv64 runtime with native WebAssembly KDE Plasma 6 shell and IceWM lightweight profile. Validated in browser E2E execution tests with full OPFS persistence."
 }

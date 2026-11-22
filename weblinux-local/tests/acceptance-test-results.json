@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-11-22T08:36:46.083Z",
+  "diagnostics": {
+    "crossOriginIsolated": true,
+    "hasSharedArrayBuffer": true,
+    "hasWebAssembly": true,
+    "hasWebGL2": true,
+    "hasWebGPU": true,
+    "hasOPFS": true,
+    "deviceMemoryGB": 8,
+    "hardwareConcurrency": 12,
+    "activeWorkers": 0,
+    "waylandActive": false
+  },
+  "commandResults": {
+    "uname -a": {
+      "rc": 0,
+      "ms": 105,
+      "out": "Linux (none) 7.0.0+ #2 SMP Sun Oct 11 22:16:39 UTC 2026 wasm GNU/Linux",
+      "exitCode": 0,
+      "stdout": "Linux (none) 7.0.0+ #2 SMP Sun Oct 11 22:16:39 UTC 2026 wasm GNU/Linux",
+      "executionTimeMs": 105
+    },
+    "cat /etc/os-release": {
+      "rc": 1,
+      "ms": 101,
+      "out": "cat: can't open '/etc/os-release': No such file or directory",
+      "exitCode": 1,
+      "stdout": "cat: can't open '/etc/os-release': No such file or directory",
+      "executionTimeMs": 101
+    },
+    "id": {
+      "rc": 0,
+      "ms": 101,
+      "out": "uid=0 gid=0",
+      "exitCode": 0,
+      "stdout": "uid=0 gid=0",
+      "executionTimeMs": 101
+    },
+    "pwd": {
+      "rc": 0,
+      "ms": 52,
+      "out": "/",
+      "exitCode": 0,
+      "stdout": "/",
+      "executionTimeMs": 52
+    },
+    "ls -la /": {
+      "rc": 0,
+      "ms": 2801,
+      "out": "drwxr-xr-x   19 0        0                0 Nov 22 08:36 \u001b[1;34m.\u001b[m\ndrwxr-xr-x   19 0        0                0 Nov 22 08:36 \u001b[1;34m..\u001b[m\n-rw-------    1 0        0              167 Nov 22 08:36 \u001b[0;0m.hush_history\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 12 01:13 \u001b[1;34maudit\u001b[m\ndrwxr-xr-x    2 0        0                0 Sep  7  2025 \u001b[1;34mbin\u001b[m\ndrwxr-xr-x   18 0        0             4096 Oct 12 21:30 \u001b[1;34mdebian\u001b[m\ndrwxrwxr-x    6 1000     1000             0 Jan  1  1970 \u001b[1;34mdev\u001b[m\ndrwxr-xr-x    2 0        0                0 Sep  7  2025 \u001b[1;34metc\u001b[m\ndrwxrwxr-x    2 1000     1000             0 Sep  7  2025 \u001b[1;34mhome\u001b[m\n-rwxr-xr-x    1 0        0             9122 Jan  1  1970 \u001b[1;32minit\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 12 01:13 \u001b[1;34mlib\u001b[m\nlrwxrwxrwx    1 0        0               11 Oct 10 18:58 \u001b[1;36mlinuxrc\u001b[m -> \u001b[1;32mbin/busybox\u001b[m\ndrwxrwxr-x    2 1000     1000             0 Sep  7  2025 \u001b[1;34mmnt\u001b[m\ndr-xr-xr-x  123 0        0                0 Jan  1  1970 \u001b[1;34mproc\u001b[m\ndrwx------    2 0        0                0 Oct 11 22:15 \u001b[1;34mroot\u001b[m\ndrwxr-xr-x    2 0        0                0 Jan  1  1970 \u001b[1;34mrun\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 12 01:13 \u001b[1;34mrv\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 12 01:13 \u001b[1;34mrvbin\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 10 18:58 \u001b[1;34msbin\u001b[m\ndr-xr-xr-x   11 0        0                0 Jan  1  1970 \u001b[1;34msys\u001b[m\ndrwxrwxrwt    2 0        0                0 Jan  1  1970 \u001b[1;34mtmp\u001b[m\ndrwxr-xr-x    5 0        0                0 Sep  7  2025 \u001b[1;34musr\u001b[m",
+      "exitCode": 0,
+      "stdout": "drwxr-xr-x   19 0        0                0 Nov 22 08:36 \u001b[1;34m.\u001b[m\ndrwxr-xr-x   19 0        0                0 Nov 22 08:36 \u001b[1;34m..\u001b[m\n-rw-------    1 0        0              167 Nov 22 08:36 \u001b[0;0m.hush_history\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 12 01:13 \u001b[1;34maudit\u001b[m\ndrwxr-xr-x    2 0        0                0 Sep  7  2025 \u001b[1;34mbin\u001b[m\ndrwxr-xr-x   18 0        0             4096 Oct 12 21:30 \u001b[1;34mdebian\u001b[m\ndrwxrwxr-x    6 1000     1000             0 Jan  1  1970 \u001b[1;34mdev\u001b[m\ndrwxr-xr-x    2 0        0                0 Sep  7  2025 \u001b[1;34metc\u001b[m\ndrwxrwxr-x    2 1000     1000             0 Sep  7  2025 \u001b[1;34mhome\u001b[m\n-rwxr-xr-x    1 0        0             9122 Jan  1  1970 \u001b[1;32minit\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 12 01:13 \u001b[1;34mlib\u001b[m\nlrwxrwxrwx    1 0        0               11 Oct 10 18:58 \u001b[1;36mlinuxrc\u001b[m -> \u001b[1;32mbin/busybox\u001b[m\ndrwxrwxr-x    2 1000     1000             0 Sep  7  2025 \u001b[1;34mmnt\u001b[m\ndr-xr-xr-x  123 0        0                0 Jan  1  1970 \u001b[1;34mproc\u001b[m\ndrwx------    2 0        0                0 Oct 11 22:15 \u001b[1;34mroot\u001b[m\ndrwxr-xr-x    2 0        0                0 Jan  1  1970 \u001b[1;34mrun\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 12 01:13 \u001b[1;34mrv\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 12 01:13 \u001b[1;34mrvbin\u001b[m\ndrwxr-xr-x    2 0        0                0 Oct 10 18:58 \u001b[1;34msbin\u001b[m\ndr-xr-xr-x   11 0        0                0 Jan  1  1970 \u001b[1;34msys\u001b[m\ndrwxrwxrwt    2 0        0                0 Jan  1  1970 \u001b[1;34mtmp\u001b[m\ndrwxr-xr-x    5 0        0                0 Sep  7  2025 \u001b[1;34musr\u001b[m",
+      "executionTimeMs": 2801
+    },
+    "df -h": {
+      "rc": 0,
+      "ms": 132,
+      "out": "Filesystem                Size      Used Available Use% Mounted on\n/dev/wda                  7.8G      3.8G      4.0G  49% /debian\n/dev/wdb                 15.8G     60.0K     15.8G   0% /debian/root",
+      "exitCode": 0,
+      "stdout": "Filesystem                Size      Used Available Use% Mounted on\n/dev/wda                  7.8G      3.8G      4.0G  49% /debian\n/dev/wdb                 15.8G     60.0K     15.8G   0% /debian/root",
+      "executionTimeMs": 132
+    },
+    "free -h": {
+      "rc": 0,
+      "ms": 104,
+      "out": "total        used        free      shared  buff/cache   available\nMem:        4122744       27604     4042756           0       52384     4031628",
+      "exitCode": 0,
+      "stdout": "total        used        free      shared  buff/cache   available\nMem:        4122744       27604     4042756           0       52384     4031628",
+      "executionTimeMs": 104
+    }
+  },
+  "testToken": "WEBLINUX_PERSISTENCE_TEST_1795336601679_AUTHENTIC"
+}

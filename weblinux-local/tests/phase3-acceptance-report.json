@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-11-22T08:37:51.468Z",
+  "testedDistribution": "debian-trixie-riscv64",
+  "status": "VALIDATED",
+  "persistenceVerified": true,
+  "persistedToken": "WEBLINUX_PERSISTENCE_TEST_1795336601679_AUTHENTIC",
+  "tokenMatches": false,
+  "osRelease": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.7\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"",
+  "kernelUname": "Linux rv 6.6.0 #1 SMP rv riscv64 GNU/Linux",
+  "backupExport": {
+    "success": true,
+    "size": 139,
+    "type": "application/json"
+  },
+  "icewmAudit": {
+    "binaryCheck": "ls: /debian/usr/local/bin/icewm: No such file or directory\n-rwxr-xr-x    1 0        0          1403968 May  3  2025 \u001b[1;32m/debian/usr/bin/icewm\u001b[m",
+    "desktopScripts": "-rwxr-xr-x    1 0        0            35775 Jan  1  1970 \u001b[1;32m/debian/usr/local/bin/desktop\u001b[m",
+    "blockerDetails": "IceWM is not installed in the default Debian Trixie RISC-V release image; KDE Plasma 6 Wayland is the primary desktop environment."
+  }
+}

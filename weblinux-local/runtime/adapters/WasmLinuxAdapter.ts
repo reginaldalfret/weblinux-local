@@ -10,6 +10,8 @@ import {
   DistributionManifest,
   BootOptions,
   RuntimeStatus,
+  RuntimeDiagnostics,
+  CommandResult,
   DownloadProgress,
   ImportResult,
   StorageUsageInfo,
@@ -25,6 +27,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     workerCount: 0,
     storageUsageBytes: 0,
     networkConnected: false,
+    waylandActive: false,
+    shellReady: false,
   };
 
   private stateListeners: Set<(status: RuntimeStatus) => void> = new Set();
@@ -36,10 +40,16 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   private uptimeTimer: any = null;
   private startTime: number = 0;
   private bootOutput: string = '';
+  private displayChannel: BroadcastChannel | null = null;
+  private shellReadyPromise: Promise<boolean> | null = null;
+  private resolveShellReady: ((val: boolean) => void) | null = null;
 
   public static getInstance(): WasmLinuxAdapter {
     if (!WasmLinuxAdapter.instance) {
       WasmLinuxAdapter.instance = new WasmLinuxAdapter();
+      if (typeof window !== 'undefined') {
+        (window as any).weblinuxAdapter = WasmLinuxAdapter.instance;
+      }
     }
     return WasmLinuxAdapter.instance;
   }
@@ -48,14 +58,61 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     this.updateStatus({ state: 'initializing' });
     this.tabId = this.generateTabId();
 
-    // Check preflight compatibility
-    const hasWasm = typeof WebAssembly !== 'undefined';
-    const hasSAB = typeof SharedArrayBuffer !== 'undefined';
-    const isIsolated = typeof crossOriginIsolated !== 'undefined' ? crossOriginIsolated : false;
+    const diag = this.getDiagnostics();
+    this.log(`[Runtime Init] Preflight Diagnostics:`);
+    this.log(`  - WebAssembly: ${diag.hasWebAssembly ? 'OK' : 'MISSING'}`);
+    this.log(`  - SharedArrayBuffer: ${diag.hasSharedArrayBuffer ? 'OK' : 'MISSING (Security Isolation required)'}`);
+    this.log(`  - crossOriginIsolated: ${diag.crossOriginIsolated ? 'ACTIVE' : 'INACTIVE (COOP/COEP headers required)'}`);
+    this.log(`  - WebGL2 Graphics: ${diag.hasWebGL2 ? 'OK' : 'MISSING'}`);
+    this.log(`  - Origin Private File System: ${diag.hasOPFS ? 'OK' : 'MISSING'}`);
+    this.log(`  - Host CPU Cores: ${diag.hardwareConcurrency} | Host Memory: ~${diag.deviceMemoryGB} GB`);
 
-    this.log(`[Runtime Init] WebAssembly: ${hasWasm}, SharedArrayBuffer: ${hasSAB}, crossOriginIsolated: ${isIsolated}`);
+    if (!diag.hasWebAssembly) {
+      throw new Error('WebAssembly is not supported in this browser. Please use a modern desktop browser (Chrome, Edge, Brave).');
+    }
+
+    if (!diag.crossOriginIsolated || !diag.hasSharedArrayBuffer) {
+      this.log(`[Diagnostic Warning] Page context is not cross-origin isolated. WebLinux requires Cross-Origin-Opener-Policy: same-origin and Cross-Origin-Embedder-Policy: require-corp to enable multi-threaded kernel execution.`);
+    }
+
+    if (!diag.hasWebGL2) {
+      throw new Error('WebGL 2.0 is unavailable. A WebGL 2.0 compatible hardware accelerator is required to render Linux desktop surfaces.');
+    }
 
     this.updateStatus({ state: 'ready' });
+  }
+
+  public getDiagnostics(): RuntimeDiagnostics {
+    const isIsolated = typeof crossOriginIsolated !== 'undefined' ? crossOriginIsolated : false;
+    const hasSAB = typeof SharedArrayBuffer !== 'undefined';
+    const hasWasm = typeof WebAssembly !== 'undefined';
+    
+    let hasWebGL2 = false;
+    try {
+      const c = document.createElement('canvas');
+      hasWebGL2 = !!(window.WebGL2RenderingContext && c.getContext('webgl2'));
+    } catch {
+      hasWebGL2 = false;
+    }
+
+    let hasWebGPU = typeof navigator !== 'undefined' && !!(navigator as any).gpu;
+    const hasOPFS = typeof navigator !== 'undefined' && !!navigator.storage && typeof navigator.storage.getDirectory === 'function';
+    const concurrency = typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 4 : 4;
+    const devMem = typeof navigator !== 'undefined' ? (navigator as any).deviceMemory || 4 : 4;
+
+    return {
+      crossOriginIsolated: isIsolated,
+      hasSharedArrayBuffer: hasSAB,
+      hasWebAssembly: hasWasm,
+      hasWebGL2: hasWebGL2,
+      hasWebGPU: hasWebGPU,
+      hasOPFS: hasOPFS,
+      deviceMemoryGB: devMem,
+      hardwareConcurrency: concurrency,
+      activeWorkers: this.status.workerCount,
+      waylandActive: !!this.status.waylandActive,
+      lastError: this.status.error,
+    };
   }
 
   public async loadManifest(manifestIdOrUri: DistributionId | string): Promise<DistributionManifest> {
@@ -91,23 +148,18 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
     for (let i = 0; i < assets.length; i++) {
       const asset = assets[i];
-      this.log(`[Asset Pipeline] Verifying ${asset.name}...`);
+      this.log(`[Asset Pipeline] Loading ${asset.name}...`);
       
       const res = await fetch(asset.path);
       if (!res.ok) {
-        throw new Error(`Asset download failed: ${asset.name} (${res.status})`);
+        throw new Error(`Asset download failed: ${asset.name} (${res.status} ${res.statusText})`);
       }
 
-      // Check stream progress
-      const contentLength = Number(res.headers.get('content-length')) || asset.expectedSize;
       const reader = res.body?.getReader();
-      let assetLoaded = 0;
-
       if (reader) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          assetLoaded += value.byteLength;
           loadedBytes += value.byteLength;
           if (onProgress) {
             onProgress({
@@ -122,7 +174,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         }
       }
 
-      this.log(`[Asset Pipeline] ${asset.name} verified and cached.`);
+      this.log(`[Asset Pipeline] ${asset.name} verified.`);
     }
 
     this.updateStatus({ state: 'ready' });
@@ -134,12 +186,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       distribution: options.manifest.id,
       desktop: options.desktop,
       error: undefined,
+      waylandActive: false,
+      shellReady: false,
     });
 
-    this.log(`[Boot Sequence] Initializing WebLinux guest: ${options.manifest.name} [${options.desktop}]`);
+    this.bootOutput = '';
+    this.shellReadyPromise = new Promise<boolean>((resolve) => {
+      this.resolveShellReady = resolve;
+    });
+
+    this.log(`[Boot Sequence] Target: ${options.manifest.name} | Desktop Shell: ${options.desktop}`);
 
     try {
-      // 1. Calculate system memory
+      // 1. Calculate system memory & workers
       const deviceMemGB = (navigator as any).deviceMemory || 8;
       const concurrency = navigator.hardwareConcurrency || 4;
       const pool = options.cpuPool || Math.max(2, Math.min(8, Math.ceil(concurrency / 2)));
@@ -147,16 +206,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       this.updateStatus({
         allocatedMemoryMB: memoryMB,
-        workerCount: pool + 3, // CPUs + I/O + watchdog
+        workerCount: pool + 3,
       });
 
       this.log(`[Hardware] Memory allocated: ${memoryMB} MiB | CPU worker pool: ${pool} threads`);
 
       // 2. Build kernel commandline
       const epoch = Math.floor(Date.now() / 1000);
+      const isIceWM = options.desktop === 'icewm';
+
       let bootCmdline = `maxcpus=3 nohz_full=0,2-63 rcu_nocbs=0,2-63 root=/dev/ram0 rootfstype=ramfs init=/init console=hvc console=ttyS0 epoch=${epoch} rvtab=${this.tabId} term=120x30 wasm_pool=${pool} mem=${memoryMB}M wasm_cache_max=256`;
 
-      if (options.autostartDesktop) {
+      // Autostart setting: KDE Plasma autostarts directly; IceWM boots to shell then executes IceWM launcher
+      if (options.autostartDesktop && !isIceWM) {
         bootCmdline += ` autostart=1`;
       } else {
         bootCmdline += ` autostart=0`;
@@ -185,14 +247,14 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       // 5. Configure disk subsystem
       const diskConfig = [
         {
-          worker: `/runtime/disk-worker.js?v=${Date.now()}`,
-          url: options.manifest.imageSource.baseUri,
+          worker: `/disk-worker.js?v=${Date.now()}`,
+          url: options.manifest.imageSource.baseUri || '/disk/release/',
           name: options.manifest.id,
           reset: !!options.freshRootDisk,
         },
         {
-          worker: `/runtime/disk-worker.js?v=${Date.now()}`,
-          url: `https://disk.plasmaontheweb.com/disk/home/`,
+          worker: `/disk-worker.js?v=${Date.now()}`,
+          url: `/disk/home/`,
           keep: true,
           name: `home-${options.manifest.id}`,
           reset: !!options.freshHomeDisk,
@@ -201,27 +263,51 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       this.log(`[Storage] Configured primary ext4 partition and persistent home disk.`);
 
-      // 6. Ensure runtime scripts are dynamically linked in window context
-      await this.ensureRuntimeScripts();
-
-      // Set global tab id for wlserver and display
+      // 6. Set global tab ID and configure Wayland IPC channel
       (window as any).rvTabId = this.tabId;
       (window as any).rvChannel = (name: string) => new BroadcastChannel(`${name}-${this.tabId}`);
 
-      // 7. Instantiate linux-wasm runtime
+      if (this.displayChannel) {
+        this.displayChannel.close();
+      }
+      this.displayChannel = (window as any).rvChannel('rv-display');
+      if (this.displayChannel) {
+        this.displayChannel.onmessage = (event) => {
+          const m = event.data;
+          if (m && m.type === 'table') {
+            this.log(`[Wayland Compositor] Window server active at 0x${m.address.toString(16)} (PID ${m.pid}) [${m.width}x${m.height}]`);
+            this.updateStatus({ waylandActive: true, state: 'running' });
+          }
+        };
+      }
+
+      // 7. Ensure runtime scripts are dynamically linked in window context
+      await this.ensureRuntimeScripts();
+
+      // 8. Console and log callbacks
       const consoleWrite = (data: string) => {
         this.bootOutput += data;
         this.log(data);
+
+        // Check for shell prompt
+        if (data.includes('# ') || this.bootOutput.endsWith('# ')) {
+          if (this.resolveShellReady) {
+            this.resolveShellReady(true);
+            this.resolveShellReady = null;
+          }
+          this.updateStatus({ shellReady: true });
+        }
       };
 
       const logFn = (msg: string) => {
         this.log(`[Kernel] ${msg}`);
       };
 
+      // 9. Instantiate linux-wasm runtime
       if (typeof (window as any).linux === 'function') {
         this.log(`[Runtime] Launching kernel workers...`);
         this.activeOs = await (window as any).linux(
-          `/runtime/linux-worker.js?v=${Date.now()}`,
+          `/linux-worker.js?v=${Date.now()}`,
           'wasm64_nommu',
           vmlinuxModule,
           bootCmdline,
@@ -235,8 +321,27 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         );
 
         (window as any).linuxOs = this.activeOs;
+
+        // If IceWM was selected, wait for shell prompt and launch IceWM desktop
+        if (isIceWM && options.autostartDesktop) {
+          this.log(`[Desktop Launcher] Waiting for shell prompt to launch IceWM session...`);
+          // Wait up to 15 seconds for shell
+          const shellAppeared = await Promise.race([
+            this.shellReadyPromise,
+            new Promise<boolean>(r => setTimeout(() => r(false), 15000))
+          ]);
+
+          if (shellAppeared) {
+            this.log(`[Desktop Launcher] Executing IceWM session start...`);
+            this.sendInput('desktop wayland-x icewm\r');
+          } else {
+            this.log(`[Desktop Launcher] Shell prompt timed out; falling back to direct input.`);
+            this.sendInput('desktop wayland-x icewm\r');
+          }
+        }
+
       } else {
-        this.log(`[Simulation/Headless Mode] Linux kernel framework validated. Executing containerized session.`);
+        throw new Error('linux() runtime constructor is not loaded.');
       }
 
       this.startTime = Date.now();
@@ -251,7 +356,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         networkConnected: options.enableNetworking,
       });
 
-      this.log(`[System Online] WebLinux desktop is now active and ready.`);
+      this.log(`[System Online] WebLinux session is now active.`);
 
     } catch (err: any) {
       console.error('[Boot Error]', err);
@@ -264,9 +369,55 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     }
   }
 
+  public async runCommand(command: string, timeoutMs: number = 30000): Promise<CommandResult> {
+    if (!this.activeOs || !this.activeOs.key_input) {
+      throw new Error('Linux runtime is not active. Cannot execute guest command.');
+    }
+
+    const marker = '__rc' + Math.random().toString(36).slice(2) + '_';
+    const startOffset = this.bootOutput.length;
+    const pattern = new RegExp(marker + '(\\d+)');
+    const began = performance.now();
+
+    this.sendInput(command + '; echo ' + marker + '$?\r');
+
+    return new Promise<CommandResult>((resolve) => {
+      const timer = setInterval(() => {
+        const text = this.bootOutput.slice(startOffset);
+        const match = text.match(pattern);
+        const elapsed = performance.now() - began;
+
+        if (!match && elapsed < timeoutMs) {
+          return;
+        }
+
+        clearInterval(timer);
+
+        // Extract command output minus the echoed command
+        let out = match ? text.slice(0, match.index) : text;
+        const newlineIdx = out.indexOf('\n');
+        if (newlineIdx !== -1) {
+          out = out.slice(newlineIdx + 1);
+        }
+        out = out.replace(/\r/g, '').trim();
+
+        const rc = match ? Number(match[1]) : null;
+        const ms = Math.round(elapsed);
+        resolve({
+          rc,
+          ms,
+          out,
+          exitCode: rc,
+          stdout: out,
+          executionTimeMs: ms,
+        });
+      }, 25);
+    });
+  }
+
   public async shutdown(): Promise<void> {
     this.updateStatus({ state: 'shutting_down' });
-    this.log(`[Shutdown] Sending SIGTERM to guest processes and syncing disks...`);
+    this.log(`[Shutdown] Sending sync and poweroff to guest...`);
 
     if (this.uptimeTimer) {
       clearInterval(this.uptimeTimer);
@@ -275,10 +426,15 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
     try {
       if (this.activeOs && this.activeOs.key_input) {
-        this.activeOs.key_input('poweroff\r');
+        this.activeOs.key_input('sync; poweroff\r');
       }
-    } catch (e) {
+    } catch {
       // Ignore
+    }
+
+    if (this.displayChannel) {
+      this.displayChannel.close();
+      this.displayChannel = null;
     }
 
     await new Promise(r => setTimeout(r, 1200));
@@ -288,6 +444,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       state: 'stopped',
       uptimeSeconds: 0,
       networkConnected: false,
+      waylandActive: false,
+      shellReady: false,
     });
     this.log(`[Shutdown Complete] Machine halted.`);
   }
@@ -304,6 +462,14 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
   public getStatus(): RuntimeStatus {
     return { ...this.status };
+  }
+
+  public getOutput(): string {
+    return this.bootOutput;
+  }
+
+  public isWaylandActive(): boolean {
+    return !!this.status.waylandActive;
   }
 
   public sendInput(input: string): void {
@@ -374,21 +540,25 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
   private async ensureRuntimeScripts(): Promise<void> {
     const scripts = [
-      '/runtime/linux.js',
-      '/runtime/display.js',
-      '/runtime/audio.js',
-      '/runtime/jitcache.js',
+      '/display.js',
+      '/linux.js',
+      '/jitcache.js',
+      '/gpu-exec.js',
+      '/vdec.js',
+      '/hostopen.js',
+      '/audio.js',
+      '/background.js',
     ];
 
     for (const src of scripts) {
       if (!document.querySelector(`script[src="${src}"]`)) {
-        await new Promise<void>((resolve, reject) => {
+        await new Promise<void>((resolve) => {
           const s = document.createElement('script');
           s.src = src;
           s.onload = () => resolve();
           s.onerror = (e) => {
             console.warn(`Could not load script ${src}:`, e);
-            resolve(); // Don't crash if already bundled
+            resolve();
           };
           document.head.appendChild(s);
         });

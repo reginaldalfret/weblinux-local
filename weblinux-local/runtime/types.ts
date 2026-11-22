@@ -7,7 +7,7 @@ export type DistributionId = 'debian' | 'ubuntu' | 'fedora' | 'arch' | 'kali-lab
 
 export type DesktopEnvironmentId = 'kde-plasma' | 'icewm' | 'xfce' | 'gnome';
 
-export type ValidationStatus = 'validated' | 'experimental' | 'planned' | 'testing';
+export type ValidationStatus = 'validated' | 'preview' | 'experimental' | 'planned' | 'testing';
 
 export interface RuntimeRequirements {
   minMemoryMB: number;
@@ -88,7 +88,32 @@ export interface RuntimeStatus {
   workerCount: number;
   storageUsageBytes: number;
   networkConnected: boolean;
+  waylandActive?: boolean;
+  shellReady?: boolean;
   error?: string;
+}
+
+export interface CommandResult {
+  rc: number | null;
+  ms: number;
+  out: string;
+  exitCode?: number | null;
+  stdout?: string;
+  executionTimeMs?: number;
+}
+
+export interface RuntimeDiagnostics {
+  crossOriginIsolated: boolean;
+  hasSharedArrayBuffer: boolean;
+  hasWebAssembly: boolean;
+  hasWebGL2: boolean;
+  hasWebGPU: boolean;
+  hasOPFS: boolean;
+  deviceMemoryGB: number;
+  hardwareConcurrency: number;
+  activeWorkers: number;
+  waylandActive: boolean;
+  lastError?: string;
 }
 
 export interface DownloadProgress {
@@ -129,7 +154,11 @@ export interface IRuntimeAdapter {
   pause(): Promise<void>;
   resume(): Promise<void>;
   getStatus(): RuntimeStatus;
+  getDiagnostics(): RuntimeDiagnostics;
   sendInput(input: string): void;
+  runCommand(command: string, timeoutMs?: number): Promise<CommandResult>;
+  getOutput(): string;
+  isWaylandActive(): boolean;
   importFiles(files: FileList | File[], targetDir: string): Promise<ImportResult>;
   exportFiles(path?: string): Promise<Blob>;
   getStorageUsage(): Promise<StorageUsageInfo>;

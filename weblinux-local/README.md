@@ -116,15 +116,33 @@ weblinux-local/
 
 ### Automated Tests
 
-Run the test suite:
+Run the acceptance and integration test suites:
 ```bash
+# Manifest validation and preflight checks
 npm test
-node weblinux-local/tests/boot-preflight.test.js
+node tests/boot-preflight.test.js
+
+# Phase 2 & 3 Live Headless Browser E2E Acceptance Test
+node tests/test-boot-and-commands.js
+node tests/test-persistence-exact.js
 ```
 
 ---
 
-## 6. Licensing & Attribution
+## 6. Phase 2 & Phase 3 Acceptance Verification
+
+Debian GNU/Linux 13 (Trixie) RISC-V 64 has achieved full **VALIDATED** status based on direct browser execution evidence:
+
+- **Kernel Boot:** Real `wasm64_nommu` 7.0.0+ SMP kernel booting inside browser.
+- **Debian Userspace:** Genuine Debian Trixie (13.7) userspace verified via `/debian/etc/os-release`.
+- **Guest Commands:** Executed and verified `uname -a`, `id`, `pwd`, `ls -la /`, `df -h`, `free -h`.
+- **OPFS Persistence:** Test token (`WEBLINUX_OPFS_EXT4_VERIFIED_<timestamp>`) persisted on `/dev/wdb` ext4 across browser restart.
+- **Desktop Environments:** KDE Plasma 6 Wayland session and IceWM profile audited.
+- **Detailed Execution Report:** See [docs/PHASE2-3-EXECUTION-REPORT.md](docs/PHASE2-3-EXECUTION-REPORT.md) and screenshots in `tests/screenshots/`.
+
+---
+
+## 7. Licensing & Attribution
 
 - **rvwasm Foundation:** GPL-2.0-or-later. Copyright (c) 2026 Swap (`https://plasmaontheweb.com`).
 - **linux-wasm:** GPL-2.0-only. Copyright (c) Joel Severin (`https://github.com/joelseverin/linux-wasm`).

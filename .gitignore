@@ -4,3 +4,6 @@ dist/
 *.log
 .vscode/
 .idea/
+.disk-cache/
+.test-user-data/
+*.cache/

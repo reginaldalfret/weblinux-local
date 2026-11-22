@@ -10,5 +10,8 @@
     "build": "npm --prefix weblinux-local/apps/web run build",
     "preview": "npm --prefix weblinux-local/apps/web run preview",
     "test": "node weblinux-local/tests/manifest-validation.test.js"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.18.1"
   }
 }

@@ -1,6 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import fs from 'fs';
+import path from 'path';
+
+const DISK_CACHE_DIR = path.resolve(__dirname, '.disk-cache');
+if (!fs.existsSync(DISK_CACHE_DIR)) {
+  fs.mkdirSync(DISK_CACHE_DIR, { recursive: true });
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,41 +17,171 @@ export default defineConfig({
     {
       name: 'configure-coop-coep-and-disk-proxy',
       configureServer(server) {
-        server.middlewares.use((req, res, next) => {
+        server.middlewares.use(async (req, res, next) => {
           // Mandatory headers for SharedArrayBuffer & WebAssembly NOMMU multithreading
           res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
           res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
 
-          // Proxy remote disk chunks when requested locally
-          if (req.url && req.url.startsWith('/disk-proxy/')) {
-            const remoteChunk = req.url.replace('/disk-proxy/', '');
-            const targetUrl = `https://disk.plasmaontheweb.com/disk/${remoteChunk}`;
-            
-            fetch(targetUrl)
-              .then(remoteRes => {
-                res.statusCode = remoteRes.status;
-                remoteRes.headers.forEach((val, key) => {
-                  if (key.toLowerCase() !== 'content-encoding') {
-                    res.setHeader(key, val);
-                  }
-                });
-                // Ensure CORS and CORP headers are present
-                res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                
-                return remoteRes.arrayBuffer();
-              })
-              .then(buf => {
-                res.end(Buffer.from(buf));
-              })
-              .catch(err => {
-                console.error('[Disk Proxy Error]:', err);
+          const rawUrl = req.url ? req.url.split('?')[0] : '';
+
+          // 1. Intercept /disk/... requests (manifests and ext4 chunks)
+          if (rawUrl.startsWith('/disk/')) {
+            const diskSubpath = rawUrl.replace(/^\/disk\//, '');
+            const targetUrl = `https://plasmaontheweb.com/disk/${diskSubpath}`;
+            const localCacheFile = path.join(DISK_CACHE_DIR, diskSubpath.replace(/\//g, '_'));
+
+            res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+
+            // Handle manifest.json
+            if (diskSubpath.endsWith('manifest.json')) {
+              try {
+                const remoteRes = await fetch(targetUrl, { cache: 'no-store' });
+                if (!remoteRes.ok) {
+                  res.statusCode = remoteRes.status;
+                  res.end(`Remote manifest returned status ${remoteRes.status}`);
+                  return;
+                }
+                const manifest = await remoteRes.json();
+                // Strip remote base so disk-worker.js uses same-origin chunk fetching directly
+                delete manifest.base;
+                const body = Buffer.from(JSON.stringify(manifest));
+                res.setHeader('Content-Type', 'application/json');
+                res.setHeader('Content-Length', body.length);
+                res.statusCode = 200;
+                res.end(body);
+                return;
+              } catch (err: any) {
+                console.error('[Manifest Proxy Error]:', err);
                 res.statusCode = 502;
-                res.end('Disk proxy failed: ' + err.message);
-              });
-            return;
+                res.end(`Manifest fetch failed: ${err.message}`);
+                return;
+              }
+            }
+
+            // Handle binary chunk files (e.g. 000000, 000001, etc.)
+            if (fs.existsSync(localCacheFile)) {
+              try {
+                const cachedBuf = fs.readFileSync(localCacheFile);
+                res.setHeader('Content-Type', 'application/octet-stream');
+                res.setHeader('Content-Length', cachedBuf.length);
+                res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+                res.statusCode = 200;
+                res.end(cachedBuf);
+                return;
+              } catch (readErr) {
+                // fallback to fetch if file read fails
+              }
+            }
+
+            // Fetch chunk from upstream and cache locally
+            try {
+              const remoteRes = await fetch(targetUrl);
+              if (!remoteRes.ok) {
+                res.statusCode = remoteRes.status;
+                res.end(`Remote chunk returned ${remoteRes.status}`);
+                return;
+              }
+              const arrayBuf = await remoteRes.arrayBuffer();
+              const chunkBuf = Buffer.from(arrayBuf);
+              
+              // Cache to disk asynchronously
+              try {
+                fs.writeFileSync(localCacheFile, chunkBuf);
+              } catch (writeErr) {
+                console.warn('[Disk Cache Write Failed]:', writeErr);
+              }
+
+              res.setHeader('Content-Type', 'application/octet-stream');
+              res.setHeader('Content-Length', chunkBuf.length);
+              res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+              res.statusCode = 200;
+              res.end(chunkBuf);
+              return;
+            } catch (err: any) {
+              console.error('[Chunk Proxy Error]:', err);
+              res.statusCode = 502;
+              res.end(`Chunk fetch failed: ${err.message}`);
+              return;
+            }
           }
 
+          next();
+        });
+      },
+      configurePreviewServer(server) {
+        server.middlewares.use(async (req, res, next) => {
+          res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+          res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+
+          const rawUrl = req.url ? req.url.split('?')[0] : '';
+          if (rawUrl.startsWith('/disk/')) {
+            const diskSubpath = rawUrl.replace(/^\/disk\//, '');
+            const targetUrl = `https://plasmaontheweb.com/disk/${diskSubpath}`;
+            const localCacheFile = path.join(DISK_CACHE_DIR, diskSubpath.replace(/\//g, '_'));
+
+            res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+
+            if (diskSubpath.endsWith('manifest.json')) {
+              try {
+                const remoteRes = await fetch(targetUrl, { cache: 'no-store' });
+                if (!remoteRes.ok) {
+                  res.statusCode = remoteRes.status;
+                  res.end(`Remote manifest returned status ${remoteRes.status}`);
+                  return;
+                }
+                const manifest = await remoteRes.json();
+                delete manifest.base;
+                const body = Buffer.from(JSON.stringify(manifest));
+                res.setHeader('Content-Type', 'application/json');
+                res.setHeader('Content-Length', body.length);
+                res.statusCode = 200;
+                res.end(body);
+                return;
+              } catch (err: any) {
+                res.statusCode = 502;
+                res.end(`Manifest fetch failed: ${err.message}`);
+                return;
+              }
+            }
+
+            if (fs.existsSync(localCacheFile)) {
+              try {
+                const cachedBuf = fs.readFileSync(localCacheFile);
+                res.setHeader('Content-Type', 'application/octet-stream');
+                res.setHeader('Content-Length', cachedBuf.length);
+                res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+                res.statusCode = 200;
+                res.end(cachedBuf);
+                return;
+              } catch (readErr) {}
+            }
+
+            try {
+              const remoteRes = await fetch(targetUrl);
+              if (!remoteRes.ok) {
+                res.statusCode = remoteRes.status;
+                res.end(`Chunk fetch status ${remoteRes.status}`);
+                return;
+              }
+              const chunkBuf = Buffer.from(await remoteRes.arrayBuffer());
+              try {
+                fs.writeFileSync(localCacheFile, chunkBuf);
+              } catch (writeErr) {}
+
+              res.setHeader('Content-Type', 'application/octet-stream');
+              res.setHeader('Content-Length', chunkBuf.length);
+              res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+              res.statusCode = 200;
+              res.end(chunkBuf);
+              return;
+            } catch (err: any) {
+              res.statusCode = 502;
+              res.end(`Chunk fetch failed: ${err.message}`);
+              return;
+            }
+          }
           next();
         });
       }
@@ -52,6 +189,15 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
+    host: '0.0.0.0',
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    }
+  },
+  preview: {
+    port: 3000,
+    host: '0.0.0.0',
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',

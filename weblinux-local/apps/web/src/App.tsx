@@ -72,6 +72,9 @@ export const App: React.FC = () => {
       setCurrentPage('boot');
       setLogs([]);
 
+      // Allow microtask/render cycle so #screen and #display are in DOM
+      await new Promise(r => setTimeout(r, 60));
+
       // 1. Initialize runtime
       await adapter.initialize();
 
@@ -188,24 +191,28 @@ export const App: React.FC = () => {
           />
         )}
 
-        {currentPage === 'boot' && (
-          <BootScreen
-            manifest={currentManifest}
-            desktop={selectedDesktop}
-            runtimeStatus={runtimeStatus}
-            logs={logs}
-            onCancel={handleShutdown}
-          />
-        )}
-
-        {currentPage === 'desktop' && (
-          <Desktop
-            manifest={currentManifest}
-            desktop={selectedDesktop}
-            runtimeStatus={runtimeStatus}
-            onShutdown={handleShutdown}
-            logs={logs}
-          />
+        {/* Persistent Desktop / Boot Viewport */}
+        {(currentPage === 'boot' || currentPage === 'desktop') && (
+          <div className="relative flex-1 flex flex-col">
+            {currentPage === 'boot' && (
+              <div className="absolute inset-0 z-50 bg-[#090a0f] overflow-y-auto">
+                <BootScreen
+                  manifest={currentManifest}
+                  desktop={selectedDesktop}
+                  runtimeStatus={runtimeStatus}
+                  logs={logs}
+                  onCancel={handleShutdown}
+                />
+              </div>
+            )}
+            <Desktop
+              manifest={currentManifest}
+              desktop={selectedDesktop}
+              runtimeStatus={runtimeStatus}
+              onShutdown={handleShutdown}
+              logs={logs}
+            />
+          </div>
         )}
 
         {currentPage === 'storage' && <StorageManagement />}
