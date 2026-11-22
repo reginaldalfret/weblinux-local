@@ -1286,7 +1286,13 @@
       if (m.exec === "vrend") {
         // vrend.js next to this file (gpu/vrend/build.sh's output), started on this context.
         const base = m.base;
-        importScripts(base + "vrend/vrend.js");
+        try {
+          importScripts(base + "vrend/vrend.js");
+        } catch (e) {
+          self.postMessage({ type: "ready", renderer: renderer(gl), exec: "vrend",
+                             errors: ["vrend.js failed to load: " + (e && e.message || e)] });
+          return;
+        }
         // (vrend's messages go to the page, whose console the drivers see; the first 200 of them)
         let said = 0;
         const say = (t) => {

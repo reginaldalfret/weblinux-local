@@ -13,5 +13,8 @@
   },
   "devDependencies": {
     "puppeteer-core": "^25.18.1"
+  },
+  "dependencies": {
+    "playwright": "^1.65.1"
   }
 }

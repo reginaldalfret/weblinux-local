@@ -1740,7 +1740,9 @@
 
   self.onmessage = (message_event) => {
     const data = message_event.data;
-    message_callbacks[data.method](data);
+    if (data && data.method && typeof message_callbacks[data.method] === "function") {
+      message_callbacks[data.method](data);
+    }
   };
 
   self.onmessageerror = (error) => {

@@ -139,7 +139,7 @@ export const Desktop: React.FC<DesktopProps> = ({
     <div
       ref={containerRef}
       className={`relative flex flex-col bg-[#050608] text-slate-100 ${
-        isFullscreen ? 'h-screen w-screen' : 'min-h-[calc(100vh-70px)]'
+        isFullscreen ? 'h-screen w-screen' : 'h-screen w-full'
       }`}
     >
       {/* Top OS Control Bar */}
