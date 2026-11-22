@@ -58,7 +58,15 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
   public async initialize(): Promise<void> {
     this.updateStatus({ state: 'initializing' });
-    this.tabId = this.generateTabId();
+    if (typeof window !== 'undefined' && (window as any).rvTabId) {
+      this.tabId = (window as any).rvTabId;
+    } else {
+      this.tabId = this.generateTabId();
+      if (typeof window !== 'undefined') {
+        (window as any).rvTabId = this.tabId;
+        (window as any).rvChannel = (name: string) => new BroadcastChannel(`${name}-${this.tabId}`);
+      }
+    }
 
     const diag = this.getDiagnostics();
     this.log(`[Runtime Init] Preflight Diagnostics:`);

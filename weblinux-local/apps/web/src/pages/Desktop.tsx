@@ -44,6 +44,19 @@ export const Desktop: React.FC<DesktopProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const adapter = WasmLinuxAdapter.getInstance();
 
+  // Ensure Wayland rv-stage and display canvas correctly wrap #screen canvas
+  useEffect(() => {
+    const sc = screenCanvasRef.current;
+    const stage = document.getElementById('rv-stage');
+    const bar = document.getElementById('rv-bar');
+    if (sc && stage && sc.parentNode && sc.parentNode !== stage) {
+      const parent = sc.parentNode;
+      if (bar && bar.parentNode !== parent) parent.insertBefore(bar, sc);
+      parent.insertBefore(stage, sc);
+      stage.appendChild(sc);
+    }
+  }, []);
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       containerRef.current?.requestFullscreen().catch(err => {
