@@ -16,6 +16,7 @@ import {
   ChevronDown,
   RefreshCw,
   Send,
+  Loader2,
 } from 'lucide-react';
 import { DistributionManifest, DesktopEnvironmentId, RuntimeStatus } from '../../../../runtime/types';
 import { WasmLinuxAdapter } from '../../../../runtime/adapters/WasmLinuxAdapter';
@@ -246,6 +247,26 @@ export const Desktop: React.FC<DesktopProps> = ({
             <span>Click inside canvas for pointer capture • Press Esc to release</span>
           </div>
         </div>
+
+        {/* Initializing / Loading Overlay over canvas while Wayland or Plasma is spinning up */}
+        {!runtimeStatus.waylandActive && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#07090e]/95 backdrop-blur-sm select-none">
+            <div className="p-8 rounded-2xl bg-[#0f131d] border border-purple-500/30 shadow-2xl flex flex-col items-center max-w-md text-center">
+              <Loader2 className="w-10 h-10 text-purple-400 animate-spin mb-4" />
+              <h3 className="text-base font-bold text-white mb-1">
+                Starting {manifest.name} ({desktop})
+              </h3>
+              <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+                Launching genuine 64-bit Linux kernel, mounting OPFS ext4 rootfs, and initializing Wayland compositor...
+              </p>
+              <div className="flex items-center gap-4 text-xs font-mono text-purple-300 bg-purple-500/10 px-3 py-1.5 rounded-lg border border-purple-500/20">
+                <span>Uptime: {runtimeStatus.uptimeSeconds}s</span>
+                <span>•</span>
+                <span>RAM: {runtimeStatus.allocatedMemoryMB} MiB</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Interactive Bottom Terminal Drawer */}

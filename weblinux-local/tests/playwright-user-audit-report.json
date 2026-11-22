@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-11-22T23:24:09.838Z",
+  "playwrightVersion": "1.65.1",
+  "browser": "Microsoft Edge (msedge)",
+  "systemChecks": {
+    "headers": {
+      "statusCode": 200,
+      "coop": "same-origin",
+      "coep": "require-corp",
+      "valid": true
+    },
+    "pageTitle": "WebLinux Local — Your Linux. Your Browser. No Installation.",
+    "bootScreenVisible": true,
+    "waylandActive": true,
+    "splashPresented": true
+  },
+  "guestTelemetry": {
+    "kernel": "Linux rv 6.6.0 #1 SMP rv riscv64 GNU/Linux",
+    "uptime": "23:24:46 up 0 min,  0 users,  load average: 1.33, 0.32, 0.11",
+    "memory": "total        used        free      shared  buff/cache   available\nMem:            4026         827        2990           0         386        3199\nSwap:              0           0           0",
+    "processes": "root       119  2.3  0.0      0     0 ?        S    23:24   0:00 /bin/sh /usr/local/bin/desktop wayland plasma-native\nroot       165  9.4  0.0      0     0 ?        S<l  23:24   0:02 /usr/bin/pulseaudio --daemonize=yes --exit-idle-time=-1 --log-target=file:/root/sound.log -L module-alsa-card device_id=0 name=wasm card_name=wasm\nmessage+   174  0.2  0.0      0     0 ?        Ss   23:24   0:00 /usr/bin/dbus-daemon --system --fork\nroot       178  9.5  0.0      0     0 ?        Ss   23:24   0:01 /usr/bin/dbus-daemon --session --fork --address=unix:path=/tmp/runtime-root/bus --print-pid=3\nroot       182 14.2  0.0      0     0 ?        S    23:24   0:02 wlserver\nroot       224  102  0.0      0     0 ?        Sl   23:24   0:12 /opt/nq/plasmashell --no-respawn\nroot       231  6.2  0.0      0     0 ?        S    23:24   0:00 /usr/bin/dbus-daemon --session --fork --address=unix:path=/tmp/runtime-root/bus --print-pid=3\nroot       244 35.7  0.0      0     0 ?        S+   23:24   0:00 grep -E desktop|wlserver|plasma|dbus|pulseaudio"
+  },
+  "screenshots": {
+    "landingPage": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-user-check\\01-landing-page.png",
+    "bootScreen": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-user-check\\02-boot-screen-live.png",
+    "splashScreen": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-user-check\\03-plasma-splash.png",
+    "finalDesktop": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-user-check\\04-live-debian-kde-desktop.png"
+  },
+  "summary": "ALL_CHECKS_PASSED"
+}

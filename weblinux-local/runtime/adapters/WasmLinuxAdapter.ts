@@ -430,10 +430,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         });
       }, 1000);
 
+      // Keep state as 'booting' until Wayland window table is registered
       this.updateStatus({
-        state: 'running',
+        state: 'booting',
         networkConnected: options.enableNetworking,
       });
+
+      // Safety fallback: if Wayland table is not detected within 25 seconds, transition to running
+      setTimeout(() => {
+        if (this.status.state === 'booting') {
+          this.log(`[Runtime] Boot sequence settling into active state.`);
+          this.updateStatus({ state: 'running' });
+        }
+      }, 25000);
 
       this.log(`[System Online] WebLinux session is now active.`);
 
