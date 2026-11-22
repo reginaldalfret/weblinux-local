@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-22T23:24:09.838Z",
+  "timestamp": "2026-11-22T23:32:31.648Z",
   "playwrightVersion": "1.65.1",
   "browser": "Microsoft Edge (msedge)",
   "systemChecks": {
@@ -16,9 +16,9 @@
   },
   "guestTelemetry": {
     "kernel": "Linux rv 6.6.0 #1 SMP rv riscv64 GNU/Linux",
-    "uptime": "23:24:46 up 0 min,  0 users,  load average: 1.33, 0.32, 0.11",
-    "memory": "total        used        free      shared  buff/cache   available\nMem:            4026         827        2990           0         386        3199\nSwap:              0           0           0",
-    "processes": "root       119  2.3  0.0      0     0 ?        S    23:24   0:00 /bin/sh /usr/local/bin/desktop wayland plasma-native\nroot       165  9.4  0.0      0     0 ?        S<l  23:24   0:02 /usr/bin/pulseaudio --daemonize=yes --exit-idle-time=-1 --log-target=file:/root/sound.log -L module-alsa-card device_id=0 name=wasm card_name=wasm\nmessage+   174  0.2  0.0      0     0 ?        Ss   23:24   0:00 /usr/bin/dbus-daemon --system --fork\nroot       178  9.5  0.0      0     0 ?        Ss   23:24   0:01 /usr/bin/dbus-daemon --session --fork --address=unix:path=/tmp/runtime-root/bus --print-pid=3\nroot       182 14.2  0.0      0     0 ?        S    23:24   0:02 wlserver\nroot       224  102  0.0      0     0 ?        Sl   23:24   0:12 /opt/nq/plasmashell --no-respawn\nroot       231  6.2  0.0      0     0 ?        S    23:24   0:00 /usr/bin/dbus-daemon --session --fork --address=unix:path=/tmp/runtime-root/bus --print-pid=3\nroot       244 35.7  0.0      0     0 ?        S+   23:24   0:00 grep -E desktop|wlserver|plasma|dbus|pulseaudio"
+    "uptime": "23:33:16 up 0 min,  0 users,  load average: 1.48, 0.38, 0.13",
+    "memory": "total        used        free      shared  buff/cache   available\nMem:            2009         375        1434           0         338        1633\nSwap:              0           0           0",
+    "processes": "root       119  3.0  0.0      0     0 ?        S    23:32   0:01 /bin/sh /usr/local/bin/desktop wayland plasma-native\nroot       154 14.3  0.0      0     0 ?        S<l  23:32   0:04 /usr/bin/pulseaudio --daemonize=yes --exit-idle-time=-1 --log-target=file:/root/sound.log -L module-alsa-card device_id=0 name=wasm card_name=wasm\nmessage+   160  0.3  0.0      0     0 ?        Ss   23:32   0:00 /usr/bin/dbus-daemon --system --fork\nroot       164  2.5  0.0      0     0 ?        Ss   23:32   0:00 /usr/bin/dbus-daemon --session --fork --address=unix:path=/tmp/runtime-root/bus --print-pid=3\nroot       168 15.3  0.0      0     0 ?        S    23:32   0:02 wlserver\nroot       210  110  0.0      0     0 ?        Rl   23:33   0:11 /opt/nq/plasmashell --no-respawn\nroot       225 50.0  0.0      0     0 ?        S+   23:33   0:00 grep -E desktop|wlserver|plasma|dbus|pulseaudio"
   },
   "screenshots": {
     "landingPage": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-user-check\\01-landing-page.png",

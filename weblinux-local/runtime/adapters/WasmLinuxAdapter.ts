@@ -276,8 +276,11 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       // 1. Calculate system memory & workers
       const deviceMemGB = (navigator as any).deviceMemory || 8;
       const concurrency = navigator.hardwareConcurrency || 4;
-      const pool = options.cpuPool || Math.max(2, Math.min(8, Math.ceil(concurrency / 2)));
-      const memoryMB = options.memoryMB || (deviceMemGB >= 16 ? 8192 : deviceMemGB >= 8 ? 4096 : 3072);
+      // Clamp worker pool to max 4 to prevent thread pool exhaustion and high CPU load
+      const pool = options.cpuPool || Math.max(2, Math.min(4, Math.ceil(concurrency / 2)));
+      // Allocate 2048 MiB default (Debian Trixie + KDE Plasma uses ~827 MiB, giving >1.2 GB headroom
+      // while preventing renderer memory exhaustion / STATUS_ACCESS_VIOLATION in multi-tab browser sessions).
+      const memoryMB = options.memoryMB || (deviceMemGB >= 16 ? 3072 : 2048);
 
       this.updateStatus({
         allocatedMemoryMB: memoryMB,
