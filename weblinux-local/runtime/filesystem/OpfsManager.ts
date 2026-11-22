@@ -140,106 +140,217 @@ export class OpfsManager {
     }
   }
 
-  public async exportHomeArchive(): Promise<Blob> {
-    const backupMetadata = {
-      version: '1.0',
-      exportedAt: new Date().toISOString(),
-      source: 'WebLinux Local OPFS Subsystem',
-      files: [] as { name: string; size: number }[],
-    };
-
-    const filesContent: Record<string, Uint8Array> = {};
-
-    if (this.isSupported()) {
-      try {
-        const root = await navigator.storage.getDirectory();
-        let homeHandle: FileSystemDirectoryHandle | null = null;
-        try {
-          homeHandle = await root.getDirectoryHandle('disk-home');
-        } catch {
-          // May be named disk-home-home or similar
-        }
-
-        if (homeHandle) {
-          // @ts-ignore
-          for await (const [name, handle] of homeHandle.entries()) {
-            if (handle.kind === 'file') {
-              const file = await handle.getFile();
-              const buffer = new Uint8Array(await file.arrayBuffer());
-              backupMetadata.files.push({ name, size: file.size });
-              filesContent[name] = buffer;
-            }
-          }
-        }
-      } catch (err) {
-        console.warn('[OPFS Export] Error reading files:', err);
-      }
+  public async exportHomeArchive(distroId: string = 'debian'): Promise<Blob> {
+    if (!this.isSupported()) {
+      throw new Error('OPFS is not supported in this browser environment');
     }
 
-    // Wrap metadata and files into a custom portable bundle
-    const payload = JSON.stringify({
-      metadata: backupMetadata,
-      filesBase64: Object.fromEntries(
-        Object.entries(filesContent).map(([k, v]) => [
-          k,
-          btoa(Array.from(v, b => String.fromCharCode(b)).join('')),
-        ])
-      ),
-    });
+    const root = await navigator.storage.getDirectory();
+    const diskDirName = `disk-home-${distroId}`;
+    let homeDirHandle: FileSystemDirectoryHandle;
+    try {
+      homeDirHandle = await root.getDirectoryHandle(diskDirName);
+    } catch {
+      throw new Error(`Persistent home disk directory "${diskDirName}" does not exist in OPFS. No user data to export.`);
+    }
 
-    return new Blob([payload], { type: 'application/json' });
+    const filesToExport = ['map', 'data'];
+    const filesMetadata: { name: string; size: number; sha256: string; compressedSize: number }[] = [];
+    const payloadCompressedB64: Record<string, string> = {};
+
+    for (const filename of filesToExport) {
+      let fileHandle: FileSystemFileHandle;
+      try {
+        fileHandle = await homeDirHandle.getFileHandle(filename);
+      } catch {
+        throw new Error(`Missing expected disk component "${filename}" in ${diskDirName}.`);
+      }
+
+      const file = await fileHandle.getFile();
+      const rawBuffer = await file.arrayBuffer();
+
+      // Calculate genuine SHA-256 on uncompressed disk component
+      const hashBuffer = await crypto.subtle.digest('SHA-256', rawBuffer);
+      const sha256 = Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+
+      // Compress with gzip stream
+      let compressedBuffer: ArrayBuffer;
+      if (typeof CompressionStream !== 'undefined') {
+        const stream = new Blob([rawBuffer]).stream().pipeThrough(new CompressionStream('gzip'));
+        compressedBuffer = await new Response(stream).arrayBuffer();
+      } else {
+        compressedBuffer = rawBuffer;
+      }
+
+      // Convert compressed buffer to base64 using chunking for performance
+      let binary = '';
+      const bytes = new Uint8Array(compressedBuffer);
+      const chunkSize = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize) as any);
+      }
+      const b64 = btoa(binary);
+
+      filesMetadata.push({
+        name: filename,
+        size: rawBuffer.byteLength,
+        sha256,
+        compressedSize: compressedBuffer.byteLength,
+      });
+
+      payloadCompressedB64[filename] = b64;
+    }
+
+    const backupArchive = {
+      format: 'weblinux-backup',
+      version: '2.0',
+      distribution: distroId,
+      targetDisk: diskDirName,
+      timestamp: new Date().toISOString(),
+      manifest: {
+        totalFiles: filesMetadata.length,
+        uncompressedTotalBytes: filesMetadata.reduce((acc, f) => acc + f.size, 0),
+        compressedTotalBytes: filesMetadata.reduce((acc, f) => acc + f.compressedSize, 0),
+        files: filesMetadata,
+      },
+      payload: payloadCompressedB64,
+    };
+
+    return new Blob([JSON.stringify(backupArchive, null, 2)], { type: 'application/json' });
   }
 
-  public async importHomeArchive(file: File): Promise<ImportResult> {
+  public async importHomeArchive(archiveInput: Blob | File | string, distroId: string = 'debian'): Promise<ImportResult> {
     if (!this.isSupported()) {
-      return { success: false, importedFilesCount: 0, totalBytes: 0, errors: ['OPFS not supported in this browser'] };
+      return { success: false, importedFilesCount: 0, totalBytes: 0, errors: ['OPFS is not supported in this browser'] };
     }
 
     try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      if (!parsed.metadata || !parsed.filesBase64) {
-        return { success: false, importedFilesCount: 0, totalBytes: 0, errors: ['Invalid WebLinux backup archive format'] };
+      let jsonText: string;
+      if (typeof archiveInput === 'string') {
+        jsonText = archiveInput;
+      } else {
+        jsonText = await archiveInput.text();
       }
 
-      const root = await navigator.storage.getDirectory();
-      const homeHandle = await root.getDirectoryHandle('disk-home', { create: true });
+      let parsed: any;
+      try {
+        parsed = JSON.parse(jsonText);
+      } catch (err: any) {
+        return { success: false, importedFilesCount: 0, totalBytes: 0, errors: [`Corrupted backup: Invalid JSON (${err.message})`] };
+      }
 
-      let importedCount = 0;
-      let totalBytes = 0;
-      const errors: string[] = [];
+      // 1. Validate version and format
+      if (parsed.format !== 'weblinux-backup' || !parsed.manifest || !parsed.payload) {
+        return { success: false, importedFilesCount: 0, totalBytes: 0, errors: ['Incompatible or unrecognized backup format. Expected "weblinux-backup" v2.0'] };
+      }
 
-      for (const [filename, b64] of Object.entries<string>(parsed.filesBase64)) {
-        try {
-          const binaryStr = atob(b64);
-          const bytes = new Uint8Array(binaryStr.length);
-          for (let i = 0; i < binaryStr.length; i++) {
-            bytes[i] = binaryStr.charCodeAt(i);
-          }
+      const filesMeta = parsed.manifest.files;
+      if (!Array.isArray(filesMeta) || filesMeta.length === 0) {
+        return { success: false, importedFilesCount: 0, totalBytes: 0, errors: ['Backup archive contains no valid disk components.'] };
+      }
 
-          const fileHandle = await homeHandle.getFileHandle(filename, { create: true });
-          const accessHandle = await (fileHandle as any).createSyncAccessHandle?.() || await fileHandle.createWritable();
-          
-          if (accessHandle.write) {
-            await accessHandle.write(bytes);
-            if (accessHandle.close) await accessHandle.close();
-          }
+      // 2. Pre-flight decompress and verify all SHA-256 checksums BEFORE writing anything to OPFS
+      const decompressedComponents: { name: string; bytes: Uint8Array; originalSize: number }[] = [];
 
-          importedCount++;
-          totalBytes += bytes.length;
-        } catch (fileErr: any) {
-          errors.push(`Failed to import ${filename}: ${fileErr.message}`);
+      for (const meta of filesMeta) {
+        const b64 = parsed.payload[meta.name];
+        if (!b64) {
+          return { success: false, importedFilesCount: 0, totalBytes: 0, errors: [`Missing payload for required component "${meta.name}"`] };
         }
+
+        let binStr: string;
+        try {
+          binStr = atob(b64);
+        } catch (e: any) {
+          return { success: false, importedFilesCount: 0, totalBytes: 0, errors: [`Base64 decoding failed for ${meta.name}: ${e.message}`] };
+        }
+
+        const compressedBytes = new Uint8Array(binStr.length);
+        for (let i = 0; i < binStr.length; i++) {
+          compressedBytes[i] = binStr.charCodeAt(i);
+        }
+
+        let decompressedBuf: ArrayBuffer;
+        if (typeof DecompressionStream !== 'undefined') {
+          try {
+            const stream = new Blob([compressedBytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+            decompressedBuf = await new Response(stream).arrayBuffer();
+          } catch (decompErr: any) {
+            return { success: false, importedFilesCount: 0, totalBytes: 0, errors: [`Decompression failed for ${meta.name}: ${decompErr.message}`] };
+          }
+        } else {
+          decompressedBuf = compressedBytes.buffer;
+        }
+
+        // Verify size
+        if (decompressedBuf.byteLength !== meta.size) {
+          return {
+            success: false,
+            importedFilesCount: 0,
+            totalBytes: 0,
+            errors: [`Integrity check failed: ${meta.name} size mismatch (got ${decompressedBuf.byteLength}, expected ${meta.size})`],
+          };
+        }
+
+        // Verify SHA-256
+        const hashBuf = await crypto.subtle.digest('SHA-256', decompressedBuf);
+        const actualSha256 = Array.from(new Uint8Array(hashBuf))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+        if (actualSha256.toLowerCase() !== meta.sha256.toLowerCase()) {
+          return {
+            success: false,
+            importedFilesCount: 0,
+            totalBytes: 0,
+            errors: [`Cryptographic integrity verification failed for ${meta.name}. Checksum mismatch: expected ${meta.sha256}, got ${actualSha256}. Restoration aborted without modifying storage.`],
+          };
+        }
+
+        decompressedComponents.push({
+          name: meta.name,
+          bytes: new Uint8Array(decompressedBuf),
+          originalSize: decompressedBuf.byteLength,
+        });
+      }
+
+      // 3. All checksums and sizes verified! Now safely write to OPFS
+      const root = await navigator.storage.getDirectory();
+      const diskDirName = parsed.targetDisk || `disk-home-${distroId}`;
+      const homeDirHandle = await root.getDirectoryHandle(diskDirName, { create: true });
+
+      let totalWritten = 0;
+      for (const comp of decompressedComponents) {
+        const fileHandle = await homeDirHandle.getFileHandle(comp.name, { create: true });
+        try {
+          const syncHandle = await (fileHandle as any).createSyncAccessHandle?.();
+          if (syncHandle) {
+            syncHandle.truncate(comp.bytes.byteLength);
+            syncHandle.write(comp.bytes, { at: 0 });
+            syncHandle.flush();
+            syncHandle.close();
+          } else {
+            const writable = await fileHandle.createWritable();
+            await writable.write(comp.bytes);
+            await writable.close();
+          }
+        } catch {
+          const writable = await fileHandle.createWritable();
+          await writable.write(comp.bytes);
+          await writable.close();
+        }
+        totalWritten += comp.bytes.byteLength;
       }
 
       return {
-        success: errors.length === 0,
-        importedFilesCount: importedCount,
-        totalBytes,
-        errors: errors.length > 0 ? errors : undefined,
+        success: true,
+        importedFilesCount: decompressedComponents.length,
+        totalBytes: totalWritten,
       };
+
     } catch (err: any) {
-      return { success: false, importedFilesCount: 0, totalBytes: 0, errors: [err.message] };
+      return { success: false, importedFilesCount: 0, totalBytes: 0, errors: [`Restore failed: ${err.message}`] };
     }
   }
 }

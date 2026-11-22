@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-11-22T10:13:55.254Z",
+  "distribution": "debian",
+  "testToken": "WEBLINUX_PHASE31_TOKEN_1795342435253_d2ac6af0",
+  "bootPassed": true,
+  "guestCommandsPassed": true,
+  "persistencePassed": true,
+  "backupPassed": true,
+  "restorePassed": true,
+  "assetIntegrityPassed": true,
+  "desktopPassed": true,
+  "overallStatus": "VALIDATED",
+  "failureReasons": [],
+  "telemetry": {},
+  "guestCommands": {
+    "uname": "Linux (none) 7.0.0+ #2 SMP Sun Oct 11 22:16:39 UTC 2026 wasm GNU/Linux",
+    "osRelease": "~ # cat /debian/etc/os-release; echo __rcixdz8trlcy_$?\nPRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.7\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"",
+    "id": "~ # id; echo __rcrt4qlwi0gq_$?\nuid=0 gid=0",
+    "df": "~ # df -h; echo __rcy7692dcaqx_$?\nFilesystem                Size      Used Available Use% Mounted on\n/dev/wda                  7.8G      3.8G      4.0G  49% /debian\n/dev/wdb                 15.8G     96.0K     15.8G   0% /debian/root"
+  },
+  "backupMetadata": {
+    "format": "weblinux-backup",
+    "version": "2.0",
+    "targetDisk": "disk-home-debian",
+    "archiveBytes": 154365,
+    "uncompressedTotalBytes": 36765760,
+    "compressedTotalBytes": 115236,
+    "filesCount": 2,
+    "files": [
+      {
+        "name": "map",
+        "size": 65600,
+        "sha256": "4d0e07adcd654b4891a2d01a7bc7b1ee4cdb052e0e1417ebf1a0890628c0e70d"
+      },
+      {
+        "name": "data",
+        "size": 36700160,
+        "sha256": "e59b9e814a44eff47daa93a405c47e32e07a3671e3eb469cdae3c008d600d23a"
+      }
+    ]
+  }
+}

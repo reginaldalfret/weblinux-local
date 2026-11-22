@@ -9,7 +9,7 @@
     "dev": "npm --prefix weblinux-local/apps/web run dev",
     "build": "npm --prefix weblinux-local/apps/web run build",
     "preview": "npm --prefix weblinux-local/apps/web run preview",
-    "test": "node weblinux-local/tests/manifest-validation.test.js"
+    "test": "node weblinux-local/tests/manifest-validation.test.js && node weblinux-local/tests/boot-preflight.test.js && node weblinux-local/tests/cryptographic-integrity.test.js"
   },
   "devDependencies": {
     "puppeteer-core": "^25.18.1"

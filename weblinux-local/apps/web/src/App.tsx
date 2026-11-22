@@ -39,8 +39,16 @@ export const App: React.FC = () => {
   // Load distribution manifests
   useEffect(() => {
     const distroIds: DistributionId[] = ['debian', 'ubuntu', 'fedora', 'arch', 'kali-lab'];
-    Promise.all(distroIds.map(id => adapter.loadManifest(id)))
-      .then(loaded => {
+    Promise.allSettled(distroIds.map(id => adapter.loadManifest(id)))
+      .then(results => {
+        const loaded: DistributionManifest[] = [];
+        for (const res of results) {
+          if (res.status === 'fulfilled') {
+            loaded.push(res.value);
+          } else {
+            console.warn('[Manifest Pipeline] A manifest failed to load independently:', res.reason);
+          }
+        }
         setManifests(loaded);
       })
       .catch(err => {
@@ -81,7 +89,14 @@ export const App: React.FC = () => {
       // 2. Load chosen manifest
       const activeManifest = await adapter.loadManifest(selectedDistro);
 
-      // 3. Pre-flight download assets
+      // Check validation policy: do not allow booting placeholder or unvalidated images
+      if (activeManifest.validationStatus !== 'validated') {
+        throw new Error(
+          `${activeManifest.name} is currently an unvalidated port (status: ${activeManifest.validationStatus.toUpperCase()}). To protect your environment, only validated distributions (Debian GNU/Linux 13) can be launched.`
+        );
+      }
+
+      // 3. Pre-flight download assets and cryptographically verify SHA-256
       await adapter.downloadAssets(activeManifest);
 
       // 4. Boot kernel

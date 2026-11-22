@@ -46,6 +46,10 @@ export interface DistributionManifest {
   integrity: {
     kernelSha256?: string;
     initrdSha256?: string;
+    initrdUncompressedSha256?: string;
+    kernelSize?: number;
+    initrdSize?: number;
+    initrdUncompressedSize?: number;
     chunksCount: number;
     hashes?: string[];
   };
@@ -159,7 +163,7 @@ export interface IRuntimeAdapter {
   runCommand(command: string, timeoutMs?: number): Promise<CommandResult>;
   getOutput(): string;
   isWaylandActive(): boolean;
-  importFiles(files: FileList | File[], targetDir: string): Promise<ImportResult>;
+  importFiles(files: FileList | File[] | Blob, targetDir?: string): Promise<ImportResult>;
   exportFiles(path?: string): Promise<Blob>;
   getStorageUsage(): Promise<StorageUsageInfo>;
   resetStorage(diskName?: string): Promise<void>;

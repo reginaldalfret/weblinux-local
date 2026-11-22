@@ -20,8 +20,12 @@
     "id": "21dd6321337e178c4ac19c27d790403a"
   },
   "integrity": {
-    "kernelSha256": "vmlinux-wasm64_nommu.wasm",
-    "initrdSha256": "initramfs-wasm64_nommu.cpio.gz",
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "737eaaf635090b3045b942db65f2735fd0a23cad8d316f91956708f5a50d2e70",
+    "initrdUncompressedSha256": "51eeb20a33538636011e014e90d0a66cf245d5eea57f5cf7cbda97fde12bb4ef",
+    "kernelSize": 7380050,
+    "initrdSize": 16050431,
+    "initrdUncompressedSize": 39928832,
     "chunksCount": 8192
   },
   "runtimeRequirements": {

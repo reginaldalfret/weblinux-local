@@ -116,29 +116,31 @@ weblinux-local/
 
 ### Automated Tests
 
-Run the acceptance and integration test suites:
+Run the automated test suites:
 ```bash
-# Manifest validation and preflight checks
+# Manifest validation, preflight binary checks, and cryptographic integrity
 npm test
-node tests/boot-preflight.test.js
 
-# Phase 2 & 3 Live Headless Browser E2E Acceptance Test
-node tests/test-boot-and-commands.js
-node tests/test-persistence-exact.js
+# Phase 3.1 Comprehensive Multi-Session Acceptance Suite:
+# (Cryptographic validation, OPFS persistence across reboots, real virtual disk backup/wipe/restore, KDE desktop)
+node tests/test-phase3-1-acceptance.js
 ```
 
 ---
 
-## 6. Phase 2 & Phase 3 Acceptance Verification
+## 6. Phase 3.1 Reliability, Storage Integrity & Hardening Verification
 
-Debian GNU/Linux 13 (Trixie) RISC-V 64 has achieved full **VALIDATED** status based on direct browser execution evidence:
+Debian GNU/Linux 13 (Trixie) RISC-V 64 has achieved full **VALIDATED** certification across all Phase 3.1 reliability criteria:
 
-- **Kernel Boot:** Real `wasm64_nommu` 7.0.0+ SMP kernel booting inside browser.
-- **Debian Userspace:** Genuine Debian Trixie (13.7) userspace verified via `/debian/etc/os-release`.
-- **Guest Commands:** Executed and verified `uname -a`, `id`, `pwd`, `ls -la /`, `df -h`, `free -h`.
-- **OPFS Persistence:** Test token (`WEBLINUX_OPFS_EXT4_VERIFIED_<timestamp>`) persisted on `/dev/wdb` ext4 across browser restart.
-- **Desktop Environments:** KDE Plasma 6 Wayland session and IceWM profile audited.
-- **Detailed Execution Report:** See [docs/PHASE2-3-EXECUTION-REPORT.md](docs/PHASE2-3-EXECUTION-REPORT.md) and screenshots in `tests/screenshots/`.
+- **Cryptographic Asset Integrity:** Verified genuine SHA-256 digests and byte counts for kernel and initrd, with automatic rejection of corrupted buffers.
+- **OPFS Disk Persistence:** Exact cryptographic token (`WEBLINUX_PHASE31_TOKEN_*`) verified across four completely separate browser processes.
+- **Production Virtual Disk Backup & Restore:** Full `.wlbk` v2.0 backup export with gzip compression (compressing ~36 MiB sparse ext4 home disk to ~115 KiB), cryptographic pre-validation, clean wipe confirmation, and bit-exact data restoration.
+- **Desktop Environments:** Native WebAssembly KDE Plasma 6 Wayland desktop session validated with screenshot evidence (`tests/screenshots/kde-plasma-desktop.png`).
+- **Distribution Status Safety:** Launch gate in `App.tsx` prevents booting unvalidated or experimental images.
+- **Comprehensive Reports:**
+  - [Phase 3.1 Execution Report](docs/PHASE3-1-EXECUTION-REPORT.md)
+  - [Machine-Readable Report](tests/phase3-1-acceptance-report.json)
+  - [Phase 2 & 3 Report](docs/PHASE2-3-EXECUTION-REPORT.md)
 
 ---
 

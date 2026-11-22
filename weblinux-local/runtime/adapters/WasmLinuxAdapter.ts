@@ -43,6 +43,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   private displayChannel: BroadcastChannel | null = null;
   private shellReadyPromise: Promise<boolean> | null = null;
   private resolveShellReady: ((val: boolean) => void) | null = null;
+  private cachedKernelBuffer: ArrayBuffer | null = null;
+  private cachedInitrdBuffer: ArrayBuffer | null = null;
 
   public static getInstance(): WasmLinuxAdapter {
     if (!WasmLinuxAdapter.instance) {
@@ -139,8 +141,20 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     this.log(`[Asset Pipeline] Preparing core binaries for ${manifest.name}...`);
 
     const assets = [
-      { name: 'Kernel Image (wasm64_nommu)', path: '/runtime/vmlinux-wasm64_nommu.wasm', expectedSize: 7380050 },
-      { name: 'Initial Ramdisk (BusyBox + rv)', path: '/runtime/initramfs-wasm64_nommu.cpio.gz', expectedSize: 16050431 },
+      {
+        id: 'kernel',
+        name: 'Kernel Image (wasm64_nommu)',
+        path: '/runtime/vmlinux-wasm64_nommu.wasm',
+        expectedSize: manifest.integrity.kernelSize || 7380050,
+        expectedSha256: manifest.integrity.kernelSha256 || '31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49',
+      },
+      {
+        id: 'initrd',
+        name: 'Initial Ramdisk (BusyBox + rv)',
+        path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
+        expectedSize: manifest.integrity.initrdSize || 16050431,
+        expectedSha256: manifest.integrity.initrdSha256 || '737eaaf635090b3045b942db65f2735fd0a23cad8d316f91956708f5a50d2e70',
+      },
     ];
 
     let totalBytes = assets.reduce((acc, a) => acc + a.expectedSize, 0);
@@ -148,18 +162,23 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
     for (let i = 0; i < assets.length; i++) {
       const asset = assets[i];
-      this.log(`[Asset Pipeline] Loading ${asset.name}...`);
-      
+      this.log(`[Asset Pipeline] Downloading ${asset.name} (${Math.round(asset.expectedSize / 1024 / 1024 * 10) / 10} MiB)...`);
+
       const res = await fetch(asset.path);
       if (!res.ok) {
         throw new Error(`Asset download failed: ${asset.name} (${res.status} ${res.statusText})`);
       }
 
       const reader = res.body?.getReader();
+      const chunks: Uint8Array[] = [];
+      let assetLoaded = 0;
+
       if (reader) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
+          chunks.push(value);
+          assetLoaded += value.byteLength;
           loadedBytes += value.byteLength;
           if (onProgress) {
             onProgress({
@@ -172,9 +191,57 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
             });
           }
         }
+      } else {
+        const buf = await res.arrayBuffer();
+        chunks.push(new Uint8Array(buf));
+        assetLoaded = buf.byteLength;
+        loadedBytes += buf.byteLength;
       }
 
-      this.log(`[Asset Pipeline] ${asset.name} verified.`);
+      // Combine chunks into single ArrayBuffer
+      const combined = new Uint8Array(assetLoaded);
+      let offset = 0;
+      for (const chunk of chunks) {
+        combined.set(chunk, offset);
+        offset += chunk.byteLength;
+      }
+      const buffer = combined.buffer;
+
+      // 1. Validate byte length (accounting for transparent HTTP Content-Encoding: gzip decompression)
+      let isUncompressedInitrd = false;
+      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 39928832)) {
+        isUncompressedInitrd = true;
+      } else if (buffer.byteLength !== asset.expectedSize) {
+        throw new Error(
+          `Integrity Violation: Length mismatch for ${asset.name}. Expected ${asset.expectedSize} bytes, received ${buffer.byteLength} bytes. Binary rejected.`
+        );
+      }
+
+      // 2. Validate cryptographic SHA-256 digest
+      const expectedSha256 = isUncompressedInitrd
+        ? (manifest.integrity.initrdUncompressedSha256 || '51eeb20a33538636011e014e90d0a66cf245d5eea57f5cf7cbda97fde12bb4ef')
+        : asset.expectedSha256;
+
+      if (expectedSha256) {
+        const hashBuf = await crypto.subtle.digest('SHA-256', buffer);
+        const actualSha256 = Array.from(new Uint8Array(hashBuf))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+
+        if (actualSha256.toLowerCase() !== expectedSha256.toLowerCase()) {
+          throw new Error(
+            `Integrity Violation: SHA-256 digest mismatch for ${asset.name}!\nExpected: ${expectedSha256}\nReceived: ${actualSha256}\nAsset rejected.`
+          );
+        }
+
+        this.log(`[Cryptographic Integrity Verified] ${asset.name} (${isUncompressedInitrd ? 'transparent HTTP cpio' : 'gzipped archive'}) SHA-256: ${actualSha256}`);
+      }
+
+      if (asset.id === 'kernel') {
+        this.cachedKernelBuffer = buffer;
+      } else if (asset.id === 'initrd') {
+        this.cachedInitrdBuffer = buffer;
+      }
     }
 
     this.updateStatus({ state: 'ready' });
@@ -234,15 +301,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       this.log(`[Kernel Commandline] ${bootCmdline}`);
 
-      // 3. Compile kernel WebAssembly module
-      this.log(`[Wasm Engine] Compiling kernel module (wasm64_nommu)...`);
-      const vmlinuxModule = await WebAssembly.compileStreaming(fetch('/runtime/vmlinux-wasm64_nommu.wasm'));
-      this.log(`[Wasm Engine] Kernel module compiled successfully.`);
+      // 3. Compile kernel WebAssembly module from cryptographically verified buffer
+      if (!this.cachedKernelBuffer || !this.cachedInitrdBuffer) {
+        this.log(`[Wasm Engine] Preflight: downloading and verifying asset binaries...`);
+        await this.downloadAssets(options.manifest);
+      }
 
-      // 4. Fetch initrd
-      this.log(`[Initrd] Loading root filesystem into RAM...`);
-      const initrdBuffer = await (await fetch('/runtime/initramfs-wasm64_nommu.cpio.gz')).arrayBuffer();
-      this.log(`[Initrd] Image loaded: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
+      this.log(`[Wasm Engine] Compiling verified kernel module (wasm64_nommu)...`);
+      const vmlinuxModule = await WebAssembly.compile(this.cachedKernelBuffer!);
+      this.log(`[Wasm Engine] Kernel module compiled successfully from verified binary.`);
+
+      // 4. Initrd
+      const initrdBuffer = this.cachedInitrdBuffer!;
+      this.log(`[Initrd] Image verified: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
 
       // 5. Configure disk subsystem
       const diskConfig = [
@@ -395,11 +466,12 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         // Extract command output minus the echoed command
         let out = match ? text.slice(0, match.index) : text;
+        out = out.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
         const newlineIdx = out.indexOf('\n');
         if (newlineIdx !== -1) {
           out = out.slice(newlineIdx + 1);
         }
-        out = out.replace(/\r/g, '').trim();
+        out = out.trim();
 
         const rc = match ? Number(match[1]) : null;
         const ms = Math.round(elapsed);
@@ -480,18 +552,58 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     }
   }
 
-  public async importFiles(files: FileList | File[], targetDir: string): Promise<ImportResult> {
-    this.log(`[Filesystem] Importing ${files.length} file(s) into guest directory ${targetDir}...`);
+  public async importFiles(files: FileList | File[] | Blob, targetDir: string = '/root'): Promise<ImportResult> {
+    const fileList = files instanceof Blob ? [files as File] : Array.from(files);
+
+    // 1. If single backup archive (.wlbk, .json, or Blob), attempt restore into OPFS home virtual disk
+    if (
+      fileList.length === 1 &&
+      (fileList[0].name?.endsWith('.wlbk') ||
+        fileList[0].name?.endsWith('.json') ||
+        fileList[0].type === 'application/json' ||
+        files instanceof Blob)
+    ) {
+      this.log(`[Backup Subsystem] Restoring WebLinux virtual disk archive into OPFS...`);
+      const res = await this.opfsManager.importHomeArchive(
+        fileList[0],
+        this.status.distribution || 'debian'
+      );
+      if (res.success) {
+        this.log(`[Backup Subsystem] Disk restore successful (${Math.round(res.totalBytes / 1024)} KiB restored).`);
+      } else {
+        this.log(`[Backup Subsystem] Restore rejected: ${res.errors?.join(', ')}`);
+      }
+      return res;
+    }
+
+    // 2. If session is running and regular files were passed, drop into guest ~/Downloads via Wayland drag-and-drop
+    if (
+      typeof window !== 'undefined' &&
+      (window as any).rvDisplay &&
+      typeof (window as any).rvDisplay.drop === 'function' &&
+      this.status.state === 'running'
+    ) {
+      this.log(`[Filesystem] Forwarding ${fileList.length} host file(s) into guest ~/Downloads via Wayland drag-drop...`);
+      await (window as any).rvDisplay.drop(fileList);
+      const totalBytes = fileList.reduce((acc, f) => acc + (f.size || 0), 0);
+      return {
+        success: true,
+        importedFilesCount: fileList.length,
+        totalBytes,
+      };
+    }
+
     return {
-      success: true,
-      importedFilesCount: files.length,
-      totalBytes: Array.from(files).reduce((acc, f) => acc + f.size, 0),
+      success: false,
+      importedFilesCount: 0,
+      totalBytes: 0,
+      errors: ['Cannot import files: Session is not running and input is not a WebLinux backup archive (.wlbk)'],
     };
   }
 
   public async exportFiles(): Promise<Blob> {
     this.log(`[Filesystem] Exporting user home directory...`);
-    return await this.opfsManager.exportHomeArchive();
+    return await this.opfsManager.exportHomeArchive(this.status.distribution || 'debian');
   }
 
   public async getStorageUsage(): Promise<StorageUsageInfo> {

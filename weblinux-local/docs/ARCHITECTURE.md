@@ -68,9 +68,20 @@ Unlike terminal-in-a-box simulations or server-streamed virtual machines (VNC/RD
 - Ext4 disk images are cut into uniform 1 MiB chunks.
 - Chunks are fetched on-demand over HTTP/HTTPS with SHA-256 integrity verification.
 - Downloaded and locally written blocks are persisted in the browser's Origin Private File System (OPFS) using `FileSystemSyncAccessHandle` inside dedicated disk workers.
-- The user's `/home` filesystem is mounted as an independent persistent disk, ensuring personal files survive system updates and cache resets.
+- The user's home filesystem (`/debian/root`) is backed by an independent OPFS directory (`disk-home-debian`), mounting as `/dev/wdb` (ext4), ensuring user documents and configurations survive page reloads and browser process restarts.
 
-### 3.5 Network Safety & Relay Architecture
+### 3.5 Virtual Disk Backup & Disaster Recovery Architecture (.wlbk v2.0)
+- **Sparse Virtual Disk Export:** `OpfsManager.exportHomeArchive()` accesses the active OPFS home disk, extracting the `map` index (65.6 KiB) and `data` blocks (~36 MiB).
+- **In-Memory Streaming Gzip Compression:** To avoid transmitting or downloading massive uncompressed sparse files, components are piped through native `CompressionStream('gzip')`, compressing the ~36 MiB disk into ~115 KiB.
+- **Cryptographic Pre-Validation on Import:** During restore, `importHomeArchive()` decompresses each payload, verifies byte lengths, and recalculates SHA-256 digests against the archive manifest *before writing anything to OPFS*. Any corrupted chunk or tampered archive aborts the operation immediately without destructive modification.
+- **Atomic Disk Restoration:** Verified bytes are written atomically using `FileSystemSyncAccessHandle` to restore the virtual disk in OPFS.
+
+### 3.6 Cryptographic Asset Integrity Pipeline
+- **Immutable Digests in Manifest:** Distribution manifests (`debian.json`) embed authentic SHA-256 digests for all runtime binaries (`vmlinux-wasm64_nommu.wasm` and `initramfs-wasm64_nommu.cpio.gz`).
+- **Pre-Execution Check:** `WasmLinuxAdapter.downloadAssets()` validates chunks and assembles verified `ArrayBuffer` objects in memory before compilation, protecting against man-in-the-middle tampering, truncated downloads, or cache poisoning.
+- **Transparent HTTP Content-Encoding Support:** The verification pipeline handles transparent gzip decompression from HTTP servers, cross-checking both compressed and uncompressed cryptographic signatures.
+
+### 3.7 Network Safety & Relay Architecture
 - By default, WebLinux operates 100% offline and browser-local.
 - When networking is enabled, traffic is tunneled through a restricted WebSocket relay (`rvRelay`) to an isolated TAP device.
 - Strict firewall filtering blocks private subnets (RFC 1918), link-local addresses (cloud metadata), unauthorized ports, and unauthorized domain lookups, protecting the user and operator against SSRF and botnet misuse.
