@@ -40,21 +40,53 @@ export const Desktop: React.FC<DesktopProps> = ({
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const screenCanvasRef = useRef<HTMLCanvasElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const adapter = WasmLinuxAdapter.getInstance();
 
-  // Ensure Wayland rv-stage and display canvas correctly wrap #screen canvas
+  // Mount persistent Wayland rv-stage and display canvas into Desktop viewport
   useEffect(() => {
-    const sc = screenCanvasRef.current;
     const stage = document.getElementById('rv-stage');
     const bar = document.getElementById('rv-bar');
-    if (sc && stage && sc.parentNode && sc.parentNode !== stage) {
-      const parent = sc.parentNode;
-      if (bar && bar.parentNode !== parent) parent.insertBefore(bar, sc);
-      parent.insertBefore(stage, sc);
-      stage.appendChild(sc);
+    const host = viewportRef.current;
+
+    if (stage && host) {
+      stage.style.position = 'relative';
+      stage.style.left = '0';
+      stage.style.top = '0';
+      stage.style.opacity = '1';
+      stage.style.pointerEvents = 'auto';
+      stage.style.display = 'block';
+      stage.style.maxWidth = '100%';
+      stage.style.maxHeight = '100%';
+
+      if (bar) {
+        bar.style.position = 'relative';
+        bar.style.opacity = '1';
+        bar.style.pointerEvents = 'auto';
+        host.appendChild(bar);
+      }
+
+      host.appendChild(stage);
+
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+        const sc = document.getElementById('screen');
+        if (sc) (sc as HTMLElement).focus({ preventScroll: true });
+      }, 60);
     }
+
+    return () => {
+      const rvHost = document.getElementById('rv-host');
+      if (stage && rvHost) {
+        stage.style.position = 'fixed';
+        stage.style.left = '-9999px';
+        stage.style.top = '-9999px';
+        stage.style.opacity = '0';
+        stage.style.pointerEvents = 'none';
+        rvHost.appendChild(stage);
+      }
+    };
   }, []);
 
   const toggleFullscreen = () => {
@@ -95,8 +127,10 @@ export const Desktop: React.FC<DesktopProps> = ({
   };
 
   const handlePointerLock = () => {
-    if (screenCanvasRef.current) {
-      screenCanvasRef.current.requestPointerLock?.();
+    const sc = document.getElementById('screen') as HTMLCanvasElement;
+    if (sc) {
+      sc.requestPointerLock?.();
+      sc.focus();
     }
   };
 
@@ -200,25 +234,11 @@ export const Desktop: React.FC<DesktopProps> = ({
       </div>
 
       {/* Main Canvas Viewport */}
-      <div className="relative flex-1 flex items-center justify-center bg-black overflow-hidden select-none">
-        {/* Background Canvas: Kernel Framebuffer / Wayland Surface Compositor */}
-        <canvas
-          id="screen"
-          ref={screenCanvasRef}
-          tabIndex={0}
-          width={1280}
-          height={800}
-          onClick={handlePointerLock}
-          className="max-w-full max-h-full object-contain cursor-crosshair outline-none shadow-2xl"
-          style={{
-            background: '#0a0d14',
-            aspectRatio: '16/10',
-          }}
-        />
-
-        {/* Display Container for wlserver Wayland elements */}
-        <div id="display" className="absolute inset-0 pointer-events-none" />
-
+      <div
+        ref={viewportRef}
+        onClick={handlePointerLock}
+        className="relative flex-1 flex flex-col items-center justify-center bg-black overflow-hidden select-none cursor-crosshair min-h-[500px]"
+      >
         {/* Overlay Helper Badge */}
         <div className="absolute top-4 left-4 z-20 pointer-events-none">
           <div className="px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[11px] text-slate-300 flex items-center gap-2">
