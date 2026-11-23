@@ -238,7 +238,7 @@ export const Desktop: React.FC<DesktopProps> = ({
       <div
         ref={viewportRef}
         onClick={handlePointerLock}
-        className="relative flex-1 w-full h-full flex flex-col items-stretch justify-start bg-black overflow-hidden select-none cursor-crosshair"
+        className="relative flex-1 min-h-0 w-full flex flex-col items-stretch justify-start bg-black overflow-hidden select-none cursor-crosshair"
       >
         {/* Overlay Helper Badge */}
         <div className="absolute top-4 left-4 z-20 pointer-events-none">
@@ -249,7 +249,7 @@ export const Desktop: React.FC<DesktopProps> = ({
         </div>
 
         {/* Initializing / Loading Overlay over canvas while Wayland or Plasma is spinning up */}
-        {!runtimeStatus.waylandActive && (
+        {!runtimeStatus.waylandActive && runtimeStatus.state !== 'running' && (
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#07090e]/95 backdrop-blur-sm select-none">
             <div className="p-8 rounded-2xl bg-[#0f131d] border border-purple-500/30 shadow-2xl flex flex-col items-center max-w-md text-center">
               <Loader2 className="w-10 h-10 text-purple-400 animate-spin mb-4" />
