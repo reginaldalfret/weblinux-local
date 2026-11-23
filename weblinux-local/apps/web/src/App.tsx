@@ -163,7 +163,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#090a0f] text-slate-100">
+    <div className={`flex flex-col bg-[#090a0f] text-slate-100 ${currentPage === 'desktop' ? 'h-screen w-screen overflow-hidden' : 'min-h-screen'}`}>
       {/* Navbar: hidden when in active full desktop session */}
       {currentPage !== 'desktop' && (
         <Navbar
@@ -208,7 +208,7 @@ export const App: React.FC = () => {
 
         {/* Persistent Desktop / Boot Viewport */}
         {(currentPage === 'boot' || currentPage === 'desktop') && (
-          <div className="relative flex-1 flex flex-col">
+          <div className="relative flex-1 w-full h-full flex flex-col overflow-hidden">
             {currentPage === 'boot' && (
               <div className="absolute inset-0 z-50 bg-[#090a0f] overflow-y-auto">
                 <BootScreen

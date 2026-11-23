@@ -55,11 +55,11 @@ export const Desktop: React.FC<DesktopProps> = ({
       stage.style.position = 'relative';
       stage.style.left = '0';
       stage.style.top = '0';
+      stage.style.width = '100%';
+      stage.style.height = '100%';
       stage.style.opacity = '1';
       stage.style.pointerEvents = 'auto';
       stage.style.display = 'block';
-      stage.style.maxWidth = '100%';
-      stage.style.maxHeight = '100%';
 
       if (bar) {
         bar.style.position = 'relative';
@@ -139,7 +139,7 @@ export const Desktop: React.FC<DesktopProps> = ({
     <div
       ref={containerRef}
       className={`relative flex flex-col bg-[#050608] text-slate-100 ${
-        isFullscreen ? 'h-screen w-screen' : 'h-screen w-full'
+        isFullscreen ? 'h-screen w-screen' : 'h-full w-full'
       }`}
     >
       {/* Top OS Control Bar */}
@@ -238,7 +238,7 @@ export const Desktop: React.FC<DesktopProps> = ({
       <div
         ref={viewportRef}
         onClick={handlePointerLock}
-        className="relative flex-1 flex flex-col items-center justify-center bg-black overflow-hidden select-none cursor-crosshair min-h-[500px]"
+        className="relative flex-1 w-full h-full flex flex-col items-stretch justify-start bg-black overflow-hidden select-none cursor-crosshair"
       >
         {/* Overlay Helper Badge */}
         <div className="absolute top-4 left-4 z-20 pointer-events-none">

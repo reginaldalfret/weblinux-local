@@ -496,18 +496,25 @@
   // What the screen should be now: [width, height, scale].
   const wantedSize = () => {
     let w, h;
-    if (document.fullscreenElement === stage) {
+    if (document.fullscreenElement) {
       w = window.innerWidth;
       h = window.innerHeight;
     } else if (fixedSize) {
       w = Number(fixedSize[1]);
       h = Number(fixedSize[2]);
     } else {
-      // All of the window's width (less the page's margins) and the rest of its height below the bar.
-      const box = stage.getBoundingClientRect();
-      const left = Math.max(0, box.left + window.scrollX);
-      w = document.documentElement.clientWidth - 2 * left;
-      h = window.innerHeight - (box.top + window.scrollY) - left;
+      const parent = stage && stage.parentElement;
+      if (parent && parent.id !== "rv-host" && parent !== document.body) {
+        const pbox = parent.getBoundingClientRect();
+        w = Math.floor(pbox.width || window.innerWidth);
+        h = Math.floor(pbox.height || (window.innerHeight - pbox.top));
+      } else {
+        // All of the window's width (less the page's margins) and the rest of its height below the bar.
+        const box = stage.getBoundingClientRect();
+        const left = Math.max(0, box.left + window.scrollX);
+        w = document.documentElement.clientWidth - 2 * left;
+        h = window.innerHeight - (box.top + window.scrollY) - left;
+      }
     }
     const scale = scaleParam ? Math.max(1, Math.min(4, Math.round(scaleParam)))
       : Math.max(1, Math.min(3, Math.round(window.devicePixelRatio || 1)));
