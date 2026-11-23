@@ -132,7 +132,7 @@ export const App: React.FC = () => {
     architecture: 'riscv64',
     kernelCompatibility: 'linux-wasm64_nommu-6.1',
     defaultDesktop: 'kde-plasma',
-    supportedDesktops: ['kde-plasma', 'icewm'],
+    supportedDesktops: ['kde-plasma', 'gnome', 'xfce'],
     packageManager: 'apt',
     filesystemLayout: { rootMount: '/debian', homeMount: '/root' },
     imageSource: {

@@ -1,0 +1,49 @@
+name: WebLinux Local CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Unit & Cryptographic Integrity Tests
+        run: npm test
+
+      - name: Build Web Application
+        run: npm run build
+
+      - name: Static Test-Integrity Guard
+        run: node weblinux-local/tests/phase4-1-1/guard-test-integrity.js
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Headless Acceptance Suite
+        run: |
+          npm run dev &
+          sleep 5
+          node weblinux-local/tests/phase4-1-1/run-headless-regression.js
+
+      - name: Upload Test Reports & Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-1-1-reports
+          path: weblinux-local/docs/phase4-1-1/

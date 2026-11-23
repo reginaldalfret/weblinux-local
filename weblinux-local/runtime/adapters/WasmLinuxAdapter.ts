@@ -17,6 +17,7 @@ import {
   StorageUsageInfo,
 } from '../types';
 import { OpfsManager } from '../filesystem/OpfsManager';
+import { DEBIAN_DESKTOP_PROFILES } from '../profiles/desktopProfiles';
 
 export class WasmLinuxAdapter implements IRuntimeAdapter {
   private static instance: WasmLinuxAdapter;
@@ -291,12 +292,12 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 2. Build kernel commandline
       const epoch = Math.floor(Date.now() / 1000);
-      const isIceWM = options.desktop === 'icewm';
+      const isKde = options.desktop === 'kde-plasma';
 
       let bootCmdline = `maxcpus=3 nohz_full=0,2-63 rcu_nocbs=0,2-63 root=/dev/ram0 rootfstype=ramfs init=/init console=hvc console=ttyS0 epoch=${epoch} rvtab=${this.tabId} term=120x30 wasm_pool=${pool} mem=${memoryMB}M wasm_cache_max=256`;
 
-      // Autostart setting: KDE Plasma autostarts directly; IceWM boots to shell then executes IceWM launcher
-      if (options.autostartDesktop && !isIceWM) {
+      // Autostart setting: KDE Plasma autostarts directly; GNOME and XFCE launch via profile session command
+      if (options.autostartDesktop && isKde) {
         bootCmdline += ` autostart=1`;
       } else {
         bootCmdline += ` autostart=0`;
@@ -404,22 +405,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         (window as any).linuxOs = this.activeOs;
 
-        // If IceWM was selected, wait for shell prompt and launch IceWM desktop
-        if (isIceWM && options.autostartDesktop) {
-          this.log(`[Desktop Launcher] Waiting for shell prompt to launch IceWM session...`);
-          // Wait up to 15 seconds for shell
-          const shellAppeared = await Promise.race([
+        // Multi-Desktop Session Launch (GNOME 48 & XFCE 4.20)
+        if (!isKde && options.autostartDesktop) {
+          const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
+          const sessionCmd = profile?.sessionCommand || `desktop wayland ${options.desktop}`;
+          this.log(`[Desktop Launcher] Waiting for shell to launch ${profile?.name || options.desktop}...`);
+          
+          await Promise.race([
             this.shellReadyPromise,
-            new Promise<boolean>(r => setTimeout(() => r(false), 15000))
+            new Promise<boolean>(r => setTimeout(() => r(false), 12000))
           ]);
 
-          if (shellAppeared) {
-            this.log(`[Desktop Launcher] Executing IceWM session start...`);
-            this.sendInput('desktop wayland-x icewm\r');
-          } else {
-            this.log(`[Desktop Launcher] Shell prompt timed out; falling back to direct input.`);
-            this.sendInput('desktop wayland-x icewm\r');
-          }
+          this.log(`[Desktop Launcher] Executing session command: ${sessionCmd}`);
+          this.sendInput(`${sessionCmd}\r`);
         }
 
       } else {

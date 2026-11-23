@@ -2998,6 +2998,17 @@
   let shownDesktop = null, panelShown = "", panelHeld = false;
 
   const panelFrame = (v, t) => {
+    const serial = table.version >= 3 ? v.getUint32(t + H_APPS_SERIAL, true) : 0;
+    if (serial !== appsSerial) {
+      appsSerial = serial;
+      try {
+        const at = v.getUint32(t + H_APPS_LO, true) + v.getUint32(t + H_APPS_HI, true) * 0x100000000;
+        apps = JSON.parse(decoder.decode(new Uint8Array(os.memory.buffer, at, v.getUint32(t + H_APPS_LEN, true)).slice()));
+      } catch (error) {
+        apps = [];
+        appsSerial = 0;
+      }
+    }
     if (!panel) {
       return;
     }
@@ -3012,17 +3023,6 @@
     if (T) {
       // Plasma's panel (plasma.js), over the strip the server keeps: laid out in the screen's pixels, scaled as the
       // frames are.
-      const serial = table.version >= 3 ? v.getUint32(t + H_APPS_SERIAL, true) : 0;
-      if (serial !== appsSerial) {
-        appsSerial = serial;
-        try {
-          const at = v.getUint32(t + H_APPS_LO, true) + v.getUint32(t + H_APPS_HI, true) * 0x100000000;
-          apps = JSON.parse(decoder.decode(new Uint8Array(os.memory.buffer, at, v.getUint32(t + H_APPS_LEN, true)).slice()));
-        } catch (error) {
-          apps = [];
-          appsSerial = 0;
-        }
-      }
       const focus = v.getUint32(t + H_FOCUS, true);
       const front = lastWindows.find((s) => s.id === focus);
       const display = front && (front.flags & F_FULLSCREEN) ? "none" : "";
@@ -3057,19 +3057,6 @@
       }
       T.renderPanel(panel, model);
       return;
-    }
-    // The programs, when the server has a new list.
-    const serial = table.version >= 3 ? v.getUint32(t + H_APPS_SERIAL, true) : 0;
-    if (serial !== appsSerial) {
-      appsSerial = serial;
-      try {
-        const at = v.getUint32(t + H_APPS_LO, true) + v.getUint32(t + H_APPS_HI, true) * 0x100000000;
-        const len = v.getUint32(t + H_APPS_LEN, true);
-        apps = JSON.parse(decoder.decode(new Uint8Array(os.memory.buffer, at, len).slice()));
-      } catch (error) {
-        apps = [];
-        appsSerial = 0;	// (read while it was being replaced: again next frame)
-      }
     }
     // Hidden under a fullscreen window in front.
     const focus = v.getUint32(t + H_FOCUS, true);
@@ -3531,6 +3518,26 @@ html.rv-desk #rv-bar {
     },
     switcher: () => ({ open: switcher.open, at: switcher.at, items: switcher.items.map((w) => w.title || w.app) }),
     windowList: () => (active ? windowList() : []),
+    get apps() {
+      return apps ? apps.slice() : [];
+    },
+    toggleLauncher: (open) => toggleLauncher(open),
+    launchApp: (nameOrIndex) => {
+      if (typeof nameOrIndex === 'number') {
+        if (nameOrIndex >= 0 && nameOrIndex < apps.length) {
+          launch(nameOrIndex);
+          return true;
+        }
+        return false;
+      }
+      const q = String(nameOrIndex).toLowerCase();
+      const idx = apps.findIndex(a => (a.name && a.name.toLowerCase().includes(q)) || (a.file && a.file.toLowerCase().includes(q)) || (a.wmclass && a.wmclass.toLowerCase().includes(q)));
+      if (idx >= 0) {
+        launch(idx);
+        return true;
+      }
+      return false;
+    },
     settings,
     fullscreen,
     // The page of the browser window in front to the host's browser (Alt-Shift-O): for scripts and tests.

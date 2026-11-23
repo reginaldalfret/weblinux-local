@@ -5,7 +5,27 @@
 
 export type DistributionId = 'debian' | 'ubuntu' | 'fedora' | 'arch' | 'kali-lab';
 
-export type DesktopEnvironmentId = 'kde-plasma' | 'icewm' | 'xfce' | 'gnome';
+export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce';
+
+export type DesktopProfileStatus = 'validated' | 'experimental' | 'preview' | 'unavailable';
+
+export interface DesktopProfile {
+  id: DesktopEnvironmentId;
+  name: string;
+  version: string;
+  tagline: string;
+  description: string;
+  distributionId: DistributionId;
+  status: DesktopProfileStatus;
+  sessionCommand: string;
+  compositor: string;
+  rootfsManifestId: string;
+  minimumRamMB: number;
+  recommendedRamMB: number;
+  supportedFeatures: string[];
+  knownLimitations: string[];
+  previewImage?: string;
+}
 
 export type ValidationStatus = 'validated' | 'preview' | 'experimental' | 'planned' | 'testing';
 

@@ -1,60 +1,7 @@
 import React from 'react';
-import { Monitor, CheckCircle2, Zap, ArrowRight, Layers, Sparkles, AlertCircle } from 'lucide-react';
-import { DesktopEnvironmentId } from '../../../../runtime/types';
-
-interface DesktopOption {
-  id: DesktopEnvironmentId;
-  name: string;
-  tagline: string;
-  description: string;
-  status: 'validated' | 'future_target';
-  memoryRecommendedMB: number;
-  engine: string;
-  features: string[];
-}
-
-const DESKTOPS: DesktopOption[] = [
-  {
-    id: 'kde-plasma',
-    name: 'KDE Plasma 6',
-    tagline: 'Primary Complete Desktop Environment',
-    description: 'Full-featured modern desktop shell compiled natively to WebAssembly (Qt 6.8 & KDE Frameworks 6). Runs Konsole, Dolphin, Kate, System Settings with zero emulation latency for the shell.',
-    status: 'validated',
-    memoryRecommendedMB: 8192,
-    engine: 'Native WebAssembly Qt6 / Wayland Compositor',
-    features: ['Kickoff Application Launcher', 'Dolphin File Manager', 'Konsole Terminal with IME', 'Wayland compositor protocols', 'Aurorae Window Decorations'],
-  },
-  {
-    id: 'icewm',
-    name: 'IceWM',
-    tagline: 'Initial Lightweight Desktop Environment',
-    description: 'Ultra-fast, minimal memory footprint X11/Wayland desktop environment. Ideal for low-spec laptops or quick system administration sessions.',
-    status: 'validated',
-    memoryRecommendedMB: 4096,
-    engine: 'Xwayland / IceWM Window Manager',
-    features: ['Instant startup time', 'Low memory overhead', 'Traditional taskbar & menu', 'X11 application compatibility', 'Minimal battery drain'],
-  },
-  {
-    id: 'xfce',
-    name: 'XFCE 4.18',
-    tagline: 'Future Desktop Target',
-    description: 'Fast, modular desktop environment currently undergoing GTK3/Wayland and RISC-V translation validation pipeline.',
-    status: 'future_target',
-    memoryRecommendedMB: 4096,
-    engine: 'GTK3 / Wayland Bridge (In Progress)',
-    features: ['Thunar File Manager', 'Lightweight panel system', 'Modular components', 'Low resource consumption'],
-  },
-  {
-    id: 'gnome',
-    name: 'GNOME Shell',
-    tagline: 'Future Desktop Target',
-    description: 'Modern workspace-centric desktop environment scheduled for future integration after libmutter WebAssembly port stabilization.',
-    status: 'future_target',
-    memoryRecommendedMB: 8192,
-    engine: 'Mutter Wayland Compositor (Planned)',
-    features: ['Overview spatial navigation', 'GTK4 & Libadwaita', 'System search integration'],
-  },
-];
+import { Monitor, CheckCircle2, Zap, ArrowRight, Layers, Sparkles, AlertCircle, Info, ShieldAlert } from 'lucide-react';
+import { DesktopEnvironmentId, DesktopProfile, DesktopProfileStatus } from '../../../../runtime/types';
+import { DEBIAN_DESKTOP_PROFILES } from '../../../../runtime/profiles/desktopProfiles';
 
 interface DesktopSelectorProps {
   selectedDesktop: DesktopEnvironmentId;
@@ -67,6 +14,41 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
   onSelect,
   onLaunch,
 }) => {
+  const desktopList: DesktopProfile[] = Object.values(DEBIAN_DESKTOP_PROFILES);
+
+  const getStatusBadge = (status: DesktopProfileStatus) => {
+    switch (status) {
+      case 'validated':
+        return {
+          label: 'Validated',
+          className: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+        };
+      case 'experimental':
+        return {
+          label: 'Experimental',
+          className: 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+        };
+      case 'preview':
+        return {
+          label: 'Preview',
+          className: 'bg-blue-500/10 text-blue-300 border-blue-500/30'
+        };
+      case 'unavailable':
+      default:
+        return {
+          label: 'Unavailable',
+          className: 'bg-white/5 text-slate-400 border-white/10'
+        };
+    }
+  };
+
+  const isLaunchable = (status: DesktopProfileStatus) => {
+    return status === 'validated' || status === 'experimental';
+  };
+
+  const currentSelectedProfile = DEBIAN_DESKTOP_PROFILES[selectedDesktop] || desktopList[0];
+  const canLaunchCurrent = isLaunchable(currentSelectedProfile.status);
+
   return (
     <div className="max-w-6xl mx-auto px-4 lg:px-8 py-12">
       {/* Header */}
@@ -80,35 +62,43 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
             Choose Graphical Environment
           </h1>
           <p className="text-sm text-slate-400 mt-1 max-w-xl">
-            Select the desktop shell to boot. Unlike simulated web UIs, WebLinux executes genuine compiled Linux desktop environments.
+            Select the desktop shell to boot. WebLinux Local executes genuine compiled Linux desktop environments on top of Debian 13 Trixie.
           </p>
         </div>
 
         <button
           onClick={onLaunch}
-          className="mt-4 md:mt-0 flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-xl shadow-purple-600/25 active:scale-95 transition-all cursor-pointer self-start md:self-auto"
+          data-testid="launch-desktop-btn"
+          disabled={!canLaunchCurrent}
+          className={`mt-4 md:mt-0 flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white shadow-xl transition-all cursor-pointer self-start md:self-auto ${
+            canLaunchCurrent
+              ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-purple-600/25 active:scale-95'
+              : 'bg-slate-700/50 text-slate-400 cursor-not-allowed opacity-60'
+          }`}
         >
           <Zap className="w-4 h-4 fill-current" />
-          <span>Launch WebLinux Desktop</span>
+          <span>Launch {currentSelectedProfile.name}</span>
         </button>
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {DESKTOPS.map((desktop) => {
+      {/* Cards Grid: Exactly 3 Desktops */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {desktopList.map((desktop) => {
           const isSelected = selectedDesktop === desktop.id;
-          const isValidated = desktop.status === 'validated';
+          const selectable = isLaunchable(desktop.status);
+          const badge = getStatusBadge(desktop.status);
 
           return (
             <div
               key={desktop.id}
+              data-testid={`card-${desktop.id}`}
               onClick={() => {
-                if (isValidated) onSelect(desktop.id);
+                if (selectable) onSelect(desktop.id);
               }}
               className={`rounded-2xl glass-panel p-6 border transition-all duration-300 flex flex-col justify-between cursor-pointer ${
                 isSelected
                   ? 'border-purple-500 bg-purple-500/[0.06] shadow-xl shadow-purple-500/15 ring-2 ring-purple-500/30'
-                  : isValidated
+                  : selectable
                   ? 'border-white/10 hover:border-purple-500/50 hover:bg-white/[0.04]'
                   : 'border-white/5 opacity-60 cursor-not-allowed'
               }`}
@@ -124,13 +114,9 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
                   </div>
 
                   <span
-                    className={`text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full border ${
-                      isValidated
-                        ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                        : 'bg-white/5 text-slate-400 border-white/10'
-                    }`}
+                    className={`text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full border ${badge.className}`}
                   >
-                    {isValidated ? 'Operational' : 'Future Target'}
+                    {badge.label}
                   </span>
                 </div>
 
@@ -140,39 +126,46 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
 
                 <div className="space-y-1.5 mb-4">
                   <span className="text-[11px] font-semibold uppercase text-slate-400 tracking-wider">Features:</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-300">
-                    {desktop.features.map((f, i) => (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  <div className="space-y-1 text-xs text-slate-300">
+                    {desktop.supportedFeatures.slice(0, 4).map((f, i) => (
+                      <div key={i} className="flex items-start gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
                         <span>{f}</span>
                       </div>
                     ))}
                   </div>
                 </div>
+
+                {desktop.knownLimitations.length > 0 && (
+                  <div className="mb-4 p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/20 text-[11px] text-amber-300/90 leading-tight">
+                    <span className="font-semibold text-amber-300">Note: </span>
+                    {desktop.knownLimitations[0]}
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3 pt-3 border-t border-white/5 text-xs">
                 <div className="flex justify-between text-slate-400 text-[11px]">
-                  <span>Engine Architecture:</span>
-                  <span className="font-mono text-slate-300">{desktop.engine}</span>
+                  <span>Compositor:</span>
+                  <span className="font-mono text-slate-300">{desktop.compositor}</span>
                 </div>
                 <div className="flex justify-between text-slate-400 text-[11px]">
-                  <span>Memory Requirement:</span>
-                  <span className="font-semibold text-slate-300">{desktop.memoryRecommendedMB / 1024} GB</span>
+                  <span>RAM Requirement:</span>
+                  <span className="font-semibold text-slate-300">{desktop.minimumRamMB} MiB (Min) / {desktop.recommendedRamMB} MiB (Rec)</span>
                 </div>
 
                 <button
                   type="button"
-                  disabled={!isValidated}
+                  disabled={!selectable}
                   className={`w-full py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
                     isSelected
                       ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : isValidated
+                      : selectable
                       ? 'bg-white/5 text-slate-200 hover:bg-white/10'
                       : 'bg-white/5 text-slate-400 cursor-not-allowed'
                   }`}
                 >
-                  {isSelected ? 'Active Desktop Environment' : isValidated ? 'Select This Desktop' : 'In Roadmap'}
+                  {isSelected ? 'Active Desktop Environment' : selectable ? 'Select This Desktop' : 'Unavailable'}
                 </button>
               </div>
             </div>

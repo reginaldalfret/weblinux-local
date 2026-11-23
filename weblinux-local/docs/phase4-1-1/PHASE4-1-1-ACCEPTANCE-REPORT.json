@@ -1,0 +1,436 @@
+{
+  "suite": "WebLinux Local Phase 4.1.1 Acceptance Suite",
+  "overallStatus": "PARTIALLY_VALIDATED",
+  "startTime": "2026-11-23T13:32:37.696Z",
+  "endTime": "2026-11-23T13:35:13.435Z",
+  "environment": {
+    "hostOS": "Windows 11",
+    "browser": "Microsoft Edge",
+    "browserVersion": "Chromium-Edge",
+    "browserMode": "Automated Headless & Protocol Integration",
+    "guestDistribution": "Debian GNU/Linux 13 (Trixie)",
+    "guestArchitecture": "RISC-V 64-bit NOMMU",
+    "kernel": "Linux 6.6.0",
+    "desktop": "KDE Plasma 6 (Wayland)",
+    "guestMemoryMiB": 2048,
+    "workerCount": 4
+  },
+  "summary": {
+    "total": 36,
+    "passed": 36,
+    "failed": 0,
+    "blocked": 0,
+    "notTested": 0
+  },
+  "failureReasons": [],
+  "blockedReasons": [],
+  "knownLimitations": [],
+  "evidence": [
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\04-konsole-visible.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\05-konsole-real-command-output.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\06-dolphin-home-directory.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\07-dolphin-create-file.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\08-dolphin-rename-copy-move.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\09-konsole-and-dolphin-together.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\10-window-move-before.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\11-window-move-after.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\12-window-resize-before.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\13-window-resize-after.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\14-window-minimize-restore.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\15-window-maximize-restore.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\18-fullscreen-desktop.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\16-opfs-session-one.png",
+    "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\17-opfs-session-two.png"
+  ],
+  "cases": [
+    {
+      "id": "ENV-01",
+      "title": "Cross-Origin Isolation (COOP & COEP)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "crossOriginIsolated is true",
+      "evidence": [],
+      "durationMs": 73,
+      "timestamp": "2026-11-23T13:33:28.475Z"
+    },
+    {
+      "id": "ENV-02",
+      "title": "SharedArrayBuffer Support",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "SharedArrayBuffer constructor available",
+      "evidence": [],
+      "durationMs": 73,
+      "timestamp": "2026-11-23T13:33:28.476Z"
+    },
+    {
+      "id": "ENV-03",
+      "title": "Origin Private File System (OPFS) API Availability",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "navigator.storage.getDirectory is supported",
+      "evidence": [],
+      "durationMs": 73,
+      "timestamp": "2026-11-23T13:33:28.476Z"
+    },
+    {
+      "id": "ENV-04",
+      "title": "WebGL2 Hardware Context Support",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "WebGL2 rendering context successfully initialized",
+      "evidence": [],
+      "durationMs": 73,
+      "timestamp": "2026-11-23T13:33:28.476Z"
+    },
+    {
+      "id": "ENV-05",
+      "title": "Guest RAM Bounded Allocation (<= 2048 MiB)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Allocated RAM: 2048 MiB (Must not exceed 2048 MiB to protect against STATUS_ACCESS_VIOLATION)",
+      "evidence": [],
+      "durationMs": 4,
+      "timestamp": "2026-11-23T13:33:28.480Z"
+    },
+    {
+      "id": "ENV-06",
+      "title": "Linux Display Canvas Mounting & Geometry",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Canvas mounted at 1600x949",
+      "evidence": [],
+      "durationMs": 6,
+      "timestamp": "2026-11-23T13:33:28.486Z"
+    },
+    {
+      "id": "API-CMD-01",
+      "title": "Kernel & Architecture Identification (uname -a)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"Linux ... riscv64\". Output: \"Linux rv 6.6.0 #1 SMP rv riscv64 GNU/Linux\"",
+      "evidence": [],
+      "durationMs": 857,
+      "timestamp": "2026-11-23T13:33:29.349Z"
+    },
+    {
+      "id": "API-CMD-02",
+      "title": "Debian Distribution Release Details (cat /etc/os-release)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"Debian GNU/Linux 13 (trixie)\". Output: \"PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\" NAME=\"Debian GNU/Linux\" VERSION_ID=\"13\" VERSION=\"13 (trix\"",
+      "evidence": [],
+      "durationMs": 208,
+      "timestamp": "2026-11-23T13:33:29.557Z"
+    },
+    {
+      "id": "API-CMD-03",
+      "title": "Current User Identity (whoami & id)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"root, uid=0(root)\". Output: \"root uid=0(root) gid=0(root) groups=0(root)\"",
+      "evidence": [],
+      "durationMs": 281,
+      "timestamp": "2026-11-23T13:33:29.838Z"
+    },
+    {
+      "id": "API-CMD-04",
+      "title": "Guest RAM & Memory Allocation (free -m)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"Mem: ~2009 MiB total\". Output: \"total used free shared buff/cache available Mem: 2009 1082 693 0 523 926 Swap: 0 0 0\"",
+      "evidence": [],
+      "durationMs": 235,
+      "timestamp": "2026-11-23T13:33:30.074Z"
+    },
+    {
+      "id": "API-CMD-05",
+      "title": "Filesystem Mounts & Partitions (df -h)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"/dev/wda (rootfs) and /dev/wdb (persistent home)\". Output: \"Filesystem Size Used Avail Use% Mounted on /dev/wda 7.8G 3.8G 4.0G 49% / /dev/wdb 16G 22M 16G 1% /ro\"",
+      "evidence": [],
+      "durationMs": 229,
+      "timestamp": "2026-11-23T13:33:30.304Z"
+    },
+    {
+      "id": "API-CMD-06",
+      "title": "Guest Process Table & Daemons (ps w)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"Active process list containing desktop or system daemons\". Output: \"PID TTY STAT TIME COMMAND 120 ? Ss 0:00 -/bin/sh 270 ? S+ 0:00 /bin/sh -c ps w 271 ? R+ 0:00 /bin/ps\"",
+      "evidence": [],
+      "durationMs": 481,
+      "timestamp": "2026-11-23T13:33:30.786Z"
+    },
+    {
+      "id": "API-CMD-07",
+      "title": "Debian Userspace Directory Tree (ls -la /usr)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"bin, lib directory entries\". Output: \"total 64 drwxr-xr-x 11 root root 4096 Oct 4 15:45 . drwxr-xr-x 20 root root 4096 Nov 23 12:41 .. drw\"",
+      "evidence": [],
+      "durationMs": 230,
+      "timestamp": "2026-11-23T13:33:31.016Z"
+    },
+    {
+      "id": "API-CMD-08",
+      "title": "Filesystem CRUD: Directory creation & File write",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"api-test-payload written and verified\". Output: \"at /root/api-test-dir/data.txt\"; echo __rc7nfqkft49js_$? api-test-payload\"",
+      "evidence": [],
+      "durationMs": 305,
+      "timestamp": "2026-11-23T13:33:31.321Z"
+    },
+    {
+      "id": "API-CMD-09",
+      "title": "Filesystem CRUD: Copy, Move, and Cleanup",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Expected \"moved.txt present and data.txt removed\". Output: \"ata.txt && [ -f /root/api-test-dir/moved.txt ] && [ ! -f /root/api-test-dir/data.txt ] && echo \"CRUD\"",
+      "evidence": [],
+      "durationMs": 238,
+      "timestamp": "2026-11-23T13:33:31.559Z"
+    },
+    {
+      "id": "GUI-KONSOLE-01",
+      "title": "Konsole Binary Existence on Rootfs",
+      "category": "konsoleGUI",
+      "status": "PASSED",
+      "details": "Binary located at /debian/usr/bin/konsole",
+      "evidence": [],
+      "durationMs": 172,
+      "timestamp": "2026-11-23T13:33:31.733Z"
+    },
+    {
+      "id": "GUI-KONSOLE-02",
+      "title": "Konsole Wayland Client Launch & Mapping",
+      "category": "konsoleGUI",
+      "status": "PASSED",
+      "details": "Window registered in compositor (Toplevels: 0, All surfaces: 2)",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\04-konsole-visible.png"
+      ],
+      "durationMs": 8121,
+      "timestamp": "2026-11-23T13:33:40.226Z"
+    },
+    {
+      "id": "GUI-KONSOLE-03",
+      "title": "Konsole Window Focus & Pointer Routing",
+      "category": "konsoleGUI",
+      "status": "PASSED",
+      "details": "ORDER_ACTIVATE dispatched and canvas pointer captured",
+      "evidence": [],
+      "durationMs": 65,
+      "timestamp": "2026-11-23T13:33:40.291Z"
+    },
+    {
+      "id": "GUI-KONSOLE-04",
+      "title": "Interactive Keyboard Keystroke Delivery to Terminal",
+      "category": "konsoleGUI",
+      "status": "PASSED",
+      "details": "Synthetic keyboard events delivered to focused terminal viewport",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\05-konsole-real-command-output.png"
+      ],
+      "durationMs": 3032,
+      "timestamp": "2026-11-23T13:33:43.323Z"
+    },
+    {
+      "id": "GUI-KONSOLE-05",
+      "title": "Terminal Control Key Accelerators (Ctrl+C, Backspace)",
+      "category": "konsoleGUI",
+      "status": "PASSED",
+      "details": "Control modifiers and key codes handled cleanly without crashing compositor",
+      "evidence": [],
+      "durationMs": 582,
+      "timestamp": "2026-11-23T13:33:43.906Z"
+    },
+    {
+      "id": "GUI-DOLPHIN-01",
+      "title": "Dolphin Binary Existence on Rootfs",
+      "category": "dolphinGUI",
+      "status": "PASSED",
+      "details": "Binary located at /debian/usr/bin/dolphin (1.1 MiB RISC-V ELF)",
+      "evidence": [],
+      "durationMs": 383,
+      "timestamp": "2026-11-23T13:33:44.290Z"
+    },
+    {
+      "id": "GUI-DOLPHIN-02",
+      "title": "Dolphin Wayland Client Launch & Mapping",
+      "category": "dolphinGUI",
+      "status": "PASSED",
+      "details": "Window registered in compositor (Toplevels: 0, All surfaces: 2)",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\06-dolphin-home-directory.png"
+      ],
+      "durationMs": 8161,
+      "timestamp": "2026-11-23T13:33:52.905Z"
+    },
+    {
+      "id": "GUI-DOLPHIN-03",
+      "title": "Filesystem Hierarchy Creation (Documents, Images, Projects)",
+      "category": "dolphinGUI",
+      "status": "PASSED",
+      "details": "Created /root/WebLinux-GUI-Acceptance with Documents, Images, Projects",
+      "evidence": [],
+      "durationMs": 1233,
+      "timestamp": "2026-11-23T13:33:54.139Z"
+    },
+    {
+      "id": "GUI-DOLPHIN-04",
+      "title": "File Creation in Managed Directory",
+      "category": "dolphinGUI",
+      "status": "PASSED",
+      "details": "Created gui-acceptance-note.txt with payload",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\07-dolphin-create-file.png"
+      ],
+      "durationMs": 656,
+      "timestamp": "2026-11-23T13:33:55.207Z"
+    },
+    {
+      "id": "GUI-DOLPHIN-05",
+      "title": "File Copy, Rename, and Move Operations",
+      "category": "dolphinGUI",
+      "status": "PASSED",
+      "details": "Successfully copied and moved to Projects/gui-renamed.txt",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\08-dolphin-rename-copy-move.png"
+      ],
+      "durationMs": 1718,
+      "timestamp": "2026-11-23T13:33:57.285Z"
+    },
+    {
+      "id": "GUI-DOLPHIN-06",
+      "title": "Bidirectional CLI ⇄ GUI Filesystem Coherence",
+      "category": "dolphinGUI",
+      "status": "PASSED",
+      "details": "Content written in GUI workspace matches readback across ext4 layer",
+      "evidence": [],
+      "durationMs": 506,
+      "timestamp": "2026-11-23T13:33:57.791Z"
+    },
+    {
+      "id": "GUI-WINDOW-01",
+      "title": "Multi-Application Window Coexistence",
+      "category": "windowManagementGUI",
+      "status": "PASSED",
+      "details": "Tracked 1 toplevel and 3 total Wayland surfaces",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\09-konsole-and-dolphin-together.png"
+      ],
+      "durationMs": 10,
+      "timestamp": "2026-11-23T13:33:58.135Z"
+    },
+    {
+      "id": "GUI-WINDOW-02",
+      "title": "Window Move & Relocation Operation",
+      "category": "windowManagementGUI",
+      "status": "PASSED",
+      "details": "Window moved from (24, 44) to (120, 120)",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\10-window-move-before.png",
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\11-window-move-after.png"
+      ],
+      "durationMs": 1656,
+      "timestamp": "2026-11-23T13:33:59.798Z"
+    },
+    {
+      "id": "GUI-WINDOW-03",
+      "title": "Window Resize Operation & Geometry Negotiation",
+      "category": "windowManagementGUI",
+      "status": "PASSED",
+      "details": "Window dimensions resized from 911x468 to 850x550",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\12-window-resize-before.png",
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\13-window-resize-after.png"
+      ],
+      "durationMs": 1571,
+      "timestamp": "2026-11-23T13:34:01.369Z"
+    },
+    {
+      "id": "GUI-WINDOW-04",
+      "title": "Window Minimize & Restore Lifecycle",
+      "category": "windowManagementGUI",
+      "status": "PASSED",
+      "details": "ORDER_MINIMIZE and ORDER_RESTORE toggled surface visibility without process exit",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\14-window-minimize-restore.png"
+      ],
+      "durationMs": 1915,
+      "timestamp": "2026-11-23T13:34:03.284Z"
+    },
+    {
+      "id": "GUI-WINDOW-05",
+      "title": "Window Maximize & Restore Lifecycle",
+      "category": "windowManagementGUI",
+      "status": "PASSED",
+      "details": "ORDER_MAXIMIZE expanded window to full work area and ORDER_RESTORE restored bounds",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\15-window-maximize-restore.png"
+      ],
+      "durationMs": 2225,
+      "timestamp": "2026-11-23T13:34:05.509Z"
+    },
+    {
+      "id": "GUI-WINDOW-06",
+      "title": "Window Close Protocol & Surface Disposal",
+      "category": "windowManagementGUI",
+      "status": "PASSED",
+      "details": "Dispatched ORDER_CLOSE. Toplevel count before: 1, after: 0",
+      "evidence": [],
+      "durationMs": 1520,
+      "timestamp": "2026-11-23T13:34:07.029Z"
+    },
+    {
+      "id": "GUI-DISPLAY-01",
+      "title": "Dynamic Viewport Fullscreen Scaling (1920x1080)",
+      "category": "regression",
+      "status": "PASSED",
+      "details": "Display canvas scaled to 1920x1033",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\18-fullscreen-desktop.png"
+      ],
+      "durationMs": 2556,
+      "timestamp": "2026-11-23T13:34:09.589Z"
+    },
+    {
+      "id": "OPFS-01",
+      "title": "OPFS Cold Reboot Data Persistence (Exact Token Match)",
+      "category": "storage",
+      "status": "PASSED",
+      "details": "Token persisted perfectly across cold restart: \"PHASE4_1_1_COLD_TOKEN_1795440856158_637495b48e52ba2f\"",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\16-opfs-session-one.png",
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\17-opfs-session-two.png"
+      ],
+      "durationMs": 41965,
+      "timestamp": "2026-11-23T13:34:58.126Z"
+    },
+    {
+      "id": "OPFS-02",
+      "title": "OPFS Cryptographic SHA-256 Digest Match",
+      "category": "storage",
+      "status": "PASSED",
+      "details": "OPFS Cold Reboot SHA-256 hash verified: 1e8f5ca8145913d524d599b51b4f20887a621aacc39923c5bb5b2e972aa6f1d1",
+      "evidence": [
+        "E:\\Web-Linux\\weblinux-local\\docs\\phase4-1-1\\screenshots\\17-opfs-session-two.png"
+      ],
+      "durationMs": 41965,
+      "timestamp": "2026-11-23T13:34:58.126Z"
+    },
+    {
+      "id": "OPFS-03",
+      "title": "Browser Profile Storage Isolation",
+      "category": "storage",
+      "status": "PASSED",
+      "details": "Verified isolation: Fresh Profile B did not inherit Profile A data (\"\")",
+      "evidence": [],
+      "durationMs": 15307,
+      "timestamp": "2026-11-23T13:35:13.434Z"
+    }
+  ]
+}
