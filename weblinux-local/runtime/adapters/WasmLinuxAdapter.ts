@@ -647,7 +647,15 @@ EOF
 chmod +x /debian/usr/local/bin/weblinux-xfce-session
 fi`;
 
-    const ubuntuGnomeSessionScript =
+      const virglExperimental =
+        typeof window !== 'undefined' &&
+        (Boolean((window as any).WEBLINUX_ENABLE_VIRGL_EXPERIMENTAL) ||
+          new URLSearchParams(window.location.search).get('virgl') === '1');
+      if (virglExperimental) {
+        this.log(`[Graphics] WEBLINUX_ENABLE_VIRGL_EXPERIMENTAL=1 active (experimental VirGL proto/vtest path; WebGL2 display fallback preserved)`);
+      }
+
+      const ubuntuGnomeSessionScript =
 `if [ -d /ubuntu ]; then
 cat <<'EOF' > /ubuntu/usr/local/bin/ubuntu-gnome-session
 #!/bin/sh
@@ -664,7 +672,7 @@ fi
 echo "[Ubuntu GNOME Launcher] Preflight verified: gnome-shell and mutter are installed."
 export GJS_DISABLE_JIT=1
 export JS_DISABLE_JIT=1
-export LIBGL_ALWAYS_SOFTWARE=1
+${virglExperimental ? 'export GALLIUM_DRIVER=virpipe\nexport VTEST_SOCKET_NAME=/run/user/0/rvgpu-0' : 'export LIBGL_ALWAYS_SOFTWARE=1'}
 export NO_AT_BRIDGE=1
 export XDG_CURRENT_DESKTOP=GNOME
 export XDG_SESSION_TYPE=wayland
