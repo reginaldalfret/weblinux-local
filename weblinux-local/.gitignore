@@ -11,3 +11,6 @@ tests/.edge-*
 tests/.pw-*
 tests/scratch*
 *.cache/
+
+.phase6-build/
+apps/web/public/disk/ubuntu-24.04/[0-9]*

@@ -27,11 +27,25 @@ export default defineConfig({
           // 1. Intercept /disk/... requests (manifests and ext4 chunks)
           if (rawUrl.startsWith('/disk/')) {
             const diskSubpath = rawUrl.replace(/^\/disk\//, '');
+            const localPublicDiskFile = path.resolve(__dirname, 'public/disk', diskSubpath);
             const targetUrl = `https://plasmaontheweb.com/disk/${diskSubpath}`;
             const localCacheFile = path.join(DISK_CACHE_DIR, diskSubpath.replace(/\//g, '_'));
 
             res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
             res.setHeader('Access-Control-Allow-Origin', '*');
+
+            // 1.1 First check if the file exists directly in public/disk/
+            if (fs.existsSync(localPublicDiskFile)) {
+              try {
+                const fileBuf = fs.readFileSync(localPublicDiskFile);
+                res.setHeader('Content-Type', diskSubpath.endsWith('.json') ? 'application/json' : 'application/octet-stream');
+                res.setHeader('Content-Length', fileBuf.length);
+                res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+                res.statusCode = 200;
+                res.end(fileBuf);
+                return;
+              } catch (readErr) {}
+            }
 
             // Handle manifest.json
             if (diskSubpath.endsWith('manifest.json')) {
@@ -117,11 +131,24 @@ export default defineConfig({
           const rawUrl = req.url ? req.url.split('?')[0] : '';
           if (rawUrl.startsWith('/disk/')) {
             const diskSubpath = rawUrl.replace(/^\/disk\//, '');
+            const localPublicDiskFile = path.resolve(__dirname, 'public/disk', diskSubpath);
             const targetUrl = `https://plasmaontheweb.com/disk/${diskSubpath}`;
             const localCacheFile = path.join(DISK_CACHE_DIR, diskSubpath.replace(/\//g, '_'));
 
             res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
             res.setHeader('Access-Control-Allow-Origin', '*');
+
+            if (fs.existsSync(localPublicDiskFile)) {
+              try {
+                const fileBuf = fs.readFileSync(localPublicDiskFile);
+                res.setHeader('Content-Type', diskSubpath.endsWith('.json') ? 'application/json' : 'application/octet-stream');
+                res.setHeader('Content-Length', fileBuf.length);
+                res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+                res.statusCode = 200;
+                res.end(fileBuf);
+                return;
+              } catch (readErr) {}
+            }
 
             if (diskSubpath.endsWith('manifest.json')) {
               try {

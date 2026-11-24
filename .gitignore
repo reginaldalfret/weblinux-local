@@ -12,3 +12,7 @@ tests/.pw-*
 tests/scratch*
 **/.*profile*
 *.cache/
+
+.phase6-build/
+apps/web/public/disk/ubuntu-24.04/[0-9]*
+weblinux-local/apps/web/public/disk/ubuntu-24.04/[0-9]*
