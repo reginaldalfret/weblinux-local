@@ -15,3 +15,4 @@ tests/scratch*
 .phase6-build/
 apps/web/public/disk/ubuntu-24.04/[0-9]*
 apps/web/public/disk/ubuntu-24.04-gnome/[0-9]*
+apps/web/public/disk/**/rootfs.img

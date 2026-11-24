@@ -132,6 +132,8 @@ const decode_meta_slot = (buf) => {
 let memory = null;      // the machine's memory
 let control = null;     // Int32Array: the shared words above
 let base = "";          // where the site keeps the pieces (and the manifest)
+let range_url = "";     // consolidated image URL for HTTP 206 Range requests, or ""
+let range_etag = null;  // locked ETag from verified Range probe
 let remote = "";        // where the manifest says the same pieces are, by hash (object storage), or ""
 let hashes = null;      // per piece, its sha256 as the manifest says, "" for none
 let remote_failures = 0;
@@ -459,12 +461,53 @@ const get = (url, exact) => {
 /// that failed in a row is left alone for a while so that a broken one costs nothing more than a request or two (and
 /// for as long as it asked, if it said "try again in n seconds"). The site's own copy is tried again with growing
 /// waits, as above, until RETRY_TOTAL has passed.
+const get_range = (url, start, expected) => {
+  const end = start + expected - 1;
+  try {
+    const request = new XMLHttpRequest();
+    request.open("GET", url, false);
+    request.responseType = "arraybuffer";
+    request.setRequestHeader("Range", "bytes=" + start + "-" + end);
+    request.send();
+    if (request.status === 200 || request.status === 416) {
+      return [null, "server returned HTTP " + request.status + " instead of 206; falling back to chunks"];
+    }
+    if (request.status !== 206) {
+      return [null, "HTTP " + request.status];
+    }
+    const cr = request.getResponseHeader("Content-Range") || "";
+    const m = /^bytes\s+(\d+)-(\d+)\/(\d+|\*)$/i.exec(cr.trim());
+    if (!m || Number(m[1]) !== start || Number(m[2]) !== end) {
+      return [null, "invalid Content-Range: " + cr];
+    }
+    const etag = request.getResponseHeader("ETag");
+    if (range_etag && etag && etag !== range_etag) {
+      return [null, "ETag mismatch (" + range_etag + " vs " + etag + ")"];
+    }
+    if (request.response.byteLength !== expected) {
+      return [null, "length mismatch: " + request.response.byteLength + " != " + expected];
+    }
+    return [new Uint8Array(request.response), ""];
+  } catch (error) {
+    return [null, error.message || error.name];
+  }
+};
+
 const fetch_piece = (piece) => {
   const expected = Math.min(piece_size, size - piece * piece_size);  // the last piece of a disk may be short
   const started = Date.now();
   let bytes = null;
   let problem = "";
   let info;
+  if (range_url) {
+    [bytes, problem] = get_range(range_url, piece * piece_size, expected);
+    if (!bytes) {
+      log("range read fallback at piece " + piece + " (" + problem + "): switching to chunk loader");
+      range_url = "";
+    } else {
+      return bytes;
+    }
+  }
   if (remote && hashes[piece] && Date.now() >= remote_off_until) {
     [bytes, problem, info] = get(remote + hashes[piece] + ".bin", expected);
     if (bytes) {
@@ -1377,6 +1420,30 @@ const disk_main = async (event) => {
     size = manifest.size;
     piece_size = manifest.piece;
     const pieces = Math.ceil(size / piece_size);
+    // Probe consolidated HTTP Range source if declared (never trust Accept-Ranges alone)
+    range_url = "";
+    range_etag = null;
+    if (manifest.rangeImage && manifest.rangeImage.url && manifest.rangeImage.size === size) {
+      try {
+        const candidateUrl = new URL(manifest.rangeImage.url, new URL(base, self.location.href)).href;
+        const probeEnd = Math.min(511, size - 1);
+        const probeRes = await fetch(candidateUrl, { headers: { Range: "bytes=0-" + probeEnd }, cache: "no-store" });
+        if (probeRes.status === 206) {
+          const cr = probeRes.headers.get("Content-Range") || "";
+          const m = /^bytes\s+0-(\d+)\/(\d+|\*)$/i.exec(cr.trim());
+          const probeBuf = await probeRes.arrayBuffer();
+          if (m && Number(m[1]) === probeEnd && (m[2] === "*" || Number(m[2]) === size) && probeBuf.byteLength === probeEnd + 1) {
+            range_url = candidateUrl;
+            range_etag = probeRes.headers.get("ETag");
+            log("source: HTTP 206 Range verified (" + manifest.rangeImage.url + ")");
+          }
+        } else {
+          log("range probe returned HTTP " + probeRes.status + "; using chunk loader");
+        }
+      } catch (probeErr) {
+        log("range probe unavailable (" + probeErr.message + "); using chunk loader");
+      }
+    }
     // Pieces from object storage need both an address and the hashes to name them by; a manifest without either is
     // served by the site itself, as it always was.
     remote = "";

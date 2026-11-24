@@ -37,14 +37,47 @@ export default defineConfig({
             // 1.1 First check if the file exists directly in public/disk/
             if (fs.existsSync(localPublicDiskFile)) {
               try {
-                const fileBuf = fs.readFileSync(localPublicDiskFile);
-                res.setHeader('Content-Type', diskSubpath.endsWith('.json') ? 'application/json' : 'application/octet-stream');
-                res.setHeader('Content-Length', fileBuf.length);
-                res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-                res.statusCode = 200;
-                res.end(fileBuf);
-                return;
-              } catch (readErr) {}
+                const stat = fs.statSync(localPublicDiskFile);
+                if (stat.isFile()) {
+                  const totalSize = stat.size;
+                  const etag = `"${stat.size}-${Math.floor(stat.mtimeMs)}"`;
+                  res.setHeader('Content-Type', diskSubpath.endsWith('.json') ? 'application/json' : 'application/octet-stream');
+                  res.setHeader('Accept-Ranges', 'bytes');
+                  res.setHeader('ETag', etag);
+                  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+
+                  const rangeHeader = req.headers.range;
+                  if (typeof rangeHeader === 'string' && rangeHeader.startsWith('bytes=')) {
+                    const m = /^bytes=(\d*)-(\d*)$/.exec(rangeHeader.trim());
+                    if (!m) {
+                      res.statusCode = 416;
+                      res.setHeader('Content-Range', `bytes */${totalSize}`);
+                      res.end();
+                      return;
+                    }
+                    const start = m[1] === '' ? Math.max(0, totalSize - Number(m[2])) : Number(m[1]);
+                    const end = m[2] === '' ? totalSize - 1 : Math.min(totalSize - 1, Number(m[2]));
+                    if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || start > end || end >= totalSize) {
+                      res.statusCode = 416;
+                      res.setHeader('Content-Range', `bytes */${totalSize}`);
+                      res.end();
+                      return;
+                    }
+                    res.statusCode = 206;
+                    res.setHeader('Content-Range', `bytes ${start}-${end}/${totalSize}`);
+                    res.setHeader('Content-Length', end - start + 1);
+                    fs.createReadStream(localPublicDiskFile, { start, end }).pipe(res);
+                    return;
+                  }
+
+                  res.statusCode = 200;
+                  res.setHeader('Content-Length', totalSize);
+                  fs.createReadStream(localPublicDiskFile).pipe(res);
+                  return;
+                }
+              } catch (readErr) {
+                console.error('[Local Disk Serve Error]:', readErr);
+              }
             }
 
             // Handle manifest.json
