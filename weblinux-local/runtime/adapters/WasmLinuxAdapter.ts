@@ -694,11 +694,16 @@ export XDG_SESSION_TYPE=wayland
 export GDK_BACKEND=wayland
 export XDG_RUNTIME_DIR=/tmp/runtime-root
 export WAYLAND_DISPLAY=wayland-0
+export DISPLAY=:0
 mkdir -p -m 700 "$XDG_RUNTIME_DIR"
 
-# 1. Start system & session D-Bus if not running
-mkdir -p /run/dbus
-[ -e /run/dbus/pid ] || dbus-daemon --system --fork 2>/dev/null || true
+# 1. Ensure messagebus user exists and start system & session D-Bus
+grep -q '^messagebus:' /etc/passwd 2>/dev/null || echo 'messagebus:x:100:101:D-Bus:/nonexistent:/usr/sbin/nologin' >> /etc/passwd
+grep -q '^messagebus:' /etc/group 2>/dev/null || echo 'messagebus:x:101:' >> /etc/group
+mkdir -p /run/dbus /var/run
+[ -e /var/run/dbus ] || ln -s /run/dbus /var/run/dbus
+[ -S /run/dbus/system_bus_socket ] || dbus-daemon --system --fork --nopidfile 2>/root/dbus-system.log || true
+export DBUS_SYSTEM_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
 if [ ! -S "$XDG_RUNTIME_DIR/bus" ]; then
   dbus-daemon --session --fork --address="unix:path=$XDG_RUNTIME_DIR/bus" 2>/dev/null || true
 fi
@@ -723,7 +728,7 @@ if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
 fi
 
 echo "[Ubuntu GNOME Launcher] Wayland display $WAYLAND_DISPLAY ready. Launching GNOME Shell 46..."
-nohup gnome-shell --nested --wayland > /root/gnome-shell.log 2>&1 &
+nohup gnome-shell --nested --wayland --no-x11 --wayland-display=wayland-1 > /root/gnome-shell.log 2>&1 &
 sleep 2
 echo "[Ubuntu GNOME Launcher] GNOME Shell 46 session started (PID $!)."
 EOF
