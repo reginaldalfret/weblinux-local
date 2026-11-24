@@ -35,11 +35,16 @@ const { TestRecorder } = require('../phase4-1-1/helpers/TestRecorder');
   });
 
   console.log('[STAGE 1] Launching Microsoft Edge to test Desktop Selector UI...');
-  const browserContext = await chromium.launchPersistentContext(PROFILE_DIR, {
-    channel: 'msedge',
+  const launchOptions = {
     headless: true,
     args: ['--enable-features=SharedArrayBuffer', '--no-sandbox', '--disable-setuid-sandbox', '--window-size=1600,950']
-  });
+  };
+  if (process.env.PLAYWRIGHT_CHANNEL) {
+    launchOptions.channel = process.env.PLAYWRIGHT_CHANNEL;
+  } else if (process.platform === 'win32') {
+    launchOptions.channel = 'msedge';
+  }
+  const browserContext = await chromium.launchPersistentContext(PROFILE_DIR, launchOptions);
 
   const page = browserContext.pages()[0] || await browserContext.newPage();
   await page.setViewportSize({ width: 1600, height: 950 });

@@ -39,12 +39,17 @@ const { runVisibleEdgeSpec } = require('./run-visible-edge');
     browserMode: 'Automated Headless & Protocol Integration'
   });
 
-  console.log('[STAGE 1] Launching Microsoft Edge and Booting WebLinux Debian 13...');
-  const context = await chromium.launchPersistentContext(MAIN_PROFILE, {
-    channel: 'msedge',
+  console.log('[STAGE 1] Launching Browser and Booting WebLinux Debian 13...');
+  const launchOptions = {
     headless: true,
     args: ['--enable-features=SharedArrayBuffer', '--no-sandbox', '--disable-setuid-sandbox']
-  });
+  };
+  if (process.env.PLAYWRIGHT_CHANNEL) {
+    launchOptions.channel = process.env.PLAYWRIGHT_CHANNEL;
+  } else if (process.platform === 'win32') {
+    launchOptions.channel = 'msedge';
+  }
+  const context = await chromium.launchPersistentContext(MAIN_PROFILE, launchOptions);
 
   const page = context.pages()[0] || await context.newPage();
   await page.setViewportSize({ width: 1600, height: 900 });

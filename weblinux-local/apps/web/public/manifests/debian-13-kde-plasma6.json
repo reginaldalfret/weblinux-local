@@ -1,0 +1,32 @@
+{
+  "id": "debian-13-kde-plasma6",
+  "distributionName": "Debian GNU/Linux",
+  "distributionVersion": "13 (Trixie)",
+  "desktopIdentifier": "kde-plasma",
+  "desktopName": "KDE Plasma 6",
+  "desktopVersion": "6.3.0",
+  "architecture": "riscv64",
+  "abi": "lp64d (NOMMU / ELF64-FD-PIC)",
+  "nommuCompatibility": "confirmed",
+  "kernelCompatibility": "Linux 6.6.0 (wasm64_nommu)",
+  "rootfsImageLocation": "/disk/release/",
+  "totalSizeBytes": 8589934592,
+  "chunkSizeBytes": 1048576,
+  "chunkManifestUri": "/disk/release/manifest.json",
+  "buildId": "weblinux-debian13-kde-nommu-20261122",
+  "buildTimestamp": "2026-11-22T08:00:00Z",
+  "cryptographicChecksums": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "737eaaf635090b3045b942db65f2735fd0a23cad8d316f91956708f5a50d2e70",
+    "diskManifestId": "21dd6321337e178c4ac19c27d790403a"
+  },
+  "requiredRuntimeComponents": [
+    "/opt/nq/plasmashell",
+    "/usr/bin/kwin_wayland",
+    "/usr/bin/konsole",
+    "/usr/bin/dolphin",
+    "wlserver"
+  ],
+  "validationStatus": "validated",
+  "notes": "Reference baseline Debian 13 RISC-V NOMMU image. Fully verified for browser-local execution with Wayland WebGL2 display pipeline and OPFS ext4 persistence."
+}

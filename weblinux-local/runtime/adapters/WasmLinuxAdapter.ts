@@ -363,7 +363,12 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           const m = event.data;
           if (m && m.type === 'table') {
             this.log(`[Wayland Compositor] Window server active at 0x${m.address.toString(16)} (PID ${m.pid}) [${m.width}x${m.height}]`);
-            this.updateStatus({ waylandActive: true, state: 'running' });
+            this.updateStatus({ waylandActive: true, state: 'desktop_ready' });
+            setTimeout(() => {
+              if (this.status.state === 'desktop_ready') {
+                this.updateStatus({ state: 'running' });
+              }
+            }, 300);
           }
         };
       }
@@ -382,7 +387,11 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
             this.resolveShellReady(true);
             this.resolveShellReady = null;
           }
-          this.updateStatus({ shellReady: true });
+          if (this.status.state === 'booting') {
+            this.updateStatus({ state: 'shell_ready', shellReady: true });
+          } else {
+            this.updateStatus({ shellReady: true });
+          }
         }
       };
 
@@ -507,6 +516,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         clearInterval(timer);
 
+        const timedOut = !match && elapsed >= timeoutMs;
+
         // Extract command output minus the echoed command
         let out = match ? text.slice(0, match.index) : text;
         out = out.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -516,15 +527,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         }
         out = out.trim();
 
-        const rc = match ? Number(match[1]) : null;
+        const rc = match ? Number(match[1]) : (timedOut ? 124 : null);
         const ms = Math.round(elapsed);
+        const stderr = timedOut ? `Command timed out after ${timeoutMs}ms without exit code marker` : undefined;
+
         resolve({
           rc,
           ms,
           out,
           exitCode: rc,
           stdout: out,
+          stderr,
           executionTimeMs: ms,
+          timedOut,
         });
       }, 25);
     });

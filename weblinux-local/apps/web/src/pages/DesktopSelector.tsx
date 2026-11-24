@@ -43,7 +43,7 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
   };
 
   const isLaunchable = (status: DesktopProfileStatus) => {
-    return status === 'validated' || status === 'experimental';
+    return status === 'validated';
   };
 
   const currentSelectedProfile = DEBIAN_DESKTOP_PROFILES[selectedDesktop] || desktopList[0];
@@ -62,7 +62,7 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
             Choose Graphical Environment
           </h1>
           <p className="text-sm text-slate-400 mt-1 max-w-xl">
-            Select the desktop shell to boot. WebLinux Local executes genuine compiled Linux desktop environments on top of Debian 13 Trixie.
+            Select the desktop shell to boot. WebLinux Local executes genuine compiled Linux desktop environments on top of Debian 13 Trixie (RISC-V 64-bit NOMMU).
           </p>
         </div>
 
@@ -73,11 +73,20 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
           className={`mt-4 md:mt-0 flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white shadow-xl transition-all cursor-pointer self-start md:self-auto ${
             canLaunchCurrent
               ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-purple-600/25 active:scale-95'
-              : 'bg-slate-700/50 text-slate-400 cursor-not-allowed opacity-60'
+              : 'bg-slate-800/80 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-75'
           }`}
         >
-          <Zap className="w-4 h-4 fill-current" />
-          <span>Launch {currentSelectedProfile.name}</span>
+          {canLaunchCurrent ? (
+            <>
+              <Zap className="w-4 h-4 fill-current" />
+              <span>Launch {currentSelectedProfile.name}</span>
+            </>
+          ) : (
+            <>
+              <ShieldAlert className="w-4 h-4 text-amber-400" />
+              <span>Launch Blocked: {currentSelectedProfile.name} (Missing NOMMU Packages)</span>
+            </>
+          )}
         </button>
       </div>
 
@@ -85,7 +94,7 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {desktopList.map((desktop) => {
           const isSelected = selectedDesktop === desktop.id;
-          const selectable = isLaunchable(desktop.status);
+          const isValidated = desktop.status === 'validated';
           const badge = getStatusBadge(desktop.status);
 
           return (
@@ -93,14 +102,12 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
               key={desktop.id}
               data-testid={`card-${desktop.id}`}
               onClick={() => {
-                if (selectable) onSelect(desktop.id);
+                onSelect(desktop.id);
               }}
               className={`rounded-2xl glass-panel p-6 border transition-all duration-300 flex flex-col justify-between cursor-pointer ${
                 isSelected
                   ? 'border-purple-500 bg-purple-500/[0.06] shadow-xl shadow-purple-500/15 ring-2 ring-purple-500/30'
-                  : selectable
-                  ? 'border-white/10 hover:border-purple-500/50 hover:bg-white/[0.04]'
-                  : 'border-white/5 opacity-60 cursor-not-allowed'
+                  : 'border-white/10 hover:border-purple-500/50 hover:bg-white/[0.04]'
               }`}
             >
               <div>
@@ -136,7 +143,15 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
                   </div>
                 </div>
 
-                {desktop.knownLimitations.length > 0 && (
+                {!isValidated ? (
+                  <div className="mb-4 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 leading-tight">
+                    <div className="flex items-center gap-1.5 font-semibold text-amber-300 mb-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span>Availability Blocker:</span>
+                    </div>
+                    <span>Precompiled {desktop.name} package set is unavailable on Debian 13 RISC-V NOMMU release disk image.</span>
+                  </div>
+                ) : desktop.knownLimitations.length > 0 && (
                   <div className="mb-4 p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/20 text-[11px] text-amber-300/90 leading-tight">
                     <span className="font-semibold text-amber-300">Note: </span>
                     {desktop.knownLimitations[0]}
@@ -150,22 +165,23 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
                   <span className="font-mono text-slate-300">{desktop.compositor}</span>
                 </div>
                 <div className="flex justify-between text-slate-400 text-[11px]">
+                  <span>Architecture:</span>
+                  <span className="font-mono text-slate-300">RISC-V 64-bit NOMMU</span>
+                </div>
+                <div className="flex justify-between text-slate-400 text-[11px]">
                   <span>RAM Requirement:</span>
                   <span className="font-semibold text-slate-300">{desktop.minimumRamMB} MiB (Min) / {desktop.recommendedRamMB} MiB (Rec)</span>
                 </div>
 
                 <button
                   type="button"
-                  disabled={!selectable}
                   className={`w-full py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
                     isSelected
                       ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : selectable
-                      ? 'bg-white/5 text-slate-200 hover:bg-white/10'
-                      : 'bg-white/5 text-slate-400 cursor-not-allowed'
+                      : 'bg-white/5 text-slate-200 hover:bg-white/10'
                   }`}
                 >
-                  {isSelected ? 'Active Desktop Environment' : selectable ? 'Select This Desktop' : 'Unavailable'}
+                  {isSelected ? (isValidated ? 'Active Desktop Environment' : 'Selected (Blocked on Image)') : 'Select This Profile'}
                 </button>
               </div>
             </div>

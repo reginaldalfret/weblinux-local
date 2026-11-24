@@ -1,0 +1,32 @@
+{
+  "id": "debian-13-gnome-48",
+  "distributionName": "Debian GNU/Linux",
+  "distributionVersion": "13 (Trixie)",
+  "desktopIdentifier": "gnome",
+  "desktopName": "GNOME 48",
+  "desktopVersion": "48.0",
+  "architecture": "riscv64",
+  "abi": "lp64d (requires POSIX fork and MMU paging)",
+  "nommuCompatibility": "incompatible - Mutter & GNOME Shell require MMU virtual memory paging and fork() syscalls",
+  "kernelCompatibility": "Linux 6.6.0 (wasm64_nommu)",
+  "rootfsImageLocation": "/disk/gnome/",
+  "totalSizeBytes": 8589934592,
+  "chunkSizeBytes": 1048576,
+  "chunkManifestUri": "/disk/gnome/manifest.json",
+  "buildId": "weblinux-debian13-gnome-unreleased",
+  "buildTimestamp": "2026-11-24T12:00:00Z",
+  "cryptographicChecksums": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "737eaaf635090b3045b942db65f2735fd0a23cad8d316f91956708f5a50d2e70",
+    "diskManifestId": "unreleased-gnome-48-nommu"
+  },
+  "requiredRuntimeComponents": [
+    "gnome-shell",
+    "mutter",
+    "nautilus",
+    "gnome-terminal",
+    "gsettings-desktop-schemas"
+  ],
+  "validationStatus": "blocked",
+  "notes": "Upstream Debian 13 GNOME 48 packages are compiled for RISC-V with MMU. Upstream Mutter and SpiderMonkey (gjs) fail under NOMMU without complete memory-subsystem refactoring. Release image is unavailable."
+}

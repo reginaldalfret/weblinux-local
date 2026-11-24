@@ -1,0 +1,32 @@
+{
+  "id": "debian-13-xfce-420",
+  "distributionName": "Debian GNU/Linux",
+  "distributionVersion": "13 (Trixie)",
+  "desktopIdentifier": "xfce",
+  "desktopName": "XFCE 4.20",
+  "desktopVersion": "4.20.0",
+  "architecture": "riscv64",
+  "abi": "lp64d (requires NOMMU recompilation)",
+  "nommuCompatibility": "unconfirmed - Labwc and XFCE components require NOMMU-compatible toolchain & static linking",
+  "kernelCompatibility": "Linux 6.6.0 (wasm64_nommu)",
+  "rootfsImageLocation": "/disk/xfce/",
+  "totalSizeBytes": 8589934592,
+  "chunkSizeBytes": 1048576,
+  "chunkManifestUri": "/disk/xfce/manifest.json",
+  "buildId": "weblinux-debian13-xfce-unreleased",
+  "buildTimestamp": "2026-11-24T12:00:00Z",
+  "cryptographicChecksums": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "737eaaf635090b3045b942db65f2735fd0a23cad8d316f91956708f5a50d2e70",
+    "diskManifestId": "unreleased-xfce-420-nommu"
+  },
+  "requiredRuntimeComponents": [
+    "labwc",
+    "xfce4-session",
+    "xfce4-panel",
+    "thunar",
+    "xfce4-terminal"
+  ],
+  "validationStatus": "blocked",
+  "notes": "Upstream Debian 13 XFCE 4.20 and Labwc 0.8 packages are compiled for MMU. Dedicated NOMMU rootfs image is pending standalone cross-compilation pipeline."
+}

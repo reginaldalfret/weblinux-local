@@ -58,7 +58,7 @@ export const App: React.FC = () => {
     // Subscribe to runtime status and logs
     const unsubStatus = adapter.onStateChange(status => {
       setRuntimeStatus(status);
-      if (status.state === 'running') {
+      if (status.state === 'running' || status.state === 'desktop_ready') {
         setCurrentPage('desktop');
       } else if (status.state === 'stopped') {
         setCurrentPage('landing');
