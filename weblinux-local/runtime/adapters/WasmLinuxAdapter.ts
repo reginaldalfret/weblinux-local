@@ -420,8 +420,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         (window as any).linuxOs = this.activeOs;
 
-        // Multi-Desktop Session Launch (GNOME 48 & XFCE 4.20)
-        if ((options.desktop === 'gnome' || options.desktop === 'xfce') && options.autostartDesktop) {
+        // Multi-Desktop Session Launch (Debian GNOME/XFCE & Ubuntu GNOME 46)
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -435,22 +435,36 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           // Provision dedicated session launcher scripts
           await this.provisionDesktopLaunchers();
 
-          const launcherScript = options.desktop === 'gnome'
-            ? '/usr/local/bin/weblinux-gnome-session'
-            : '/usr/local/bin/weblinux-xfce-session';
+          if (options.desktop === 'ubuntu-gnome') {
+            this.log(`[Desktop Launcher] Executing verified Ubuntu GNOME 46 session script: /usr/local/bin/ubuntu-gnome-session`);
+            const launchRes = await this.runCommand(`ubuntu /usr/local/bin/ubuntu-gnome-session`, 20000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Ubuntu GNOME launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else {
+            const launcherScript = options.desktop === 'gnome'
+              ? '/usr/local/bin/weblinux-gnome-session'
+              : '/usr/local/bin/weblinux-xfce-session';
 
-          this.log(`[Desktop Launcher] Executing verified session script: ${launcherScript}`);
-          
-          // Execute launcher and monitor output
-          const launchRes = await this.runCommand(`debian ${launcherScript}`, 12000);
-          if (launchRes.exitCode !== 0) {
-            const errSummary = (launchRes.stderr || launchRes.stdout || 'Launcher returned non-zero exit code').trim();
-            this.log(`[Desktop Launcher Error] ${errSummary}`);
-            this.updateStatus({
-              state: 'error',
-              error: `${profile?.name || options.desktop} launch blocked: ${errSummary}`,
-            });
-            return;
+            this.log(`[Desktop Launcher] Executing verified session script: ${launcherScript}`);
+            
+            // Execute launcher and monitor output
+            const launchRes = await this.runCommand(`debian ${launcherScript}`, 12000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch blocked: ${errSummary}`,
+              });
+              return;
+            }
           }
         }
 
@@ -670,17 +684,48 @@ if [ -n "$MISSING" ]; then
   exit 127
 fi
 echo "[Ubuntu GNOME Launcher] Preflight verified: gnome-shell and mutter are installed."
+
 export GJS_DISABLE_JIT=1
 export JS_DISABLE_JIT=1
-${virglExperimental ? 'export GALLIUM_DRIVER=virpipe\nexport VTEST_SOCKET_NAME=/run/user/0/rvgpu-0' : 'export LIBGL_ALWAYS_SOFTWARE=1'}
+${virglExperimental ? 'export GALLIUM_DRIVER=virpipe\nexport VTEST_SOCKET_NAME=/tmp/runtime-root/rvgpu-0' : 'export LIBGL_ALWAYS_SOFTWARE=1'}
 export NO_AT_BRIDGE=1
 export XDG_CURRENT_DESKTOP=GNOME
 export XDG_SESSION_TYPE=wayland
 export GDK_BACKEND=wayland
-export XDG_RUNTIME_DIR=/run/user/0
-mkdir -p -m 700 $XDG_RUNTIME_DIR
-echo "[Ubuntu GNOME Launcher] Launching GNOME 46 nested session..."
-exec dbus-run-session -- gnome-shell --nested --wayland
+export XDG_RUNTIME_DIR=/tmp/runtime-root
+export WAYLAND_DISPLAY=wayland-0
+mkdir -p -m 700 "$XDG_RUNTIME_DIR"
+
+# 1. Start system & session D-Bus if not running
+mkdir -p /run/dbus
+[ -e /run/dbus/pid ] || dbus-daemon --system --fork 2>/dev/null || true
+if [ ! -S "$XDG_RUNTIME_DIR/bus" ]; then
+  dbus-daemon --session --fork --address="unix:path=$XDG_RUNTIME_DIR/bus" 2>/dev/null || true
+fi
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+
+# 2. Start WebLinux Wayland window server (wlserver) so WebGL2 canvas & wayland-0 exist
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  if [ -x /run/hostnode/hostnode ] && [ -d /run/wlserver ]; then
+    echo "page" > "$XDG_RUNTIME_DIR/wlserver.shell"
+    HOSTNODE_HOME=/run/wlserver /run/hostnode/hostnode > /root/wlserver.log 2>&1 &
+    i=0
+    while [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ] && [ $i -lt 50 ]; do
+      sleep 0.1
+      i=$((i + 1))
+    done
+  fi
+fi
+
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  echo "[Ubuntu GNOME Launcher ERROR] Wayland display socket $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY did not start" >&2
+  exit 1
+fi
+
+echo "[Ubuntu GNOME Launcher] Wayland display $WAYLAND_DISPLAY ready. Launching GNOME Shell 46..."
+nohup gnome-shell --nested --wayland > /root/gnome-shell.log 2>&1 &
+sleep 2
+echo "[Ubuntu GNOME Launcher] GNOME Shell 46 session started (PID $!)."
 EOF
 chmod +x /ubuntu/usr/local/bin/ubuntu-gnome-session
 fi`;
