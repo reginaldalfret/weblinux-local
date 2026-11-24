@@ -664,9 +664,9 @@ const linux = async (worker_url, variant, vmlinux, boot_cmdline, initrd, log, co
   /// Memory shared between all CPUs.
   const memory = new WebAssembly.Memory({
     initial: Ulong(30), // TODO: extract this automatically from vmlinux.
-    // As much as V8 lets a 64-bit memory have, 16 GiB (kV8MaxWasmMemory64Pages), which is also the maximum every
-    // program is linked with; the full 32-bit address space for a 32-bit one. The kernel grows it to its size.
-    maximum: Ulong(arch_bits == 64 ? 0x40000 : 0x10000),
+    // Cap maximum WebAssembly.Memory to 4 GiB (0x10000 pages) to prevent 16 GiB V8 VirtualAlloc exhaustion
+    // and STATUS_ACCESS_VIOLATION / STATUS_STACK_OVERFLOW renderer crashes on host systems with multiple open tabs.
+    maximum: Ulong(0x10000),
     shared: true,
     address: 'i' + arch_bits,
   });

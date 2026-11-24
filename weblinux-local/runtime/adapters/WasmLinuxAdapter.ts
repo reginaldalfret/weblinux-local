@@ -328,23 +328,27 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.log(`[Initrd] Image verified: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
 
       // 5. Configure disk subsystem
+      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce
+      const rootDiskId = `root-${options.manifest.id}-${options.desktop}`;
+      const homeDiskId = `home-${options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
+
       const diskConfig = [
         {
           worker: `/disk-worker.js?v=${Date.now()}`,
           url: options.manifest.imageSource.baseUri || '/disk/release/',
-          name: options.manifest.id,
+          name: rootDiskId,
           reset: !!options.freshRootDisk,
         },
         {
           worker: `/disk-worker.js?v=${Date.now()}`,
           url: `/disk/home/`,
           keep: true,
-          name: `home-${options.manifest.id}`,
+          name: homeDiskId,
           reset: !!options.freshHomeDisk,
         }
       ];
 
-      this.log(`[Storage] Configured primary ext4 partition and persistent home disk.`);
+      this.log(`[Storage] Configured isolated profile root disk (${rootDiskId}) and shared persistent home (${homeDiskId}).`);
 
       // 6. Set global tab ID and configure Wayland IPC channel
       (window as any).rvTabId = this.tabId;
@@ -408,16 +412,35 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         // Multi-Desktop Session Launch (GNOME 48 & XFCE 4.20)
         if (!isKde && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
-          const sessionCmd = profile?.sessionCommand || `desktop wayland ${options.desktop}`;
-          this.log(`[Desktop Launcher] Waiting for shell to launch ${profile?.name || options.desktop}...`);
+          this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
           await Promise.race([
             this.shellReadyPromise,
-            new Promise<boolean>(r => setTimeout(() => r(false), 12000))
+            new Promise<boolean>(r => setTimeout(() => r(false), 15000))
           ]);
 
-          this.log(`[Desktop Launcher] Executing session command: ${sessionCmd}`);
-          this.sendInput(`${sessionCmd}\r`);
+          this.updateStatus({ state: 'compositor_starting' });
+
+          // Provision dedicated session launcher scripts
+          await this.provisionDesktopLaunchers();
+
+          const launcherScript = options.desktop === 'gnome'
+            ? '/usr/local/bin/weblinux-gnome-session'
+            : '/usr/local/bin/weblinux-xfce-session';
+
+          this.log(`[Desktop Launcher] Executing verified session script: ${launcherScript}`);
+          
+          // Execute launcher and monitor output
+          const launchRes = await this.runCommand(`debian ${launcherScript}`, 12000);
+          if (launchRes.exitCode !== 0) {
+            const errSummary = (launchRes.stderr || launchRes.stdout || 'Launcher returned non-zero exit code').trim();
+            this.log(`[Desktop Launcher Error] ${errSummary}`);
+            this.updateStatus({
+              state: 'error',
+              error: `${profile?.name || options.desktop} launch blocked: ${errSummary}`,
+            });
+            return;
+          }
         }
 
       } else {
@@ -437,13 +460,15 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         networkConnected: options.enableNetworking,
       });
 
-      // Safety fallback: if Wayland table is not detected within 25 seconds, transition to running
-      setTimeout(() => {
-        if (this.status.state === 'booting') {
-          this.log(`[Runtime] Boot sequence settling into active state.`);
-          this.updateStatus({ state: 'running' });
-        }
-      }, 25000);
+      // For KDE Plasma 6: monitor compositor readiness timeout
+      if (isKde) {
+        setTimeout(() => {
+          if (this.status.state === 'booting' && !this.status.waylandActive) {
+            this.log(`[Runtime] Boot sequence settling into active state.`);
+            this.updateStatus({ state: 'running' });
+          }
+        }, 25000);
+      }
 
       this.log(`[System Online] WebLinux session is now active.`);
 
@@ -538,6 +563,82 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       shellReady: false,
     });
     this.log(`[Shutdown Complete] Machine halted.`);
+  }
+
+  public async provisionDesktopLaunchers(): Promise<void> {
+    this.log(`[Desktop Launcher] Provisioning session entrypoint scripts into guest...`);
+    const gnomeSessionScript = 
+`cat <<'EOF' > /debian/usr/local/bin/weblinux-gnome-session
+#!/bin/sh
+echo "[GNOME Launcher] Initializing GNOME 48 Wayland Session..."
+MISSING=""
+for b in gnome-shell mutter; do
+  if ! command -v "$b" >/dev/null 2>&1; then MISSING="$MISSING $b"; fi
+done
+if [ -n "$MISSING" ]; then
+  echo "[GNOME Launcher ERROR] Required GNOME components missing: $MISSING" >&2
+  echo "[GNOME Launcher ERROR] Status: BLOCKED - Package set unavailable on riscv64 NOMMU image." >&2
+  exit 127
+fi
+export XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_TYPE=wayland GDK_BACKEND=wayland
+mutter --wayland --nested --wayland-display=wayland-1 &
+sleep 1
+export WAYLAND_DISPLAY=wayland-1
+exec gnome-shell --wayland
+EOF
+chmod +x /debian/usr/local/bin/weblinux-gnome-session`;
+
+    const xfceSessionScript = 
+`cat <<'EOF' > /debian/usr/local/bin/weblinux-xfce-session
+#!/bin/sh
+echo "[XFCE Launcher] Initializing XFCE 4.20 Wayland Session..."
+MISSING=""
+for b in labwc xfce4-session; do
+  if ! command -v "$b" >/dev/null 2>&1; then MISSING="$MISSING $b"; fi
+done
+if [ -n "$MISSING" ]; then
+  echo "[XFCE Launcher ERROR] Required XFCE components missing: $MISSING" >&2
+  echo "[XFCE Launcher ERROR] Status: BLOCKED - Package set unavailable on riscv64 NOMMU image." >&2
+  exit 127
+fi
+export XDG_CURRENT_DESKTOP=XFCE XDG_SESSION_TYPE=wayland GDK_BACKEND=wayland
+exec labwc -s xfce4-session
+EOF
+chmod +x /debian/usr/local/bin/weblinux-xfce-session`;
+
+    await this.runCommand(gnomeSessionScript, 5000);
+    await this.runCommand(xfceSessionScript, 5000);
+    this.log(`[Desktop Launcher] Provisioned /usr/local/bin/weblinux-gnome-session and weblinux-xfce-session.`);
+  }
+
+  public async switchDesktop(targetDesktop: any): Promise<void> {
+    this.log(`[Desktop Switch] Transitioning session from ${this.status.desktop || 'current'} to ${targetDesktop}...`);
+    this.updateStatus({ state: 'shutting_down' });
+    
+    if (this.activeOs && this.activeOs.key_input) {
+      try {
+        // 1. Sync persistent storage on /dev/wdb
+        await this.runCommand('sync', 5000);
+        
+        // 2. Terminate active compositor and desktop processes
+        await this.runCommand('pkill -TERM -f "plasmashell|kwin|mutter|gnome-shell|labwc|xfce4" || true', 5000);
+        await new Promise(r => setTimeout(r, 800));
+        
+        // 3. Clean up Wayland runtime sockets
+        await this.runCommand('rm -f /tmp/runtime-root/wayland-* /run/wlserver/wayland-* 2>/dev/null || true', 3000);
+
+        // 4. Power off / reset session safely
+        if (this.activeOs.stop) {
+          try { this.activeOs.stop(); } catch {}
+        }
+      } catch {
+        // Ignore session teardown errors
+      }
+    }
+
+    this.activeOs = null;
+    this.updateStatus({ state: 'stopped', waylandActive: false, desktop: targetDesktop });
+    this.log(`[Desktop Switch] Previous session stopped cleanly. Storage synced.`);
   }
 
   public async pause(): Promise<void> {

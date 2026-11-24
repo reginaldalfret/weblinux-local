@@ -1,0 +1,7 @@
+{
+  "sources.list": "deb http://deb.debian.org/debian trixie main",
+  "apt_labwc": "",
+  "apt_xfce4": "",
+  "apt_mutter": "",
+  "weston": ""
+}

@@ -101,7 +101,7 @@ export interface BootOptions {
   customKernelArgs?: string;
 }
 
-export type RuntimeState = 'uninitialized' | 'initializing' | 'ready' | 'downloading' | 'booting' | 'running' | 'paused' | 'shutting_down' | 'stopped' | 'error';
+export type RuntimeState = 'uninitialized' | 'initializing' | 'ready' | 'downloading' | 'booting' | 'running' | 'paused' | 'shutting_down' | 'stopped' | 'error' | 'compositor_starting';
 
 export interface RuntimeStatus {
   state: RuntimeState;
@@ -123,6 +123,7 @@ export interface CommandResult {
   out: string;
   exitCode?: number | null;
   stdout?: string;
+  stderr?: string;
   executionTimeMs?: number;
 }
 
