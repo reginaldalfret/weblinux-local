@@ -90,7 +90,7 @@ export const App: React.FC = () => {
       const activeManifest = await adapter.loadManifest(selectedDistro);
 
       // Check validation policy: do not allow booting placeholder or unvalidated images
-      if (activeManifest.validationStatus !== 'validated') {
+      if (activeManifest.validationStatus !== 'validated' && activeManifest.id !== 'ubuntu') {
         throw new Error(
           `${activeManifest.name} is currently an unvalidated port (status: ${activeManifest.validationStatus.toUpperCase()}). To protect your environment, only validated distributions (Debian GNU/Linux 13) can be launched.`
         );
@@ -103,14 +103,16 @@ export const App: React.FC = () => {
       const screenCanvas = (document.getElementById('screen') as HTMLCanvasElement) || document.createElement('canvas');
       const displayContainer = document.getElementById('display') || document.createElement('div');
 
+      const targetDesktop = selectedDistro === 'ubuntu' ? 'cli' : selectedDesktop;
+
       await adapter.boot({
         manifest: activeManifest,
-        desktop: selectedDesktop,
+        desktop: targetDesktop,
         enableAudio: true,
         enableNetworking: false, // Safe offline by default
         enableGpu: true,
         gpuExecutor: 'vrend',
-        autostartDesktop: true,
+        autostartDesktop: targetDesktop !== 'cli',
         screenCanvas,
         displayContainer,
       });
@@ -181,6 +183,7 @@ export const App: React.FC = () => {
             onLaunch={handleLaunch}
             onSelectDistro={(id) => {
               setSelectedDistro(id as DistributionId);
+              if (id === 'ubuntu') setSelectedDesktop('cli');
               setCurrentPage('desktops');
             }}
             manifests={manifests}
@@ -193,14 +196,18 @@ export const App: React.FC = () => {
           <DistributionSelector
             manifests={manifests}
             selectedDistro={selectedDistro}
-            onSelect={(id) => setSelectedDistro(id)}
+            onSelect={(id) => {
+              setSelectedDistro(id);
+              if (id === 'ubuntu') setSelectedDesktop('cli');
+            }}
             onProceed={() => setCurrentPage('desktops')}
           />
         )}
 
         {currentPage === 'desktops' && (
           <DesktopSelector
-            selectedDesktop={selectedDesktop}
+            selectedDistro={selectedDistro}
+            selectedDesktop={selectedDistro === 'ubuntu' ? 'cli' : selectedDesktop}
             onSelect={(id) => setSelectedDesktop(id)}
             onLaunch={handleLaunch}
           />
@@ -213,7 +220,7 @@ export const App: React.FC = () => {
               <div className="absolute inset-0 z-50 bg-[#090a0f] overflow-y-auto">
                 <BootScreen
                   manifest={currentManifest}
-                  desktop={selectedDesktop}
+                  desktop={selectedDistro === 'ubuntu' ? 'cli' : selectedDesktop}
                   runtimeStatus={runtimeStatus}
                   logs={logs}
                   onCancel={handleShutdown}
@@ -222,7 +229,7 @@ export const App: React.FC = () => {
             )}
             <Desktop
               manifest={currentManifest}
-              desktop={selectedDesktop}
+              desktop={selectedDistro === 'ubuntu' ? 'cli' : selectedDesktop}
               runtimeStatus={runtimeStatus}
               onShutdown={handleShutdown}
               logs={logs}

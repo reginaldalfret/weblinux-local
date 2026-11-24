@@ -1,6 +1,6 @@
 console.log('================================================================');
-console.log('  WEBLINUX LOCAL — PHASE 6.2 ACCEPTANCE TEST SUITE');
-console.log('  Ubuntu 24.04.5 LTS Noble Rootfs & Chunk Integrity Qualification');
+console.log('  WEBLINUX LOCAL — PHASE 6 CONSOLIDATED ACCEPTANCE TEST SUITE');
+console.log('  Ubuntu 24.04.5 LTS Noble Rootfs, Boot, Supervisor & Persistence');
 console.log('================================================================\n');
 
 try {
@@ -8,11 +8,16 @@ try {
   require('./chunks/chunks-validation.test.js');
   require('./reconstruction/reconstruction.test.js');
   require('./manifest/manifest-integration.test.js');
+  require('./runtime/runtime-config.test.js');
+  require('./boot/boot-pipeline.test.js');
+  require('./supervisor/supervisor-execution.test.js');
+  require('./terminal/terminal-commands.test.js');
+  require('./storage/storage-isolation.test.js');
 
-  console.log('================================================================');
-  console.log('  STATUS: ALL PHASE 6.2 TESTS PASSED WITH 100% SUCCESS');
+  console.log('\n================================================================');
+  console.log('  STATUS: ALL 9 TEST SUITES PASSED WITH 100% SUCCESS');
   console.log('================================================================');
 } catch (err) {
-  console.error('\n❌ PHASE 6.2 TEST FAILURE:', err.message);
+  console.error('\n❌ TEST FAILURE:', err.message);
   process.exit(1);
 }

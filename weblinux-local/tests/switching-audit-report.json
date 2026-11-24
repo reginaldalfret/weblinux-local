@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-11-24T16:18:52.734Z",
+  "stage1_ubuntu": {
+    "initialFile": "cat: can't open '/ubuntu/root/persisted.txt': No such file or directory",
+    "updatedFile": "Ubuntu Session 2 Marker"
+  },
+  "stage2_debian": {
+    "debianOs": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.7\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"",
+    "isolationCheck": "ls: /debian/root/persisted.txt: No such file or directory",
+    "debianFile": "Debian Baseline Verified"
+  },
+  "stage3_ubuntu_return": {
+    "ubuntuPersistentFile": "~ # cat /ubuntu/root/persisted.txt; echo __rct5nzc6jnock_$?\nUbuntu Session 2 Marker",
+    "debianLeakCheck": "ls: /ubuntu/root/debian-state.txt: No such file or directory",
+    "finalUname": "Linux rv 6.6.0 #1 SMP rv riscv64 riscv64 riscv64 GNU/Linux"
+  },
+  "isolation_passed": true,
+  "persistence_passed": true
+}

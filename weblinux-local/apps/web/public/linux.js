@@ -861,10 +861,12 @@ const linux = async (worker_url, variant, vmlinux, boot_cmdline, initrd, log, co
   // name: what to call it in the origin's private file system, reset: forget what is kept there, keep: the
   // disk is the image only the first time, and its own from then on }. A worker of its own keeps each; the
   // kernel starts when they are ready.
+  const disk_workers = [];
   await Promise.all([].concat(disk_options || []).map((options, index) => new Promise((resolve) => {
     const label = "[Disk " + options.name + "]: ";
     const control = new Int32Array(new SharedArrayBuffer(64));
     const disk_worker = new Worker(options.worker, { name: "disk " + options.name });
+    disk_workers.push(disk_worker);
     disks[index] = null;
     disk_worker.onmessage = (event) => {
       if (event.data.method == "log") {
@@ -937,6 +939,18 @@ const linux = async (worker_url, variant, vmlinux, boot_cmdline, initrd, log, co
       input_buffer = input_buffer.transfer(old_size + key_buffer.byteLength);
       (new Uint8Array(input_buffer)).set(key_buffer, old_size);
       console_in_fill();
+    },
+
+    terminate: () => {
+      for (const cpu of Object.values(cpus)) {
+        try { if (cpu && cpu.worker) cpu.worker.terminate(); } catch {}
+      }
+      for (const t of Object.values(tasks)) {
+        try { if (t && t.worker) t.worker.terminate(); } catch {}
+      }
+      for (const dw of disk_workers) {
+        try { if (dw) dw.terminate(); } catch {}
+      }
     }
   };
 };

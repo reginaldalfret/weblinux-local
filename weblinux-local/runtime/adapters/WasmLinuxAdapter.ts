@@ -161,8 +161,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         id: 'initrd',
         name: 'Initial Ramdisk (BusyBox + rv)',
         path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
-        expectedSize: manifest.integrity.initrdSize || 16050431,
-        expectedSha256: manifest.integrity.initrdSha256 || '737eaaf635090b3045b942db65f2735fd0a23cad8d316f91956708f5a50d2e70',
+        expectedSize: manifest.integrity.initrdSize || 15056774,
+        expectedSha256: manifest.integrity.initrdSha256 || '84c49e2936fdbb2e30b83bd7a6067ccd2b76cd97b71171f1c9dbff54704a8c95',
       },
     ];
 
@@ -218,7 +218,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 1. Validate byte length (accounting for transparent HTTP Content-Encoding: gzip decompression)
       let isUncompressedInitrd = false;
-      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 39928832)) {
+      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 36644864)) {
         isUncompressedInitrd = true;
       } else if (buffer.byteLength !== asset.expectedSize) {
         throw new Error(
@@ -228,7 +228,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 2. Validate cryptographic SHA-256 digest
       const expectedSha256 = isUncompressedInitrd
-        ? (manifest.integrity.initrdUncompressedSha256 || '51eeb20a33538636011e014e90d0a66cf245d5eea57f5cf7cbda97fde12bb4ef')
+        ? (manifest.integrity.initrdUncompressedSha256 || '57a96754b8f91fe239d08310713d11befff92ce20623467e3ea9a25ae347b8de')
         : asset.expectedSha256;
 
       if (expectedSha256) {
@@ -294,7 +294,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       const epoch = Math.floor(Date.now() / 1000);
       const isKde = options.desktop === 'kde-plasma';
 
-      let bootCmdline = `maxcpus=3 nohz_full=0,2-63 rcu_nocbs=0,2-63 root=/dev/ram0 rootfstype=ramfs init=/init console=hvc console=ttyS0 epoch=${epoch} rvtab=${this.tabId} term=120x30 wasm_pool=${pool} mem=${memoryMB}M wasm_cache_max=256`;
+      let bootCmdline = `maxcpus=3 nohz_full=0,2-63 rcu_nocbs=0,2-63 root=/dev/ram0 rootfstype=ramfs init=/init console=hvc console=ttyS0 epoch=${epoch} rvtab=${this.tabId} term=120x30 wasm_pool=${pool} mem=${memoryMB}M wasm_cache_max=256 distro=${options.manifest.id}`;
 
       // Autostart setting: KDE Plasma autostarts directly; GNOME and XFCE launch via profile session command
       if (options.autostartDesktop && isKde) {
@@ -382,7 +382,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         this.log(data);
 
         // Check for shell prompt
-        if (data.includes('# ') || this.bootOutput.endsWith('# ')) {
+        if (data.includes('# ') || this.bootOutput.endsWith('# ') || data.includes('CLI ready') || data.includes('root@')) {
           if (this.resolveShellReady) {
             this.resolveShellReady(true);
             this.resolveShellReady = null;
@@ -419,7 +419,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         (window as any).linuxOs = this.activeOs;
 
         // Multi-Desktop Session Launch (GNOME 48 & XFCE 4.20)
-        if (!isKde && options.autostartDesktop) {
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -477,6 +477,16 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
             this.updateStatus({ state: 'running' });
           }
         }, 25000);
+      } else if (options.desktop === 'cli' || options.manifest.id === 'ubuntu') {
+        setTimeout(() => {
+          if (this.status.state === 'booting' || this.status.state === 'shell_ready') {
+            this.log(`[Runtime] Ubuntu CLI session ready and online.`);
+            this.updateStatus({ state: 'running', shellReady: true });
+            if (this.resolveShellReady) {
+              this.resolveShellReady(true);
+            }
+          }
+        }, 5000);
       }
 
       this.log(`[System Online] WebLinux session is now active.`);
@@ -556,7 +566,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
     try {
       if (this.activeOs && this.activeOs.key_input) {
-        this.activeOs.key_input('sync; poweroff\r');
+        this.activeOs.key_input('sync\r');
       }
     } catch {
       // Ignore
@@ -567,7 +577,16 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.displayChannel = null;
     }
 
-    await new Promise(r => setTimeout(r, 1200));
+    // Allow guest kernel sync and disk-worker idle flush to OPFS
+    await new Promise(r => setTimeout(r, 2000));
+
+    if (this.activeOs && typeof this.activeOs.terminate === 'function') {
+      try {
+        this.activeOs.terminate();
+      } catch (termErr) {
+        console.warn('[Shutdown] activeOs.terminate error:', termErr);
+      }
+    }
 
     this.activeOs = null;
     this.updateStatus({

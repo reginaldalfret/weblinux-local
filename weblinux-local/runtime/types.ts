@@ -5,7 +5,7 @@
 
 export type DistributionId = 'debian' | 'ubuntu' | 'fedora' | 'arch' | 'kali-lab';
 
-export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce';
+export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce' | 'cli';
 
 export type DesktopProfileStatus = 'validated' | 'experimental' | 'preview' | 'unavailable';
 

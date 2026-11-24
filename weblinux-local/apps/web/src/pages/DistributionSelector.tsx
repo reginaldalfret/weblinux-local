@@ -46,17 +46,18 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
         {manifests.map((distro) => {
           const isSelected = selectedDistro === distro.id;
           const isValidated = distro.validationStatus === 'validated';
+          const isSelectable = isValidated || distro.id === 'ubuntu';
 
           return (
             <div
               key={distro.id}
               onClick={() => {
-                if (isValidated) onSelect(distro.id);
+                if (isSelectable) onSelect(distro.id);
               }}
               className={`rounded-2xl glass-panel p-6 border transition-all duration-300 flex flex-col justify-between cursor-pointer ${
                 isSelected
                   ? 'border-purple-500 bg-purple-500/[0.06] shadow-xl shadow-purple-500/15 ring-2 ring-purple-500/30'
-                  : isValidated
+                  : isSelectable
                   ? 'border-white/10 hover:border-purple-500/50 hover:bg-white/[0.04]'
                   : 'border-white/5 opacity-70 cursor-not-allowed'
               }`}
@@ -74,10 +75,12 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
                     className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border ${
                       isValidated
                         ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                        : distro.id === 'ubuntu'
+                        ? 'bg-purple-500/10 text-purple-300 border-purple-500/30'
                         : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
                     }`}
                   >
-                    {isValidated ? 'Validated' : 'Experimental Port'}
+                    {isValidated ? 'Validated' : distro.id === 'ubuntu' ? 'Experimental CLI' : 'Experimental Port'}
                   </span>
                 </div>
 

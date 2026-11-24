@@ -38,7 +38,7 @@ export const Desktop: React.FC<DesktopProps> = ({
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  const [isTerminalOpen, setIsTerminalOpen] = useState(desktop === 'cli');
   const [terminalInput, setTerminalInput] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const viewportRef = useRef<HTMLDivElement>(null);

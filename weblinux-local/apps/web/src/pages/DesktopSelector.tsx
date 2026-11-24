@@ -1,26 +1,31 @@
 import React from 'react';
 import { Monitor, CheckCircle2, Zap, ArrowRight, Layers, Sparkles, AlertCircle, Info, ShieldAlert } from 'lucide-react';
-import { DesktopEnvironmentId, DesktopProfile, DesktopProfileStatus } from '../../../../runtime/types';
+import { DistributionId, DesktopEnvironmentId, DesktopProfile, DesktopProfileStatus } from '../../../../runtime/types';
 import { DEBIAN_DESKTOP_PROFILES } from '../../../../runtime/profiles/desktopProfiles';
 
 interface DesktopSelectorProps {
+  selectedDistro?: DistributionId;
   selectedDesktop: DesktopEnvironmentId;
   onSelect: (id: DesktopEnvironmentId) => void;
   onLaunch: () => void;
 }
 
 export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
+  selectedDistro = 'debian',
   selectedDesktop,
   onSelect,
   onLaunch,
 }) => {
-  const desktopList: DesktopProfile[] = Object.values(DEBIAN_DESKTOP_PROFILES);
+  const isUbuntu = selectedDistro === 'ubuntu';
+  const desktopList: DesktopProfile[] = isUbuntu
+    ? [DEBIAN_DESKTOP_PROFILES['cli']]
+    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli');
 
   const getStatusBadge = (status: DesktopProfileStatus) => {
     switch (status) {
       case 'validated':
         return {
-          label: 'Validated',
+          label: isUbuntu ? 'Validated CLI' : 'Validated',
           className: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
         };
       case 'experimental':
@@ -46,7 +51,9 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
     return status === 'validated';
   };
 
-  const currentSelectedProfile = DEBIAN_DESKTOP_PROFILES[selectedDesktop] || desktopList[0];
+  const currentSelectedProfile = isUbuntu
+    ? DEBIAN_DESKTOP_PROFILES['cli']
+    : (DEBIAN_DESKTOP_PROFILES[selectedDesktop] || desktopList[0]);
   const canLaunchCurrent = isLaunchable(currentSelectedProfile.status);
 
   return (
@@ -56,13 +63,15 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
         <div>
           <div className="flex items-center gap-2 text-purple-400 text-xs font-semibold uppercase tracking-wider mb-2">
             <Monitor className="w-4 h-4" />
-            <span>Step 2 of 2: Desktop Environment Selection</span>
+            <span>Step 2 of 2: {isUbuntu ? 'Terminal Shell Environment' : 'Desktop Environment Selection'}</span>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">
-            Choose Graphical Environment
+            {isUbuntu ? 'Ubuntu 24.04.5 LTS Runtime' : 'Choose Graphical Environment'}
           </h1>
           <p className="text-sm text-slate-400 mt-1 max-w-xl">
-            Select the desktop shell to boot. WebLinux Local executes genuine compiled Linux desktop environments on top of Debian 13 Trixie (RISC-V 64-bit NOMMU).
+            {isUbuntu
+              ? 'WebLinux Local executes authentic Ubuntu 24.04.5 LTS Noble Numbat (RISC-V 64-bit NOMMU) with an interactive CLI shell, /bin/rv syscall emulation, and persistent ext4 OPFS storage.'
+              : 'Select the desktop shell to boot. WebLinux Local executes genuine compiled Linux desktop environments on top of Debian 13 Trixie (RISC-V 64-bit NOMMU).'}
           </p>
         </div>
 
@@ -90,8 +99,8 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
         </button>
       </div>
 
-      {/* Cards Grid: Exactly 3 Desktops */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Cards Grid */}
+      <div className={`grid grid-cols-1 ${desktopList.length === 1 ? 'max-w-2xl' : 'md:grid-cols-3'} gap-6`}>
         {desktopList.map((desktop) => {
           const isSelected = selectedDesktop === desktop.id;
           const isValidated = desktop.status === 'validated';

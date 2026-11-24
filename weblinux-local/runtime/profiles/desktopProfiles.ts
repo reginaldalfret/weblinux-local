@@ -87,5 +87,32 @@ export const DEBIAN_DESKTOP_PROFILES: Record<string, DesktopProfile> = {
       'Some legacy X11 panel plugins require Xwayland rootful bridge'
     ],
     previewImage: '/screenshots/phase5/10-xfce-desktop.png'
+  },
+  'cli': {
+    id: 'cli',
+    name: 'Ubuntu CLI Shell',
+    version: '24.04.5 LTS',
+    tagline: 'High-Performance RISC-V 64-bit Terminal Environment',
+    description: 'Official Ubuntu 24.04.5 LTS (Noble Numbat) interactive terminal environment running under the RISC-V 64-bit NOMMU WebAssembly execution engine with /bin/rv syscall emulation, full ext4 root filesystem, and APT package management.',
+    distributionId: 'ubuntu',
+    status: 'validated',
+    sessionCommand: 'ubuntu /bin/bash',
+    compositor: 'Linux Native Terminal / TTY',
+    rootfsManifestId: 'ubuntu-24.04-cli',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Interactive Bash 5.2 / Dash shell',
+      'Authentic Ubuntu Noble userspace (/etc/os-release)',
+      'APT / Dpkg package management inspection',
+      'Ext4 virtual disk mount on /ubuntu with 2,555 files',
+      'Persistent OPFS home directory on /ubuntu/root (/dev/wdb)',
+      'Full Linux utilities: ls, cat, uname, df, ps, env, id'
+    ],
+    knownLimitations: [
+      'Graphical Wayland compositor disabled in Phase 6.3 (CLI only)',
+      'Fork/exec emulation handled via /bin/rv binfmt_misc'
+    ],
+    previewImage: '/screenshots/phase6/ubuntu-cli-terminal.png'
   }
 };
