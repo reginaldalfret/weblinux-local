@@ -218,7 +218,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 1. Validate byte length (accounting for transparent HTTP Content-Encoding: gzip decompression)
       let isUncompressedInitrd = false;
-      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 36644864)) {
+      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 36645376)) {
         isUncompressedInitrd = true;
       } else if (buffer.byteLength !== asset.expectedSize) {
         throw new Error(
@@ -228,7 +228,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 2. Validate cryptographic SHA-256 digest
       const expectedSha256 = isUncompressedInitrd
-        ? (manifest.integrity.initrdUncompressedSha256 || '57a96754b8f91fe239d08310713d11befff92ce20623467e3ea9a25ae347b8de')
+        ? (manifest.integrity.initrdUncompressedSha256 || '2dc8dde9d8ab6a1300925d2c499e1e4b585f32b5cb7c44b27368dcdacc0eb49e')
         : asset.expectedSha256;
 
       if (expectedSha256) {
@@ -328,14 +328,16 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.log(`[Initrd] Image verified: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
 
       // 5. Configure disk subsystem
-      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce
-      const rootDiskId = `root-${options.manifest.id}-${options.desktop}`;
-      const homeDiskId = `home-${options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
+      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce, root-ubuntu-gnome
+      const isUbuntuGnome = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-gnome') && options.desktop === 'ubuntu-gnome';
+      const rootUrl = isUbuntuGnome ? '/disk/ubuntu-24.04-gnome/' : (options.manifest.imageSource.baseUri || '/disk/release/');
+      const rootDiskId = isUbuntuGnome ? 'root-ubuntu-gnome' : `root-${options.manifest.id}-${options.desktop}`;
+      const homeDiskId = `home-${options.manifest.id === 'ubuntu-gnome' ? 'ubuntu' : options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
         {
           worker: `/disk-worker.js?v=${Date.now()}`,
-          url: options.manifest.imageSource.baseUri || '/disk/release/',
+          url: rootUrl,
           name: rootDiskId,
           reset: !!options.freshRootDisk,
         },
@@ -602,7 +604,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   public async provisionDesktopLaunchers(): Promise<void> {
     this.log(`[Desktop Launcher] Provisioning session entrypoint scripts into guest...`);
     const gnomeSessionScript = 
-`cat <<'EOF' > /debian/usr/local/bin/weblinux-gnome-session
+`if [ -d /debian ]; then
+cat <<'EOF' > /debian/usr/local/bin/weblinux-gnome-session
 #!/bin/sh
 echo "[GNOME Launcher] Initializing GNOME 48 Wayland Session..."
 MISSING=""
@@ -620,10 +623,12 @@ sleep 1
 export WAYLAND_DISPLAY=wayland-1
 exec gnome-shell --wayland
 EOF
-chmod +x /debian/usr/local/bin/weblinux-gnome-session`;
+chmod +x /debian/usr/local/bin/weblinux-gnome-session
+fi`;
 
     const xfceSessionScript = 
-`cat <<'EOF' > /debian/usr/local/bin/weblinux-xfce-session
+`if [ -d /debian ]; then
+cat <<'EOF' > /debian/usr/local/bin/weblinux-xfce-session
 #!/bin/sh
 echo "[XFCE Launcher] Initializing XFCE 4.20 Wayland Session..."
 MISSING=""
@@ -638,11 +643,43 @@ fi
 export XDG_CURRENT_DESKTOP=XFCE XDG_SESSION_TYPE=wayland GDK_BACKEND=wayland
 exec labwc -s xfce4-session
 EOF
-chmod +x /debian/usr/local/bin/weblinux-xfce-session`;
+chmod +x /debian/usr/local/bin/weblinux-xfce-session
+fi`;
+
+    const ubuntuGnomeSessionScript =
+`if [ -d /ubuntu ]; then
+cat <<'EOF' > /ubuntu/usr/local/bin/ubuntu-gnome-session
+#!/bin/sh
+echo "[Ubuntu GNOME Launcher] Initializing Ubuntu 24.04.5 LTS GNOME 46 Session..."
+MISSING=""
+for b in gnome-shell mutter; do
+  if ! command -v "$b" >/dev/null 2>&1; then MISSING="$MISSING $b"; fi
+done
+if [ -n "$MISSING" ]; then
+  echo "[Ubuntu GNOME Launcher ERROR] Required GNOME components missing: $MISSING" >&2
+  echo "[Ubuntu GNOME Launcher ERROR] Status: BLOCKED - Package set unavailable." >&2
+  exit 127
+fi
+echo "[Ubuntu GNOME Launcher] Preflight verified: gnome-shell and mutter are installed."
+export GJS_DISABLE_JIT=1
+export JS_DISABLE_JIT=1
+export LIBGL_ALWAYS_SOFTWARE=1
+export NO_AT_BRIDGE=1
+export XDG_CURRENT_DESKTOP=GNOME
+export XDG_SESSION_TYPE=wayland
+export GDK_BACKEND=wayland
+export XDG_RUNTIME_DIR=/run/user/0
+mkdir -p -m 700 $XDG_RUNTIME_DIR
+echo "[Ubuntu GNOME Launcher] Launching GNOME 46 nested session..."
+exec dbus-run-session -- gnome-shell --nested --wayland
+EOF
+chmod +x /ubuntu/usr/local/bin/ubuntu-gnome-session
+fi`;
 
     await this.runCommand(gnomeSessionScript, 5000);
     await this.runCommand(xfceSessionScript, 5000);
-    this.log(`[Desktop Launcher] Provisioned /usr/local/bin/weblinux-gnome-session and weblinux-xfce-session.`);
+    await this.runCommand(ubuntuGnomeSessionScript, 5000);
+    this.log(`[Desktop Launcher] Provisioned desktop session entrypoints.`);
   }
 
   public async switchDesktop(targetDesktop: any): Promise<void> {

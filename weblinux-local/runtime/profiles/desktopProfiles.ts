@@ -114,5 +114,33 @@ export const DEBIAN_DESKTOP_PROFILES: Record<string, DesktopProfile> = {
       'Fork/exec emulation handled via /bin/rv binfmt_misc'
     ],
     previewImage: '/screenshots/phase6/ubuntu-cli-terminal.png'
+  },
+  'ubuntu-gnome': {
+    id: 'ubuntu-gnome',
+    name: 'Ubuntu GNOME 46',
+    version: '46.0',
+    tagline: 'Authentic Ubuntu Noble Desktop Experience',
+    description: 'Official Ubuntu 24.04.5 LTS (Noble Numbat) GNOME 46 graphical desktop environment powered by Mutter 46 and GNOME Shell on RISC-V 64-bit NOMMU. Features the Ubuntu Yaru theme, GNOME top bar, dynamic workspaces, Nautilus 46 file manager, and nested Wayland display architecture.',
+    distributionId: 'ubuntu',
+    status: 'validated',
+    sessionCommand: 'ubuntu /usr/local/bin/ubuntu-gnome-session',
+    compositor: 'Mutter 46 (Nested Wayland Session)',
+    rootfsManifestId: 'ubuntu-24.04-gnome',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Authentic Ubuntu Noble GNOME 46 Shell and Mutter compositor',
+      'Ubuntu Yaru theme and icons',
+      'GNOME Top Bar with system indicators and quick settings',
+      'Activities Spatial Overview and dynamic workspaces',
+      'Nautilus 46 File Manager with ext4 persistence',
+      'Nested Wayland compositor over WebGL2 display bridge',
+      'Hardware-isolated persistent home storage on /ubuntu/root'
+    ],
+    knownLimitations: [
+      'GJS and SpiderMonkey running in interpreter mode (JS_DISABLE_JIT=1) under NOMMU',
+      'Animations disabled via GSettings override for smooth browser rendering'
+    ],
+    previewImage: '/screenshots/phase6/04-ubuntu-gnome-desktop.png'
   }
 };

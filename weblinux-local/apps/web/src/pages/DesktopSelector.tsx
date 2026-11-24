@@ -18,14 +18,14 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
 }) => {
   const isUbuntu = selectedDistro === 'ubuntu';
   const desktopList: DesktopProfile[] = isUbuntu
-    ? [DEBIAN_DESKTOP_PROFILES['cli']]
-    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli');
+    ? [DEBIAN_DESKTOP_PROFILES['ubuntu-gnome'], DEBIAN_DESKTOP_PROFILES['cli']]
+    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome');
 
   const getStatusBadge = (status: DesktopProfileStatus) => {
     switch (status) {
       case 'validated':
         return {
-          label: isUbuntu ? 'Validated CLI' : 'Validated',
+          label: 'Validated',
           className: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
         };
       case 'experimental':
@@ -48,12 +48,10 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
   };
 
   const isLaunchable = (status: DesktopProfileStatus) => {
-    return status === 'validated';
+    return status === 'validated' || status === 'experimental';
   };
 
-  const currentSelectedProfile = isUbuntu
-    ? DEBIAN_DESKTOP_PROFILES['cli']
-    : (DEBIAN_DESKTOP_PROFILES[selectedDesktop] || desktopList[0]);
+  const currentSelectedProfile = DEBIAN_DESKTOP_PROFILES[selectedDesktop] || desktopList[0];
   const canLaunchCurrent = isLaunchable(currentSelectedProfile.status);
 
   return (

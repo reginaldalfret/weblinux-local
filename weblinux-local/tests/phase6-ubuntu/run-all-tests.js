@@ -13,9 +13,10 @@ try {
   require('./supervisor/supervisor-execution.test.js');
   require('./terminal/terminal-commands.test.js');
   require('./storage/storage-isolation.test.js');
+  require('./gnome/ubuntu-gnome.test.js');
 
   console.log('\n================================================================');
-  console.log('  STATUS: ALL 9 TEST SUITES PASSED WITH 100% SUCCESS');
+  console.log('  STATUS: ALL 10 TEST SUITES PASSED WITH 100% SUCCESS');
   console.log('================================================================');
 } catch (err) {
   console.error('\n❌ TEST FAILURE:', err.message);

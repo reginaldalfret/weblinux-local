@@ -1,0 +1,11 @@
+{
+  "distributionId": "ubuntu-24.04-gnome",
+  "rootfsFormat": "ext4",
+  "imageFilename": "ubuntu-24.04-gnome.ext4",
+  "imageSize": 3221225472,
+  "chunkSize": 1048576,
+  "chunkCount": 3072,
+  "nonZeroChunkCount": 776,
+  "fullImageSha256": "6e83ffacc25bfefe08cdaada8b4771acc5e422a171ba7506840fc38fa0094a0e",
+  "buildTimestamp": "2026-11-24T18:26:30.253Z"
+}
