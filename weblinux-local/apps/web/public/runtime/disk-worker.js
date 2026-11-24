@@ -90,8 +90,44 @@ const HEADING = 64;
 // ADDRESS_HIGH 0, which is right for the memory it makes.)
 const LOCK = 0, REQUEST = 1, DONE = 2, OP = 3, SECTOR_LOW = 4, SECTOR_HIGH = 5, ADDRESS = 6, COUNT = 7, RESULT = 8,
       SECTORS_LOW = 9, SECTORS_HIGH = 10, ADDRESS_HIGH = 11;
-const OP_READ = 0, OP_WRITE = 1, OP_FLUSH = 2;
-const EIO = 5;
+const OP_READ = 0, OP_WRITE = 1, OP_FLUSH = 2, OP_SHUTDOWN = 3;
+const EIO = 5, ENOSPC = 28;
+const META_MAGIC = 0x52564d31, META_VERSION = 1, META_SLOT_SIZE = 64, META_TOTAL_SIZE = 128, META_FLAG_DIRTY = 1;
+
+const CRC32_TABLE = new Uint32Array(256);
+for (let i = 0; i < 256; i++) {
+  let c = i;
+  for (let k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+  CRC32_TABLE[i] = c >>> 0;
+}
+const crc32 = (bytes, len = bytes.byteLength) => {
+  let crc = 0xffffffff;
+  for (let i = 0; i < len; i++) crc = CRC32_TABLE[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
+  return (crc ^ 0xffffffff) >>> 0;
+};
+const encode_meta_slot = (gen, dirty, placesCount, mapCrc, pieceCount, pieceSz) => {
+  const buf = new Uint8Array(META_SLOT_SIZE);
+  const v = new DataView(buf.buffer);
+  v.setUint32(0, META_MAGIC, true);
+  v.setUint32(4, META_VERSION, true);
+  v.setUint32(8, gen >>> 0, true);
+  v.setUint32(12, dirty ? META_FLAG_DIRTY : 0, true);
+  v.setUint32(16, placesCount >>> 0, true);
+  v.setUint32(20, mapCrc >>> 0, true);
+  v.setUint32(24, pieceCount >>> 0, true);
+  v.setUint32(28, pieceSz >>> 0, true);
+  v.setUint32(60, crc32(buf, 60), true);
+  return buf;
+};
+const decode_meta_slot = (buf) => {
+  if (buf.byteLength < META_SLOT_SIZE) return { valid: false, dirty: false, generation: 0, places: 0, mapCrc32: 0 };
+  const v = new DataView(buf.buffer, buf.byteOffset, META_SLOT_SIZE);
+  const magic = v.getUint32(0, true), version = v.getUint32(4, true), generation = v.getUint32(8, true);
+  const flags = v.getUint32(12, true), placesCount = v.getUint32(16, true), mapCrc32 = v.getUint32(20, true);
+  const pieceCount = v.getUint32(24, true), pieceSz = v.getUint32(28, true), entryCrc = v.getUint32(60, true);
+  const valid = magic === META_MAGIC && version === META_VERSION && crc32(buf, 60) === entryCrc;
+  return { valid, dirty: (flags & META_FLAG_DIRTY) !== 0, generation, places: placesCount, mapCrc32, pieceCount, pieceSz };
+};
 
 let memory = null;      // the machine's memory
 let control = null;     // Int32Array: the shared words above
@@ -107,6 +143,11 @@ let place = null;       // Uint32Array, per piece: its place in `data` plus one,
 let places = 0;         // places in use in `data`
 let data = null;        // FileSystemSyncAccessHandle, or null: nothing is kept
 let map = null;
+let meta = null;        // FileSystemSyncAccessHandle for dual-slot durability metadata
+let meta_gen = 0;       // current committed metadata generation
+let lock_release = null; // releases navigator.locks writer ownership on shutdown
+let shutting_down = false;
+const metrics = { writesReceived: 0, writesCompleted: 0, flushesCompleted: 0, flushErrors: 0, lastError: null };
 let unsaved = 0;        // pieces placed since `map` was last written
 const in_memory = new Map();  // piece -> Uint8Array, for the pieces that are not in `data`
 let direct = true;      // whether read() and write() take views of the machine's (shared) memory
@@ -508,14 +549,19 @@ const storage_lost = (error, where) => {
   }
   lost = true;
   const at = Date.now();
-  for (const handle of [data, map]) {
+  for (const handle of [data, map, meta]) {
     try {
-      handle.close();
+      if (handle) handle.close();
     } catch (ignored) {
     }
   }
   data = null;
   map = null;
+  meta = null;
+  if (lock_release) {
+    try { lock_release(); } catch (ignored) {}
+    lock_release = null;
+  }
   unsaved = 0;
   if (pool) {
     Atomics.store(pool.flags, FL_STOP, 1);
@@ -890,21 +936,68 @@ const stop_pool = () => {
   pool = null;
 };
 
-/// Bring `map` up to date with `data`, and both to where they survive. If the files fail, they are lost (storage_lost).
-const save = () => {
-  if (!data || !unsaved) {
+const is_quota_error = (error) => !!error && (error.name == "QuotaExceededError" || error.code == 22 || String(error.message).includes("no room"));
+
+const release_lock = () => {
+  if (lock_release) {
+    try { lock_release(); } catch (ignored) {}
+    lock_release = null;
+  }
+};
+
+/// Two-phase metadata commit: flush `data`, mark next `meta` slot dirty, write & flush `map`,
+/// then commit clean `meta` slot with CRC32 and increment generation.
+const save = (forceFlush = false, propagateErrors = false) => {
+  if (!data || (!unsaved && !forceFlush)) {
     return;
   }
   try {
     data.flush();
-    const done = map.write(place, { at: HEADING });
-    if (file_error(done)) {
-      throw count_error(done);
+    if (unsaved || forceFlush) {
+      const nextGen = (meta_gen + 1) >>> 0;
+      const slotOffset = (nextGen % 2) * META_SLOT_SIZE;
+      const mapBytes = new Uint8Array(place.buffer, place.byteOffset, place.byteLength);
+      const mapCrc = crc32(mapBytes);
+
+      if (meta) {
+        const dirtySlot = encode_meta_slot(nextGen, true, places, mapCrc, place.length, piece_size);
+        const m1 = meta.write(dirtySlot, { at: slotOffset });
+        if (file_error(m1)) throw count_error(m1);
+        meta.flush();
+      }
+
+      const done = map.write(place, { at: HEADING });
+      if (file_error(done)) {
+        throw count_error(done);
+      }
+      map.flush();
+
+      if (meta) {
+        const cleanSlot = encode_meta_slot(nextGen, false, places, mapCrc, place.length, piece_size);
+        const m2 = meta.write(cleanSlot, { at: slotOffset });
+        if (file_error(m2)) throw count_error(m2);
+        meta.flush();
+        meta_gen = nextGen;
+      }
     }
-    map.flush();
     unsaved = 0;
+    metrics.flushesCompleted++;
     saved_at = Date.now();
   } catch (error) {
+    metrics.flushErrors++;
+    metrics.lastError = error.name + ": " + error.message;
+    if (is_quota_error(error)) {
+      log("storage quota exceeded during flush: " + error.message);
+      postMessage({ method: "storage_error", code: "QUOTA_EXCEEDED", disk: disk_name, text: error.message });
+      if (channel) {
+        try { channel.postMessage({ type: "quota_exceeded", disk: disk_name, message: error.message }); } catch {}
+      }
+      if (propagateErrors) throw error;
+      return;
+    }
+    if (propagateErrors) {
+      throw error;
+    }
     storage_lost(error, "saving");
   }
 };
@@ -1018,14 +1111,42 @@ const transfer = (write, offset, address, length) => {
   }
 };
 
-/// Open the two files, or leave `data` null. `heading` names the image they must belong to. Returns whether
-/// what was there from before was kept.
+const acquire_disk_lock = async (name) => {
+  if (typeof navigator === "undefined" || !navigator.locks || typeof navigator.locks.request !== "function") {
+    return true;
+  }
+  return new Promise((resolve) => {
+    navigator.locks.request("weblinux-disk-lock-" + name, { ifAvailable: true }, (lock) => {
+      if (!lock) {
+        resolve(false);
+        return;
+      }
+      return new Promise((release) => {
+        lock_release = release;
+        resolve(true);
+      });
+    }).catch(() => resolve(true));
+  });
+};
+
+/// Open the OPFS files (`data`, `map`, `meta`), or leave `data` null on failure/lock conflict.
 const open_files = async (name, heading, reset) => {
+  const locked = await acquire_disk_lock(name);
+  if (!locked) {
+    const msg = "writer lock conflict: disk '" + name + "' is actively owned by another tab or session";
+    log(msg);
+    postMessage({ method: "lock_conflict", code: "DISK_LOCKED", disk: name, text: msg });
+    if (channel) {
+      try { channel.postMessage({ type: "lock_conflict", disk: name, text: msg }); } catch {}
+    }
+    return false;
+  }
+
   let handles = [];
   try {
     const root = await navigator.storage.getDirectory();
     const directory = await root.getDirectoryHandle("disk-" + name, { create: true });
-    for (const file of ["data", "map"]) {
+    for (const file of ["data", "map", "meta"]) {
       const handle = await directory.getFileHandle(file, { create: true });
       // A page that was just reloaded may find the files still locked by the worker it had before: the browser
       // lets go of them a little after that worker is gone.
@@ -1034,7 +1155,7 @@ const open_files = async (name, heading, reset) => {
           handles.push(await handle.createSyncAccessHandle());
           break;
         } catch (error) {
-          if (error.name != "NoModificationAllowedError" || attempt == 40) {
+          if (error.name != "NoModificationAllowedError" || attempt == 20) {
             throw error;
           }
           await new Promise((resolve) => setTimeout(resolve, 50));
@@ -1043,21 +1164,42 @@ const open_files = async (name, heading, reset) => {
     }
   } catch (error) {
     for (const handle of handles) {
-      handle.close();
+      try { handle.close(); } catch {}
     }
+    release_lock();
     log(error.name == "NoModificationAllowedError"
         ? "the disk is in use by another tab: this one keeps its changes in memory only"
         : "no private file system for the disk (" + error.name + ": " + error.message
           + "): changes are kept in memory only");
     return false;
   }
-  [data, map] = handles;
+  [data, map, meta] = handles;
   saved_at = Date.now();
 
   // What is there from before counts if it is of this image and whole.
   const found = new Uint8Array(HEADING);
   if (!reset && map.getSize() == HEADING + place.byteLength && map.read(found, { at: 0 }) == HEADING
       && found.every((byte, i) => byte == heading[i]) && map.read(place, { at: HEADING }) == place.byteLength) {
+    // Check dual-slot durability metadata for interrupted commits
+    if (meta && meta.getSize() >= META_TOTAL_SIZE) {
+      const metaBytes = new Uint8Array(META_TOTAL_SIZE);
+      meta.read(metaBytes, { at: 0 });
+      const slotA = decode_meta_slot(metaBytes.subarray(0, META_SLOT_SIZE));
+      const slotB = decode_meta_slot(metaBytes.subarray(META_SLOT_SIZE, META_TOTAL_SIZE));
+      const compat = (s) => s.valid && s.pieceCount === place.length && s.pieceSize === piece_size;
+      const clean = [];
+      if (compat(slotA) && !slotA.dirty) clean.push(slotA);
+      if (compat(slotB) && !slotB.dirty) clean.push(slotB);
+      clean.sort((a, b) => b.generation - a.generation);
+      if (clean.length > 0) {
+        meta_gen = clean[0].generation;
+        const mapCrc = crc32(new Uint8Array(place.buffer, place.byteOffset, place.byteLength));
+        if (mapCrc !== clean[0].mapCrc32) {
+          log("recovery notice: map CRC mismatch against committed generation " + meta_gen + "; validating stored places");
+        }
+      }
+    }
+
     const stored = Math.floor(data.getSize() / piece_size);
     let kept = 0;
     for (let piece = 0; piece < place.length; piece++) {
@@ -1069,17 +1211,37 @@ const open_files = async (name, heading, reset) => {
       }
     }
     data.truncate(places * piece_size);  // pieces that arrived but never made it into `map`
+
+    // Non-destructive upgrade of legacy v1 disk without meta file
+    if (meta && meta.getSize() < META_TOTAL_SIZE) {
+      meta_gen = 1;
+      const mapCrc = crc32(new Uint8Array(place.buffer, place.byteOffset, place.byteLength));
+      const slot0 = encode_meta_slot(meta_gen, false, places, mapCrc, place.length, piece_size);
+      meta.truncate(META_TOTAL_SIZE);
+      meta.write(slot0, { at: 0 });
+      meta.flush();
+    }
+
     log("kept from before: " + Math.round(kept * piece_size / 1048576) + " MiB of "
-        + Math.round(size / 1048576) + " MiB");
+        + Math.round(size / 1048576) + " MiB (gen " + meta_gen + ")");
     return true;
   } else {
     const had = map.getSize() > 0;
     place.fill(0);
+    places = 0;
+    meta_gen = 1;
     data.truncate(0);
     map.truncate(0);
     map.write(heading, { at: 0 });
     map.write(place, { at: HEADING });
     map.flush();
+    if (meta) {
+      const mapCrc = crc32(new Uint8Array(place.buffer, place.byteOffset, place.byteLength));
+      const slot0 = encode_meta_slot(meta_gen, false, 0, mapCrc, place.length, piece_size);
+      meta.truncate(META_TOTAL_SIZE);
+      meta.write(slot0, { at: 0 });
+      meta.flush();
+    }
     log(reset ? "started afresh, as asked" : had ? "the image on the server is another one: started afresh"
         : "new: parts are fetched as they are needed, and kept");
     return false;
@@ -1130,16 +1292,36 @@ const serve = () => {
     }
     idle_since = Date.now();
     let result = 0;
+    let should_exit = false;
     try {
       const op = control[OP];
-      if (op == OP_FLUSH) {
+      if (op == OP_SHUTDOWN) {
+        shutting_down = true;
+        stop_pool();
+        if (data) {
+          save(true, true);
+          for (const handle of [data, map, meta]) {
+            try { if (handle) handle.close(); } catch (closeErr) {
+              metrics.lastError = "close: " + closeErr.message;
+            }
+          }
+          data = null;
+          map = null;
+          meta = null;
+        }
+        release_lock();
+        should_exit = true;
+      } else if (op == OP_FLUSH) {
         if (unsaved) {
-          save();
+          save(false, true);
         } else if (data) {
           try {
             data.flush();  // what was written into pieces that were here already
+            metrics.flushesCompleted++;
             saved_at = Date.now();
           } catch (error) {
+            metrics.flushErrors++;
+            metrics.lastError = error.name + ": " + error.message;
             if (!is_gone(error)) {
               throw error;
             }
@@ -1147,19 +1329,33 @@ const serve = () => {
           }
         }
       } else {
+        if (op == OP_WRITE) {
+          if (shutting_down) {
+            throw new Error("write rejected: disk is shutting down");
+          }
+          metrics.writesReceived++;
+        }
         const sector = (control[SECTOR_LOW] >>> 0) + control[SECTOR_HIGH] * 4294967296;
         const address = (control[ADDRESS] >>> 0) + (control[ADDRESS_HIGH] >>> 0) * 4294967296;
         transfer(op == OP_WRITE, sector * SECTOR, address, control[COUNT] * SECTOR);
+        if (op == OP_WRITE) {
+          metrics.writesCompleted++;
+        }
       }
     } catch (error) {
       // (One line for the first, and a count now and then: a disk that fails fails at every request.)
       log_limited(String(error.message).replace(/\d+/g, "#"), "error: " + error.message);
-      result = -EIO;
+      metrics.lastError = error.name + ": " + error.message;
+      result = is_quota_error(error) ? -ENOSPC : -EIO;
     }
     control[RESULT] = result;
     Atomics.store(control, REQUEST, 0);
     Atomics.store(control, DONE, 1);
     Atomics.notify(control, DONE);
+    if (should_exit) {
+      postMessage({ method: "shutdown_complete", ok: result === 0, disk: disk_name, metrics: { ...metrics, generation: meta_gen } });
+      return;
+    }
     if (unsaved >= 64) {
       save();
     }

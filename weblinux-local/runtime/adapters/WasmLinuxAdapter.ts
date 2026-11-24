@@ -579,12 +579,13 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.displayChannel = null;
     }
 
-    // Allow guest kernel sync and disk-worker idle flush to OPFS
-    await new Promise(r => setTimeout(r, 2000));
+    // Allow guest kernel sync to issue flush before coordinated OPFS shutdown
+    await new Promise(r => setTimeout(r, 800));
 
     if (this.activeOs && typeof this.activeOs.terminate === 'function') {
       try {
-        this.activeOs.terminate();
+        this.log(`[Shutdown] Flushing OPFS disks, closing handles, and releasing locks...`);
+        await this.activeOs.terminate();
       } catch (termErr) {
         console.warn('[Shutdown] activeOs.terminate error:', termErr);
       }

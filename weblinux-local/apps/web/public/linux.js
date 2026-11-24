@@ -866,11 +866,19 @@ const linux = async (worker_url, variant, vmlinux, boot_cmdline, initrd, log, co
     const label = "[Disk " + options.name + "]: ";
     const control = new Int32Array(new SharedArrayBuffer(64));
     const disk_worker = new Worker(options.worker, { name: "disk " + options.name });
-    disk_workers.push(disk_worker);
+    const entry = { worker: disk_worker, control: control, name: options.name, shutdownResolve: null };
+    disk_workers.push(entry);
     disks[index] = null;
     disk_worker.onmessage = (event) => {
       if (event.data.method == "log") {
         log(label + event.data.text);
+      } else if (event.data.method == "lock_conflict" || event.data.method == "storage_error") {
+        log(label + "ERROR [" + event.data.code + "]: " + event.data.text);
+      } else if (event.data.method == "shutdown_complete") {
+        if (entry.shutdownResolve) {
+          entry.shutdownResolve(event.data);
+          entry.shutdownResolve = null;
+        }
       } else {
         if (event.data.method == "ready") {
           disks[index] = control;
@@ -941,16 +949,40 @@ const linux = async (worker_url, variant, vmlinux, boot_cmdline, initrd, log, co
       console_in_fill();
     },
 
-    terminate: () => {
+    terminate: async () => {
+      // 1. Stop CPU and task workers first so no new block writes are issued
       for (const cpu of Object.values(cpus)) {
         try { if (cpu && cpu.worker) cpu.worker.terminate(); } catch {}
       }
       for (const t of Object.values(tasks)) {
         try { if (t && t.worker) t.worker.terminate(); } catch {}
       }
-      for (const dw of disk_workers) {
-        try { if (dw) dw.terminate(); } catch {}
-      }
+      // 2. Gracefully flush, commit metadata, close OPFS handles, and release Web Locks
+      await Promise.all(disk_workers.map((entry) => new Promise((resolve) => {
+        if (!entry || !entry.worker) { resolve(); return; }
+        const timeout = setTimeout(() => {
+          try { entry.worker.terminate(); } catch {}
+          resolve();
+        }, 3000);
+        entry.shutdownResolve = () => {
+          clearTimeout(timeout);
+          try { entry.worker.terminate(); } catch {}
+          resolve();
+        };
+        try {
+          // Wait briefly if an in-flight block request is finishing
+          const deadline = Date.now() + 500;
+          while (Atomics.load(entry.control, 1) === 1 && Date.now() < deadline) { /* spin */ }
+          entry.control[3] = 3; // OP_SHUTDOWN
+          Atomics.store(entry.control, 2, 0); // DONE = 0
+          Atomics.store(entry.control, 1, 1); // REQUEST = 1
+          Atomics.notify(entry.control, 1);
+        } catch {
+          clearTimeout(timeout);
+          try { entry.worker.terminate(); } catch {}
+          resolve();
+        }
+      })));
     }
   };
 };
