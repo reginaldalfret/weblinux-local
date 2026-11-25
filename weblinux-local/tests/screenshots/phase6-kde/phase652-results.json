@@ -1,15 +1,14 @@
 {
   "cold": {
-    "runtimeReadySec": 36,
-    "splashDismissSec": 167,
-    "firstAppSec": 215
+    "runtimeReadySec": 67,
+    "firstAppSec": 262
   },
   "warm": {
-    "runtimeReadySec": 49
+    "runtimeReadySec": 27
   },
   "checks": {
     "viewportFits": true,
     "resizeResponsive": true,
-    "warmPersistence": true
+    "warmPersistence": false
   }
 }
