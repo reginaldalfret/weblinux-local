@@ -194,7 +194,8 @@ export const App: React.FC = () => {
             onLaunch={handleLaunch}
             onSelectDistro={(id) => {
               setSelectedDistro(id as DistributionId);
-              if (id === 'ubuntu') setSelectedDesktop('cli');
+              if (id === 'ubuntu') setSelectedDesktop('ubuntu-kde');
+              else if (id === 'debian') setSelectedDesktop('kde-plasma');
               setCurrentPage('desktops');
             }}
             manifests={manifests}
@@ -209,7 +210,8 @@ export const App: React.FC = () => {
             selectedDistro={selectedDistro}
             onSelect={(id) => {
               setSelectedDistro(id);
-              if (id === 'ubuntu') setSelectedDesktop('cli');
+              if (id === 'ubuntu') setSelectedDesktop('ubuntu-kde');
+              else if (id === 'debian') setSelectedDesktop('kde-plasma');
             }}
             onProceed={() => setCurrentPage('desktops')}
           />
@@ -218,7 +220,7 @@ export const App: React.FC = () => {
         {currentPage === 'desktops' && (
           <DesktopSelector
             selectedDistro={selectedDistro}
-            selectedDesktop={selectedDistro === 'ubuntu' ? 'cli' : selectedDesktop}
+            selectedDesktop={selectedDesktop}
             onSelect={(id) => setSelectedDesktop(id)}
             onLaunch={handleLaunch}
           />
@@ -231,7 +233,7 @@ export const App: React.FC = () => {
               <div className="absolute inset-0 z-50 bg-[#090a0f] overflow-y-auto">
                 <BootScreen
                   manifest={currentManifest}
-                  desktop={selectedDistro === 'ubuntu' ? 'cli' : selectedDesktop}
+                  desktop={selectedDesktop}
                   runtimeStatus={runtimeStatus}
                   logs={logs}
                   onCancel={handleShutdown}
@@ -240,7 +242,7 @@ export const App: React.FC = () => {
             )}
             <Desktop
               manifest={currentManifest}
-              desktop={selectedDistro === 'ubuntu' ? 'cli' : selectedDesktop}
+              desktop={selectedDesktop}
               runtimeStatus={runtimeStatus}
               onShutdown={handleShutdown}
               logs={logs}

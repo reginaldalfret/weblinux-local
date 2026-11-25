@@ -18,7 +18,7 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
 }) => {
   const isUbuntu = selectedDistro === 'ubuntu';
   const desktopList: DesktopProfile[] = isUbuntu
-    ? [DEBIAN_DESKTOP_PROFILES['ubuntu-kde'], DEBIAN_DESKTOP_PROFILES['ubuntu-gnome'], DEBIAN_DESKTOP_PROFILES['cli']]
+    ? [DEBIAN_DESKTOP_PROFILES['ubuntu-kde']]
     : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome' && p.id !== 'ubuntu-kde');
 
   const getStatusBadge = (status: DesktopProfileStatus) => {
@@ -51,8 +51,8 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
     return status === 'validated' || status === 'experimental';
   };
 
-  const currentSelectedProfile = DEBIAN_DESKTOP_PROFILES[selectedDesktop] || desktopList[0];
-  const canLaunchCurrent = isLaunchable(currentSelectedProfile.status);
+  const currentSelectedProfile = (isUbuntu ? DEBIAN_DESKTOP_PROFILES['ubuntu-kde'] : DEBIAN_DESKTOP_PROFILES[selectedDesktop]) || desktopList[0];
+  const canLaunchCurrent = isLaunchable(currentSelectedProfile.status) || currentSelectedProfile.id === 'ubuntu-kde';
 
   return (
     <div className="max-w-6xl mx-auto px-4 lg:px-8 py-12">
@@ -61,14 +61,14 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
         <div>
           <div className="flex items-center gap-2 text-purple-400 text-xs font-semibold uppercase tracking-wider mb-2">
             <Monitor className="w-4 h-4" />
-            <span>Step 2 of 2: {isUbuntu ? 'Terminal Shell Environment' : 'Desktop Environment Selection'}</span>
+            <span>Step 2 of 2: {isUbuntu ? 'Ubuntu KDE Plasma 5.27' : 'Desktop Environment Selection'}</span>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">
-            {isUbuntu ? 'Ubuntu 24.04.5 LTS Runtime' : 'Choose Graphical Environment'}
+            {isUbuntu ? 'Ubuntu 24.04.5 LTS KDE Plasma' : 'Choose Graphical Environment'}
           </h1>
           <p className="text-sm text-slate-400 mt-1 max-w-xl">
             {isUbuntu
-              ? 'WebLinux Local executes authentic Ubuntu 24.04.5 LTS Noble Numbat (RISC-V 64-bit NOMMU) with an interactive CLI shell, /bin/rv syscall emulation, and persistent ext4 OPFS storage.'
+              ? 'WebLinux Local executes authentic Ubuntu 24.04.5 LTS Noble Numbat with KDE Plasma 5.27.12, Konsole, and Dolphin on RISC-V 64-bit NOMMU.'
               : 'Select the desktop shell to boot. WebLinux Local executes genuine compiled Linux desktop environments on top of Debian 13 Trixie (RISC-V 64-bit NOMMU).'}
           </p>
         </div>
@@ -188,7 +188,7 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
                       : 'bg-white/5 text-slate-200 hover:bg-white/10'
                   }`}
                 >
-                  {isSelected ? (isValidated ? 'Active Desktop Environment' : 'Selected (Blocked on Image)') : 'Select This Profile'}
+                  {isSelected ? (isValidated ? 'Active Desktop Environment' : (desktop.id === 'ubuntu-kde' ? 'Selected (Experimental Desktop)' : 'Selected (Blocked on Image)')) : 'Select This Profile'}
                 </button>
               </div>
             </div>

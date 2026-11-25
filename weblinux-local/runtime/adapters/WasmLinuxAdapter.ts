@@ -784,11 +784,13 @@ export QT_QUICK_BACKEND=software
 export QMLSCENE_DEVICE=softwarecontext
 export LIBGL_ALWAYS_SOFTWARE=1
 export QV4_FORCE_INTERPRETER=1
-export QT_LOGGING_RULES="qt.qpa.wayland*=true"
 export NO_AT_BRIDGE=1
 mkdir -p -m 700 "$XDG_RUNTIME_DIR"
 
-# 1. System & session D-Bus
+# 1. Disable non-functional setuid UDisks2 D-Bus activation (avoids 30-40s Dolphin/file-dialog timeouts)
+rm -f /usr/share/dbus-1/system-services/org.freedesktop.UDisks2.service 2>/dev/null || true
+
+# 2. System & session D-Bus
 grep -q '^messagebus:' /etc/passwd 2>/dev/null || echo 'messagebus:x:100:101:D-Bus:/nonexistent:/usr/sbin/nologin' >> /etc/passwd
 grep -q '^messagebus:' /etc/group 2>/dev/null || echo 'messagebus:x:101:' >> /etc/group
 mkdir -p /run/dbus /var/run
@@ -800,9 +802,26 @@ if [ ! -S "$XDG_RUNTIME_DIR/bus" ]; then
 fi
 export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
 
-# 2. Build KService menu cache if kbuildsycoca5 is available
-if command -v kbuildsycoca5 >/dev/null 2>&1; then
-  kbuildsycoca5 --noincremental >> /root/ubuntu-kde-session.log 2>&1 || true
+# 3. Start WebLinux GPU server (rvgpu -> WebGL2/WebGPU) if available
+if [ -x /run/hostnode/hostnode ] && [ -f /run/rvgpu/boot.js ] && [ ! -S "$XDG_RUNTIME_DIR/rvgpu-0" ]; then
+  rm -f "$XDG_RUNTIME_DIR/rvgpu-0.ready" "$XDG_RUNTIME_DIR/rvgpu-0.none"
+  HOSTNODE_HOME=/run/rvgpu /run/hostnode/hostnode > /root/rvgpu.log 2>&1 &
+  g=0
+  while [ ! -f "$XDG_RUNTIME_DIR/rvgpu-0.ready" ] && [ ! -f "$XDG_RUNTIME_DIR/rvgpu-0.none" ] && [ $g -lt 20 ]; do
+    sleep 0.1
+    g=$((g + 1))
+  done
+fi
+if [ -f "$XDG_RUNTIME_DIR/rvgpu-0.ready" ]; then
+  export GALLIUM_DRIVER=virpipe
+  export VTEST_SOCKET_NAME="$XDG_RUNTIME_DIR/rvgpu-0"
+  unset LIBGL_ALWAYS_SOFTWARE
+  echo "[Ubuntu KDE Launcher] rvgpu active ($VTEST_SOCKET_NAME, GALLIUM_DRIVER=virpipe)" >> /root/ubuntu-kde-session.log
+fi
+
+# 4. Build KService menu cache only if missing (run in background to avoid blocking compositor startup)
+if ! ls /root/.cache/ksycoca5_* >/dev/null 2>&1 && command -v kbuildsycoca5 >/dev/null 2>&1; then
+  kbuildsycoca5 >> /root/ubuntu-kde-session.log 2>&1 &
 fi
 
 # 3. Start WebLinux Wayland/KWin compositor (wlserver in WLSERVER_SHELL=plasma mode)

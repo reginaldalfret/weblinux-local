@@ -131,9 +131,11 @@ export const Desktop: React.FC<DesktopProps> = ({
 
   const handlePointerLock = () => {
     const sc = document.getElementById('screen') as HTMLCanvasElement;
+    if (document.pointerLockElement) {
+      document.exitPointerLock?.();
+    }
     if (sc) {
-      sc.requestPointerLock?.();
-      sc.focus();
+      sc.focus({ preventScroll: true });
     }
   };
 
@@ -240,13 +242,13 @@ export const Desktop: React.FC<DesktopProps> = ({
       <div
         ref={viewportRef}
         onClick={handlePointerLock}
-        className="relative flex-1 min-h-0 w-full flex flex-col items-stretch justify-start bg-black overflow-hidden select-none cursor-crosshair"
+        className="relative flex-1 min-h-0 w-full flex flex-col items-stretch justify-start bg-black overflow-hidden select-none cursor-default"
       >
         {/* Overlay Helper Badge */}
         <div className="absolute top-4 left-4 z-20 pointer-events-none">
           <div className="px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[11px] text-slate-300 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>Click inside canvas for pointer capture • Press Esc to release</span>
+            <span>Click inside desktop to focus keyboard input</span>
           </div>
         </div>
 
