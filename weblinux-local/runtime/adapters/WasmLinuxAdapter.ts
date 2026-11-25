@@ -15,6 +15,8 @@ import {
   DownloadProgress,
   ImportResult,
   StorageUsageInfo,
+  GraphicsMode,
+  GraphicsCapabilities,
 } from '../types';
 import { OpfsManager } from '../filesystem/OpfsManager';
 import { DEBIAN_DESKTOP_PROFILES } from '../profiles/desktopProfiles';
@@ -46,6 +48,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   private resolveShellReady: ((val: boolean) => void) | null = null;
   private cachedKernelBuffer: ArrayBuffer | null = null;
   private cachedInitrdBuffer: ArrayBuffer | null = null;
+  private graphicsMode: GraphicsMode = 'automatic';
 
   public static getInstance(): WasmLinuxAdapter {
     if (!WasmLinuxAdapter.instance) {
@@ -815,8 +818,11 @@ fi
 if [ -f "$XDG_RUNTIME_DIR/rvgpu-0.ready" ]; then
   export GALLIUM_DRIVER=virpipe
   export VTEST_SOCKET_NAME="$XDG_RUNTIME_DIR/rvgpu-0"
-  unset LIBGL_ALWAYS_SOFTWARE
-  echo "[Ubuntu KDE Launcher] rvgpu active ($VTEST_SOCKET_NAME, GALLIUM_DRIVER=virpipe)" >> /root/ubuntu-kde-session.log
+  unset LIBGL_ALWAYS_SOFTWARE QT_QUICK_BACKEND QMLSCENE_DEVICE
+  export QSG_INFO=1
+  echo "[Ubuntu KDE Launcher] rvgpu active ($VTEST_SOCKET_NAME, GALLIUM_DRIVER=virpipe, OpenGL QSG)" >> /root/ubuntu-kde-session.log
+else
+  echo "[Ubuntu KDE Launcher] rvgpu unavailable; using software QML fallback" >> /root/ubuntu-kde-session.log
 fi
 
 # 4. Build KService menu cache only if missing (run in background to avoid blocking compositor startup)
@@ -982,6 +988,65 @@ fi`;
       await this.opfsManager.resetAll();
     }
     this.log(`[Storage] Reset operation executed on ${diskName || 'all disks'}.`);
+  }
+
+  public setGraphicsMode(mode: GraphicsMode): void {
+    this.graphicsMode = mode;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        window.localStorage.setItem('weblinux_graphics_mode', mode);
+      } catch {
+        // Ignore storage errors
+      }
+    }
+    this.updateStatus({ graphics: this.getGraphicsCapabilities() });
+  }
+
+  public getGraphicsMode(): GraphicsMode {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const saved = window.localStorage.getItem('weblinux_graphics_mode') as GraphicsMode | null;
+        if (saved === 'software' || saved === 'experimental-rvgpu' || saved === 'automatic') {
+          this.graphicsMode = saved;
+        }
+      } catch {
+        // Ignore
+      }
+    }
+    return this.graphicsMode;
+  }
+
+  public getGraphicsCapabilities(): GraphicsCapabilities {
+    const win = typeof window !== 'undefined' ? (window as any) : {};
+    const rvGpu = win.rvGpu;
+    const stats = rvGpu?.stats;
+    const d = win.rvDisplay;
+    const webgl2 = !!(d && d.gl) || this.getDiagnostics().hasWebGL2;
+    const webgpu = typeof navigator !== 'undefined' && !!(navigator as any).gpu;
+    const executorLoaded = !!rvGpu;
+    const startErrors: string[] = Array.isArray(stats?.startErrors) ? stats.startErrors : [];
+    const executorReady = !!(stats?.readyKind && startErrors.length === 0 && !stats?.deviceLost);
+    const execStats = stats?.exec;
+    const guestConnected = !!(execStats && (execStats.records > 0 || execStats.submits > 0));
+    let activeBackend: GraphicsCapabilities['activeBackend'] = 'software';
+    if (this.getGraphicsMode() !== 'software' && executorReady) {
+      if (stats.readyKind === 'webgpu') activeBackend = 'webgpu';
+      else if (stats.readyKind === 'vrend') activeBackend = 'vrend-webgl2';
+      else if (stats.readyKind === 'proto') activeBackend = 'proto';
+    }
+    return {
+      mode: this.getGraphicsMode(),
+      webgl2,
+      webgpu,
+      executorLoaded,
+      executorReady,
+      guestConnected,
+      activeBackend,
+      renderer: stats?.workerRenderer || stats?.renderer || undefined,
+      fallbackReason: startErrors[0] || stats?.fallback || stats?.deviceLost || undefined,
+      commandRecords: execStats?.records ?? 0,
+      draws: execStats?.draws ?? 0,
+    };
   }
 
   public onStateChange(listener: (status: RuntimeStatus) => void): () => void {

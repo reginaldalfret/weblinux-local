@@ -1,0 +1,55 @@
+{
+  "caps": {
+    "mode": "automatic",
+    "webgl2": true,
+    "webgpu": true,
+    "executorLoaded": true,
+    "executorReady": true,
+    "guestConnected": true,
+    "activeBackend": "vrend-webgl2",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2050 (0x000025AD) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "commandRecords": 1235,
+    "draws": 0
+  },
+  "gpuStats": {
+    "mode": "worker",
+    "presents": 0,
+    "imports": 0,
+    "importMs": 0,
+    "lastImportMs": 0,
+    "maxImportMs": 0,
+    "blitMs": 0,
+    "exec": {
+      "records": 1235,
+      "submits": 100,
+      "bytes": 82404,
+      "puts": 797,
+      "putBytes": 33405720,
+      "gets": 81,
+      "getBytes": 60428800,
+      "getMs": 549.4499999997206,
+      "presents": 0,
+      "execMs": 1042.0250000013039,
+      "lastExecMs": 2.6499999999068677,
+      "maxExecMs": 238.464999999851,
+      "copyMs": 1.7950000017881393,
+      "errors": []
+    },
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2050 (0x000025AD) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "select": {
+      "exec": "vrend",
+      "why": "site default vrend"
+    },
+    "exec_kind": "vrend",
+    "vrendFirst": [
+      "vrend: gl_version 30 - es profile enabled",
+      "vrend: Running without ARB/KHR robustness in place may crash",
+      "vrend: GLSL feature level 130"
+    ],
+    "readyKind": "vrend",
+    "workerRenderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2050 (0x000025AD) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "capsLen": 1408,
+    "startErrors": []
+  },
+  "guestLogs": "rcohb92edmu5b_$?\n[Ubuntu KDE Launcher] Initializing Ubuntu 24.04.5 LTS KDE Plasma 5.27 Session...\n[Ubuntu KDE Launcher] Preflight verified: plasmashell, konsole, dolphin installed.\n[Ubuntu KDE Launcher] rvgpu active (/tmp/runtime-root/rvgpu-0, GALLIUM_DRIVER=virpipe, OpenGL QSG)\n[Ubuntu KDE Launcher] Wayland display wayland-0 ready. Launching Plasma 5.27...\n[Ubuntu KDE Launcher] Plasma 5.27 session started (PID 222).\nkbuildsycoca5 running...\nkf.service.sycoca: Service type not found: \"application/vnd.kde.fontspackage\"\nkf.service.sycoca: Service type not found: \"application/x-font-type1\"\nkf.service.sycoca: Service type not found: \"font/ttf\"\nkf.service.sycoca: Service type not found: \"application/x-font-pcf\"\nkf.service.sycoca: Service type not found: \"application/x-font-afm\"\nkf.service.sycoca: Service type not found: \"text/plain\"\nkf.service.sycoca: Service type not found: \"application/x-font-bdf\"\nkf.service.sycoca: Service type not found: \"font/collection\"\nkf.service.sycoca: Service type not found: \"inode/directory\"\nlibEGL warning: failed to get driver name for fd -1\n\nlibEGL warning: MESA-LOADER: failed to retrieve device information\n\nlibEGL warning: failed to get driver name for fd -1\n\nChecking screens: available: (QScreen(0x52c6350, name=\"PAGE-1\")) redundant: QHash() fake: QSet() all: (QScreen(0x52c6350, name=\"PAGE-1\"))\nAborting shell load: The activity manager daemon (kactivitymanagerd) is not running.\nIf this Plasma has been installed into a custom prefix, verify that its D-Bus services dir is known to the system for the daemon to be activatable.\nQDBusConnection: name 'org.kde.kglobalaccel' had owner '' but we thought it was ':1.3'\nAborting shell load: The activity manager daemon (kactivitymanagerd) is not running.\nIf this Plasma has been installed into a custom prefix, verify that its D-Bus services dir is known to the system for the daemon to be activatable.\nqt.scenegraph.general: threaded render loop\nqt.scenegraph.general: Using sg animation driver\nqt.scenegraph.general: Animation Driver: using vsync: 16.67 ms\nkf.plasma.quick: Applet preload policy set to 1\nCould not load a session backend. Session management operations such as shutdown will not be operational. This is a setup issue.\nfile:///usr/lib/riscv64-linux-gnu/qt5/qml/org/kde/kirigami.2/templates/InlineMessage.qml:265:13: QML SelectableLabel: Binding loop detected for property \"implicitWidth\"\nkf.service.services: KApplicationTrader: mimeType \"inode/directory\" not found\nqt.qpa.wayland: Wayland does not support QWindow::requestActivate()\nqt.qpa.wayland: Wayland does not support QWindow::requestActivate()\nqt.qpa.wayland: Wayland does not support QWindow::requestActivate()\nqt.qpa.wayland: Wayland does not support QWindow::requestActivate()\nqt.qpa.wayland: Wayland does not support QWindow::requestActivate()\nTrying to use rootObject before initialization is completed, whilst using setInitializationDelayed. Forcing completion\nkf.service.services: KApplicationTrader: mimeType \"text/html\" not found\nkf.service.services: KApplicationTrader: mimeType \"text/html\" not found\norg.kde.plasma.kicker: Entry is not valid \"preferred://browser\" QSharedPointer(0x3071ede0)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.discover.desktop\" QSharedPointer(0x30719fc0)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.plasma-systemmonitor.desktop\" QSharedPointer(0x3071fab0)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.kate.desktop\" QSharedPointer(0x3071fd50)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.kontact.desktop\" QSharedPointer(0x3073fc80)\nkf.service.services: KApplicationTrader: mimeType \"inode/directory\" not found\nkf.service.services: KApplicationTrader: mimeType \"text/html\" not found\nkde.plasmashell: Activity added twice \"c7cd59f0-154e-43b6-ad1a-87eea1528bfb\"\nkf.service.services: KApplicationTrader: mimeType \"text/html\" not found\norg.kde.plasma.kicker: Entry is not valid \"preferred://browser\" QSharedPointer(0x3376aeb0)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.discover.desktop\" QSharedPointer(0x301b7fe0)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.plasma-systemmonitor.desktop\" QSharedPointer(0x300f8280)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.kate.desktop\" QSharedPointer(0x3fd12c40)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.kontact.desktop\" QSharedPointer(0x3377c780)\nkf.service.services: KApplicationTrader: mimeType \"text/html\" not found\norg.kde.plasma.kicker: Entry is not valid \"preferred://browser\" QSharedPointer(0x3060fea0)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.discover.desktop\" QSharedPointer(0x3376af00)\norg.kde.plasma.kicker: Entry is not valid \"org.kde.plasma-systemmonitor.desktop\" QSharedPointer(0x307510e0)"
+}
