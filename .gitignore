@@ -18,5 +18,7 @@ apps/web/public/disk/ubuntu-24.04/[0-9]*
 weblinux-local/apps/web/public/disk/ubuntu-24.04/[0-9]*
 apps/web/public/disk/ubuntu-24.04-gnome/[0-9]*
 weblinux-local/apps/web/public/disk/ubuntu-24.04-gnome/[0-9]*
+apps/web/public/disk/ubuntu-24.04-kde/[0-9]*
+weblinux-local/apps/web/public/disk/ubuntu-24.04-kde/[0-9]*
 apps/web/public/disk/**/rootfs.img
 weblinux-local/apps/web/public/disk/**/rootfs.img

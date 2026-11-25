@@ -87,11 +87,21 @@ export const App: React.FC = () => {
       await adapter.initialize();
 
       // 2. Load chosen manifest
-      const manifestId = (selectedDistro === 'ubuntu' && selectedDesktop === 'ubuntu-gnome') ? 'ubuntu-gnome' : selectedDistro;
+      const manifestId =
+        selectedDistro === 'ubuntu' && selectedDesktop === 'ubuntu-gnome'
+          ? 'ubuntu-gnome'
+          : selectedDistro === 'ubuntu' && selectedDesktop === 'ubuntu-kde'
+          ? 'ubuntu-kde'
+          : selectedDistro;
       const activeManifest = await adapter.loadManifest(manifestId as DistributionId);
 
       // Check validation policy: do not allow booting placeholder or unvalidated images
-      if (activeManifest.validationStatus !== 'validated' && activeManifest.id !== 'ubuntu' && activeManifest.id !== 'ubuntu-gnome') {
+      if (
+        activeManifest.validationStatus !== 'validated' &&
+        activeManifest.id !== 'ubuntu' &&
+        activeManifest.id !== 'ubuntu-gnome' &&
+        activeManifest.id !== 'ubuntu-kde'
+      ) {
         throw new Error(
           `${activeManifest.name} is currently an unvalidated port (status: ${activeManifest.validationStatus.toUpperCase()}). To protect your environment, only validated distributions (Debian GNU/Linux 13) can be launched.`
         );

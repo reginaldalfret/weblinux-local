@@ -14,8 +14,8 @@ assert.strictEqual(manifest.defaultDesktop, 'cli', 'Default desktop must be cli'
 assert.ok(manifest.supportedDesktops.includes('cli'), 'Supported desktops must include cli');
 
 // 2. Verify initramfs integrity configuration
-assert.strictEqual(manifest.integrity.initrdUncompressedSize, 36645376, 'Initrd uncompressed size must be 36,645,376 bytes');
-assert.strictEqual(manifest.integrity.initrdUncompressedSha256, '2dc8dde9d8ab6a1300925d2c499e1e4b585f32b5cb7c44b27368dcdacc0eb49e', 'Initrd uncompressed SHA-256 must match repackaged cpio digest');
+assert.strictEqual(manifest.integrity.initrdUncompressedSize, 36645888, 'Initrd uncompressed size must be 36,645,888 bytes');
+assert.strictEqual(manifest.integrity.initrdUncompressedSha256, '71c0ddb7192ef269e3ee2bccdd80d8162ba1ac11ad9d2f5e67d504d8444ea1f7', 'Initrd uncompressed SHA-256 must match repackaged cpio digest');
 
 // 3. Verify chunk manifest configuration
 const diskManifestPath = path.resolve(__dirname, '../../../apps/web/public/disk/ubuntu-24.04/manifest.json');

@@ -142,5 +142,32 @@ export const DEBIAN_DESKTOP_PROFILES: Record<string, DesktopProfile> = {
       'Animations disabled via GSettings override for smooth browser rendering'
     ],
     previewImage: '/screenshots/phase6/04-ubuntu-gnome-desktop.png'
+  },
+  'ubuntu-kde': {
+    id: 'ubuntu-kde',
+    name: 'Ubuntu KDE Plasma 5.27',
+    version: '5.27.12 LTS',
+    tagline: 'Qt5-Powered Ubuntu Noble Graphical Desktop',
+    description: 'Authentic Ubuntu 24.04.5 LTS (Noble Numbat) KDE Plasma 5.27 LTS desktop environment powered by Qt 5.15.13, KDE Frameworks 5.115, plasmashell, Konsole, Dolphin, and System Settings over WebLinux Wayland.',
+    distributionId: 'ubuntu',
+    status: 'experimental',
+    sessionCommand: 'ubuntu-kde /usr/local/bin/ubuntu-kde-session',
+    compositor: 'wlserver / KWin 5.27',
+    rootfsManifestId: 'ubuntu-24.04-kde',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Authentic Ubuntu Noble KDE Plasma 5.27.12 LTS Shell',
+      'Konsole 23.08 Terminal & Dolphin 23.08 File Manager',
+      'System Settings & Breeze 5.27 Theme',
+      'Qt Quick Software Renderer (no SpiderMonkey JIT overhead)',
+      'Native wlserver WLSERVER_SHELL=plasma Wayland integration',
+      'Isolated root-ubuntu-kde disk + persistent home-ubuntu'
+    ],
+    knownLimitations: [
+      'Software Qt Quick rendering (QT_QUICK_BACKEND=software)',
+      'Experimental Ubuntu graphical profile'
+    ],
+    previewImage: '/screenshots/phase6/04-ubuntu-kde-desktop.png'
   }
 };

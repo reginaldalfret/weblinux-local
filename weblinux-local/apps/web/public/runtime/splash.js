@@ -757,7 +757,7 @@
     // (plasmashell as the desktop's shell, wlserver/plasmashell.js: the desktop is ready when its desktop, a layer
     // surface of the background layer, is on the screen)
     if (D && D.nativeShell && D.nativeShell() && D.active()) {
-      if (D.windows().some((w) => w.kind === 6 && w.layer === 0)) {
+      if (D.windows().some((w) => (w.kind === 6 && w.layer === 0) || (w.kind === 1 && (w.role === 1 || (w.title && w.title.startsWith("Desktop @")))))) {
         if (!session.stages.has("desktop")) {
           stage("desktop");
         } else if (!session.stages.has("ready")) {

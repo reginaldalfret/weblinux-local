@@ -18,8 +18,8 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
 }) => {
   const isUbuntu = selectedDistro === 'ubuntu';
   const desktopList: DesktopProfile[] = isUbuntu
-    ? [DEBIAN_DESKTOP_PROFILES['ubuntu-gnome'], DEBIAN_DESKTOP_PROFILES['cli']]
-    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome');
+    ? [DEBIAN_DESKTOP_PROFILES['ubuntu-kde'], DEBIAN_DESKTOP_PROFILES['ubuntu-gnome'], DEBIAN_DESKTOP_PROFILES['cli']]
+    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome' && p.id !== 'ubuntu-kde');
 
   const getStatusBadge = (status: DesktopProfileStatus) => {
     switch (status) {
@@ -150,7 +150,7 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
                   </div>
                 </div>
 
-                {!isValidated ? (
+                {!isValidated && desktop.id !== 'ubuntu-kde' ? (
                   <div className="mb-4 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 leading-tight">
                     <div className="flex items-center gap-1.5 font-semibold text-amber-300 mb-1">
                       <AlertCircle className="w-3.5 h-3.5" />

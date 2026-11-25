@@ -218,7 +218,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 1. Validate byte length (accounting for transparent HTTP Content-Encoding: gzip decompression)
       let isUncompressedInitrd = false;
-      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 36645376)) {
+      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 36645888)) {
         isUncompressedInitrd = true;
       } else if (buffer.byteLength !== asset.expectedSize) {
         throw new Error(
@@ -228,7 +228,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 2. Validate cryptographic SHA-256 digest
       const expectedSha256 = isUncompressedInitrd
-        ? (manifest.integrity.initrdUncompressedSha256 || '2dc8dde9d8ab6a1300925d2c499e1e4b585f32b5cb7c44b27368dcdacc0eb49e')
+        ? (manifest.integrity.initrdUncompressedSha256 || '71c0ddb7192ef269e3ee2bccdd80d8162ba1ac11ad9d2f5e67d504d8444ea1f7')
         : asset.expectedSha256;
 
       if (expectedSha256) {
@@ -328,11 +328,20 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.log(`[Initrd] Image verified: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
 
       // 5. Configure disk subsystem
-      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce, root-ubuntu-gnome
+      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce, root-ubuntu-gnome, root-ubuntu-kde
       const isUbuntuGnome = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-gnome') && options.desktop === 'ubuntu-gnome';
-      const rootUrl = isUbuntuGnome ? '/disk/ubuntu-24.04-gnome/' : (options.manifest.imageSource.baseUri || '/disk/release/');
-      const rootDiskId = isUbuntuGnome ? 'root-ubuntu-gnome' : `root-${options.manifest.id}-${options.desktop}`;
-      const homeDiskId = `home-${options.manifest.id === 'ubuntu-gnome' ? 'ubuntu' : options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
+      const isUbuntuKde = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-kde') && options.desktop === 'ubuntu-kde';
+      const rootUrl = isUbuntuGnome
+        ? '/disk/ubuntu-24.04-gnome/'
+        : isUbuntuKde
+        ? '/disk/ubuntu-24.04-kde/'
+        : (options.manifest.imageSource.baseUri || '/disk/release/');
+      const rootDiskId = isUbuntuGnome
+        ? 'root-ubuntu-gnome'
+        : isUbuntuKde
+        ? 'root-ubuntu-kde'
+        : `root-${options.manifest.id}-${options.desktop}`;
+      const homeDiskId = `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde') ? 'ubuntu' : options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
         {
@@ -420,8 +429,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         (window as any).linuxOs = this.activeOs;
 
-        // Multi-Desktop Session Launch (Debian GNOME/XFCE & Ubuntu GNOME 46)
-        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome') && options.autostartDesktop) {
+        // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27)
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -435,7 +444,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           // Provision dedicated session launcher scripts
           await this.provisionDesktopLaunchers();
 
-          if (options.desktop === 'ubuntu-gnome') {
+          if (options.desktop === 'ubuntu-kde') {
+            this.log(`[Desktop Launcher] Executing verified Ubuntu KDE Plasma session script: /usr/local/bin/ubuntu-kde-session`);
+            const launchRes = await this.runCommand(`ubuntu-kde /usr/local/bin/ubuntu-kde-session`, 25000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Ubuntu KDE launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else if (options.desktop === 'ubuntu-gnome') {
             this.log(`[Desktop Launcher] Executing verified Ubuntu GNOME 46 session script: /usr/local/bin/ubuntu-gnome-session`);
             const launchRes = await this.runCommand(`ubuntu /usr/local/bin/ubuntu-gnome-session`, 20000);
             if (launchRes.exitCode !== 0) {
@@ -735,9 +756,85 @@ EOF
 chmod +x /ubuntu/usr/local/bin/ubuntu-gnome-session
 fi`;
 
+    const ubuntuKdeSessionScript =
+`if [ -d /ubuntu ]; then
+cat <<'EOF' > /ubuntu/usr/local/bin/ubuntu-kde-session
+#!/bin/sh
+echo "[Ubuntu KDE Launcher] Initializing Ubuntu 24.04.5 LTS KDE Plasma 5.27 Session..." > /root/ubuntu-kde-session.log
+MISSING=""
+for b in plasmashell konsole dolphin; do
+  if ! command -v "$b" >/dev/null 2>&1; then MISSING="$MISSING $b"; fi
+done
+if [ -n "$MISSING" ]; then
+  echo "[Ubuntu KDE Launcher ERROR] Required KDE components missing: $MISSING" | tee -a /root/ubuntu-kde-session.log >&2
+  exit 127
+fi
+echo "[Ubuntu KDE Launcher] Preflight verified: plasmashell, konsole, dolphin installed." | tee -a /root/ubuntu-kde-session.log
+
+export HOME=/root USER=root SHELL=/bin/bash LANG=C.UTF-8
+export XDG_RUNTIME_DIR=/tmp/runtime-root
+export WAYLAND_DISPLAY=wayland-0
+export DISPLAY=:0
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=KDE
+export KDE_FULL_SESSION=true
+export KDE_SESSION_VERSION=5
+export QT_QPA_PLATFORM=wayland
+export QT_QUICK_BACKEND=software
+export QMLSCENE_DEVICE=softwarecontext
+export LIBGL_ALWAYS_SOFTWARE=1
+export QV4_FORCE_INTERPRETER=1
+export QT_LOGGING_RULES="qt.qpa.wayland*=true"
+export NO_AT_BRIDGE=1
+mkdir -p -m 700 "$XDG_RUNTIME_DIR"
+
+# 1. System & session D-Bus
+grep -q '^messagebus:' /etc/passwd 2>/dev/null || echo 'messagebus:x:100:101:D-Bus:/nonexistent:/usr/sbin/nologin' >> /etc/passwd
+grep -q '^messagebus:' /etc/group 2>/dev/null || echo 'messagebus:x:101:' >> /etc/group
+mkdir -p /run/dbus /var/run
+[ -e /var/run/dbus ] || ln -s /run/dbus /var/run/dbus
+[ -S /run/dbus/system_bus_socket ] || dbus-daemon --system --fork --nopidfile > /root/dbus.log 2>&1 || true
+export DBUS_SYSTEM_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
+if [ ! -S "$XDG_RUNTIME_DIR/bus" ]; then
+  dbus-daemon --session --fork --address="unix:path=$XDG_RUNTIME_DIR/bus" >> /root/dbus.log 2>&1 || true
+fi
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+
+# 2. Build KService menu cache if kbuildsycoca5 is available
+if command -v kbuildsycoca5 >/dev/null 2>&1; then
+  kbuildsycoca5 --noincremental >> /root/ubuntu-kde-session.log 2>&1 || true
+fi
+
+# 3. Start WebLinux Wayland/KWin compositor (wlserver in WLSERVER_SHELL=plasma mode)
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  if [ -x /run/hostnode/hostnode ] && [ -d /run/wlserver ]; then
+    echo "plasma" > "$XDG_RUNTIME_DIR/wlserver.shell"
+    WLSERVER_SHELL=plasma HOSTNODE_HOME=/run/wlserver /run/hostnode/hostnode > /root/kwin.log 2>&1 &
+    i=0
+    while [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ] && [ $i -lt 50 ]; do
+      sleep 0.1
+      i=$((i + 1))
+    done
+  fi
+fi
+
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  echo "[Ubuntu KDE Launcher ERROR] Wayland display socket $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY did not start" | tee -a /root/ubuntu-kde-session.log >&2
+  exit 1
+fi
+
+echo "[Ubuntu KDE Launcher] Wayland display $WAYLAND_DISPLAY ready. Launching Plasma 5.27..." | tee -a /root/ubuntu-kde-session.log
+nohup plasmashell --no-respawn > /root/plasma-shell.log 2> /root/qt.log &
+sleep 2
+echo "[Ubuntu KDE Launcher] Plasma 5.27 session started (PID $!)." | tee -a /root/ubuntu-kde-session.log
+EOF
+chmod +x /ubuntu/usr/local/bin/ubuntu-kde-session
+fi`;
+
     await this.runCommand(gnomeSessionScript, 5000);
     await this.runCommand(xfceSessionScript, 5000);
     await this.runCommand(ubuntuGnomeSessionScript, 5000);
+    await this.runCommand(ubuntuKdeSessionScript, 5000);
     this.log(`[Desktop Launcher] Provisioned desktop session entrypoints.`);
   }
 
