@@ -87,5 +87,87 @@ export const DEBIAN_DESKTOP_PROFILES: Record<string, DesktopProfile> = {
       'Some legacy X11 panel plugins require Xwayland rootful bridge'
     ],
     previewImage: '/screenshots/phase5/10-xfce-desktop.png'
+  },
+  'cli': {
+    id: 'cli',
+    name: 'Ubuntu CLI Shell',
+    version: '24.04.5 LTS',
+    tagline: 'High-Performance RISC-V 64-bit Terminal Environment',
+    description: 'Official Ubuntu 24.04.5 LTS (Noble Numbat) interactive terminal environment running under the RISC-V 64-bit NOMMU WebAssembly execution engine with /bin/rv syscall emulation, full ext4 root filesystem, and APT package management.',
+    distributionId: 'ubuntu',
+    status: 'validated',
+    sessionCommand: 'ubuntu /bin/bash',
+    compositor: 'Linux Native Terminal / TTY',
+    rootfsManifestId: 'ubuntu-24.04-cli',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Interactive Bash 5.2 / Dash shell',
+      'Authentic Ubuntu Noble userspace (/etc/os-release)',
+      'APT / Dpkg package management inspection',
+      'Ext4 virtual disk mount on /ubuntu with 2,555 files',
+      'Persistent OPFS home directory on /ubuntu/root (/dev/wdb)',
+      'Full Linux utilities: ls, cat, uname, df, ps, env, id'
+    ],
+    knownLimitations: [
+      'Graphical Wayland compositor disabled in Phase 6.3 (CLI only)',
+      'Fork/exec emulation handled via /bin/rv binfmt_misc'
+    ],
+    previewImage: '/screenshots/phase6/ubuntu-cli-terminal.png'
+  },
+  'ubuntu-gnome': {
+    id: 'ubuntu-gnome',
+    name: 'Ubuntu GNOME 46',
+    version: '46.0',
+    tagline: 'Authentic Ubuntu Noble Desktop Experience',
+    description: 'Official Ubuntu 24.04.5 LTS (Noble Numbat) GNOME 46 graphical desktop environment powered by Mutter 46 and GNOME Shell on RISC-V 64-bit NOMMU. Features the Ubuntu Yaru theme, GNOME top bar, dynamic workspaces, Nautilus 46 file manager, and nested Wayland display architecture.',
+    distributionId: 'ubuntu',
+    status: 'validated',
+    sessionCommand: 'ubuntu /usr/local/bin/ubuntu-gnome-session',
+    compositor: 'Mutter 46 (Nested Wayland Session)',
+    rootfsManifestId: 'ubuntu-24.04-gnome',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Authentic Ubuntu Noble GNOME 46 Shell and Mutter compositor',
+      'Ubuntu Yaru theme and icons',
+      'GNOME Top Bar with system indicators and quick settings',
+      'Activities Spatial Overview and dynamic workspaces',
+      'Nautilus 46 File Manager with ext4 persistence',
+      'Nested Wayland compositor over WebGL2 display bridge',
+      'Hardware-isolated persistent home storage on /ubuntu/root'
+    ],
+    knownLimitations: [
+      'GJS and SpiderMonkey running in interpreter mode (JS_DISABLE_JIT=1) under NOMMU',
+      'Animations disabled via GSettings override for smooth browser rendering'
+    ],
+    previewImage: '/screenshots/phase6/04-ubuntu-gnome-desktop.png'
+  },
+  'ubuntu-kde': {
+    id: 'ubuntu-kde',
+    name: 'Ubuntu KDE Plasma 5.27',
+    version: '5.27.12 LTS',
+    tagline: 'Qt5-Powered Ubuntu Noble Graphical Desktop',
+    description: 'Authentic Ubuntu 24.04.5 LTS (Noble Numbat) KDE Plasma 5.27 LTS desktop environment powered by Qt 5.15.13, KDE Frameworks 5.115, plasmashell, Konsole, Dolphin, and System Settings over WebLinux Wayland.',
+    distributionId: 'ubuntu',
+    status: 'experimental',
+    sessionCommand: 'ubuntu-kde /usr/local/bin/ubuntu-kde-session',
+    compositor: 'wlserver / KWin 5.27',
+    rootfsManifestId: 'ubuntu-24.04-kde',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Authentic Ubuntu Noble KDE Plasma 5.27.12 LTS Shell',
+      'Konsole 23.08 Terminal & Dolphin 23.08 File Manager',
+      'System Settings & Breeze 5.27 Theme',
+      'Qt Quick Software Renderer (no SpiderMonkey JIT overhead)',
+      'Native wlserver WLSERVER_SHELL=plasma Wayland integration',
+      'Isolated root-ubuntu-kde disk + persistent home-ubuntu'
+    ],
+    knownLimitations: [
+      'Software Qt Quick rendering (QT_QUICK_BACKEND=software)',
+      'Experimental Ubuntu graphical profile'
+    ],
+    previewImage: '/screenshots/phase6/04-ubuntu-kde-desktop.png'
   }
 };

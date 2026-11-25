@@ -161,8 +161,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         id: 'initrd',
         name: 'Initial Ramdisk (BusyBox + rv)',
         path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
-        expectedSize: manifest.integrity.initrdSize || 16050431,
-        expectedSha256: manifest.integrity.initrdSha256 || '737eaaf635090b3045b942db65f2735fd0a23cad8d316f91956708f5a50d2e70',
+        expectedSize: manifest.integrity.initrdSize || 15056774,
+        expectedSha256: manifest.integrity.initrdSha256 || '84c49e2936fdbb2e30b83bd7a6067ccd2b76cd97b71171f1c9dbff54704a8c95',
       },
     ];
 
@@ -218,7 +218,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 1. Validate byte length (accounting for transparent HTTP Content-Encoding: gzip decompression)
       let isUncompressedInitrd = false;
-      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 39928832)) {
+      if (asset.id === 'initrd' && buffer.byteLength === (manifest.integrity.initrdUncompressedSize || 36645888)) {
         isUncompressedInitrd = true;
       } else if (buffer.byteLength !== asset.expectedSize) {
         throw new Error(
@@ -228,7 +228,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 2. Validate cryptographic SHA-256 digest
       const expectedSha256 = isUncompressedInitrd
-        ? (manifest.integrity.initrdUncompressedSha256 || '51eeb20a33538636011e014e90d0a66cf245d5eea57f5cf7cbda97fde12bb4ef')
+        ? (manifest.integrity.initrdUncompressedSha256 || '71c0ddb7192ef269e3ee2bccdd80d8162ba1ac11ad9d2f5e67d504d8444ea1f7')
         : asset.expectedSha256;
 
       if (expectedSha256) {
@@ -294,7 +294,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       const epoch = Math.floor(Date.now() / 1000);
       const isKde = options.desktop === 'kde-plasma';
 
-      let bootCmdline = `maxcpus=3 nohz_full=0,2-63 rcu_nocbs=0,2-63 root=/dev/ram0 rootfstype=ramfs init=/init console=hvc console=ttyS0 epoch=${epoch} rvtab=${this.tabId} term=120x30 wasm_pool=${pool} mem=${memoryMB}M wasm_cache_max=256`;
+      let bootCmdline = `maxcpus=3 nohz_full=0,2-63 rcu_nocbs=0,2-63 root=/dev/ram0 rootfstype=ramfs init=/init console=hvc console=ttyS0 epoch=${epoch} rvtab=${this.tabId} term=120x30 wasm_pool=${pool} mem=${memoryMB}M wasm_cache_max=256 distro=${options.manifest.id}`;
 
       // Autostart setting: KDE Plasma autostarts directly; GNOME and XFCE launch via profile session command
       if (options.autostartDesktop && isKde) {
@@ -328,14 +328,25 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.log(`[Initrd] Image verified: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
 
       // 5. Configure disk subsystem
-      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce
-      const rootDiskId = `root-${options.manifest.id}-${options.desktop}`;
-      const homeDiskId = `home-${options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
+      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce, root-ubuntu-gnome, root-ubuntu-kde
+      const isUbuntuGnome = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-gnome') && options.desktop === 'ubuntu-gnome';
+      const isUbuntuKde = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-kde') && options.desktop === 'ubuntu-kde';
+      const rootUrl = isUbuntuGnome
+        ? '/disk/ubuntu-24.04-gnome/'
+        : isUbuntuKde
+        ? '/disk/ubuntu-24.04-kde/'
+        : (options.manifest.imageSource.baseUri || '/disk/release/');
+      const rootDiskId = isUbuntuGnome
+        ? 'root-ubuntu-gnome'
+        : isUbuntuKde
+        ? 'root-ubuntu-kde'
+        : `root-${options.manifest.id}-${options.desktop}`;
+      const homeDiskId = `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde') ? 'ubuntu' : options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
         {
           worker: `/disk-worker.js?v=${Date.now()}`,
-          url: options.manifest.imageSource.baseUri || '/disk/release/',
+          url: rootUrl,
           name: rootDiskId,
           reset: !!options.freshRootDisk,
         },
@@ -382,7 +393,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         this.log(data);
 
         // Check for shell prompt
-        if (data.includes('# ') || this.bootOutput.endsWith('# ')) {
+        if (data.includes('# ') || this.bootOutput.endsWith('# ') || data.includes('CLI ready') || data.includes('root@')) {
           if (this.resolveShellReady) {
             this.resolveShellReady(true);
             this.resolveShellReady = null;
@@ -418,8 +429,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         (window as any).linuxOs = this.activeOs;
 
-        // Multi-Desktop Session Launch (GNOME 48 & XFCE 4.20)
-        if (!isKde && options.autostartDesktop) {
+        // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27)
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -433,22 +444,48 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           // Provision dedicated session launcher scripts
           await this.provisionDesktopLaunchers();
 
-          const launcherScript = options.desktop === 'gnome'
-            ? '/usr/local/bin/weblinux-gnome-session'
-            : '/usr/local/bin/weblinux-xfce-session';
+          if (options.desktop === 'ubuntu-kde') {
+            this.log(`[Desktop Launcher] Executing verified Ubuntu KDE Plasma session script: /usr/local/bin/ubuntu-kde-session`);
+            const launchRes = await this.runCommand(`ubuntu-kde /usr/local/bin/ubuntu-kde-session`, 25000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Ubuntu KDE launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else if (options.desktop === 'ubuntu-gnome') {
+            this.log(`[Desktop Launcher] Executing verified Ubuntu GNOME 46 session script: /usr/local/bin/ubuntu-gnome-session`);
+            const launchRes = await this.runCommand(`ubuntu /usr/local/bin/ubuntu-gnome-session`, 20000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Ubuntu GNOME launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else {
+            const launcherScript = options.desktop === 'gnome'
+              ? '/usr/local/bin/weblinux-gnome-session'
+              : '/usr/local/bin/weblinux-xfce-session';
 
-          this.log(`[Desktop Launcher] Executing verified session script: ${launcherScript}`);
-          
-          // Execute launcher and monitor output
-          const launchRes = await this.runCommand(`debian ${launcherScript}`, 12000);
-          if (launchRes.exitCode !== 0) {
-            const errSummary = (launchRes.stderr || launchRes.stdout || 'Launcher returned non-zero exit code').trim();
-            this.log(`[Desktop Launcher Error] ${errSummary}`);
-            this.updateStatus({
-              state: 'error',
-              error: `${profile?.name || options.desktop} launch blocked: ${errSummary}`,
-            });
-            return;
+            this.log(`[Desktop Launcher] Executing verified session script: ${launcherScript}`);
+            
+            // Execute launcher and monitor output
+            const launchRes = await this.runCommand(`debian ${launcherScript}`, 12000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch blocked: ${errSummary}`,
+              });
+              return;
+            }
           }
         }
 
@@ -477,6 +514,16 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
             this.updateStatus({ state: 'running' });
           }
         }, 25000);
+      } else if (options.desktop === 'cli' || options.manifest.id === 'ubuntu') {
+        setTimeout(() => {
+          if (this.status.state === 'booting' || this.status.state === 'shell_ready') {
+            this.log(`[Runtime] Ubuntu CLI session ready and online.`);
+            this.updateStatus({ state: 'running', shellReady: true });
+            if (this.resolveShellReady) {
+              this.resolveShellReady(true);
+            }
+          }
+        }, 5000);
       }
 
       this.log(`[System Online] WebLinux session is now active.`);
@@ -556,7 +603,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
     try {
       if (this.activeOs && this.activeOs.key_input) {
-        this.activeOs.key_input('sync; poweroff\r');
+        this.activeOs.key_input('sync\r');
       }
     } catch {
       // Ignore
@@ -567,7 +614,17 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.displayChannel = null;
     }
 
-    await new Promise(r => setTimeout(r, 1200));
+    // Allow guest kernel sync to issue flush before coordinated OPFS shutdown
+    await new Promise(r => setTimeout(r, 800));
+
+    if (this.activeOs && typeof this.activeOs.terminate === 'function') {
+      try {
+        this.log(`[Shutdown] Flushing OPFS disks, closing handles, and releasing locks...`);
+        await this.activeOs.terminate();
+      } catch (termErr) {
+        console.warn('[Shutdown] activeOs.terminate error:', termErr);
+      }
+    }
 
     this.activeOs = null;
     this.updateStatus({
@@ -583,7 +640,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   public async provisionDesktopLaunchers(): Promise<void> {
     this.log(`[Desktop Launcher] Provisioning session entrypoint scripts into guest...`);
     const gnomeSessionScript = 
-`cat <<'EOF' > /debian/usr/local/bin/weblinux-gnome-session
+`if [ -d /debian ]; then
+cat <<'EOF' > /debian/usr/local/bin/weblinux-gnome-session
 #!/bin/sh
 echo "[GNOME Launcher] Initializing GNOME 48 Wayland Session..."
 MISSING=""
@@ -601,10 +659,12 @@ sleep 1
 export WAYLAND_DISPLAY=wayland-1
 exec gnome-shell --wayland
 EOF
-chmod +x /debian/usr/local/bin/weblinux-gnome-session`;
+chmod +x /debian/usr/local/bin/weblinux-gnome-session
+fi`;
 
     const xfceSessionScript = 
-`cat <<'EOF' > /debian/usr/local/bin/weblinux-xfce-session
+`if [ -d /debian ]; then
+cat <<'EOF' > /debian/usr/local/bin/weblinux-xfce-session
 #!/bin/sh
 echo "[XFCE Launcher] Initializing XFCE 4.20 Wayland Session..."
 MISSING=""
@@ -619,11 +679,182 @@ fi
 export XDG_CURRENT_DESKTOP=XFCE XDG_SESSION_TYPE=wayland GDK_BACKEND=wayland
 exec labwc -s xfce4-session
 EOF
-chmod +x /debian/usr/local/bin/weblinux-xfce-session`;
+chmod +x /debian/usr/local/bin/weblinux-xfce-session
+fi`;
+
+      const virglExperimental =
+        typeof window !== 'undefined' &&
+        (Boolean((window as any).WEBLINUX_ENABLE_VIRGL_EXPERIMENTAL) ||
+          new URLSearchParams(window.location.search).get('virgl') === '1');
+      if (virglExperimental) {
+        this.log(`[Graphics] WEBLINUX_ENABLE_VIRGL_EXPERIMENTAL=1 active (experimental VirGL proto/vtest path; WebGL2 display fallback preserved)`);
+      }
+
+      const ubuntuGnomeSessionScript =
+`if [ -d /ubuntu ]; then
+cat <<'EOF' > /ubuntu/usr/local/bin/ubuntu-gnome-session
+#!/bin/sh
+echo "[Ubuntu GNOME Launcher] Initializing Ubuntu 24.04.5 LTS GNOME 46 Session..."
+MISSING=""
+for b in gnome-shell mutter; do
+  if ! command -v "$b" >/dev/null 2>&1; then MISSING="$MISSING $b"; fi
+done
+if [ -n "$MISSING" ]; then
+  echo "[Ubuntu GNOME Launcher ERROR] Required GNOME components missing: $MISSING" >&2
+  echo "[Ubuntu GNOME Launcher ERROR] Status: BLOCKED - Package set unavailable." >&2
+  exit 127
+fi
+echo "[Ubuntu GNOME Launcher] Preflight verified: gnome-shell and mutter are installed."
+
+export GJS_DISABLE_JIT=1
+export JS_DISABLE_JIT=1
+${virglExperimental ? 'export GALLIUM_DRIVER=virpipe\nexport VTEST_SOCKET_NAME=/tmp/runtime-root/rvgpu-0' : 'export LIBGL_ALWAYS_SOFTWARE=1'}
+export NO_AT_BRIDGE=1
+export XDG_CURRENT_DESKTOP=GNOME
+export XDG_SESSION_TYPE=wayland
+export GDK_BACKEND=wayland
+export XDG_RUNTIME_DIR=/tmp/runtime-root
+export WAYLAND_DISPLAY=wayland-0
+export DISPLAY=:0
+mkdir -p -m 700 "$XDG_RUNTIME_DIR"
+
+# 1. Ensure messagebus user exists and start system & session D-Bus
+grep -q '^messagebus:' /etc/passwd 2>/dev/null || echo 'messagebus:x:100:101:D-Bus:/nonexistent:/usr/sbin/nologin' >> /etc/passwd
+grep -q '^messagebus:' /etc/group 2>/dev/null || echo 'messagebus:x:101:' >> /etc/group
+mkdir -p /run/dbus /var/run
+[ -e /var/run/dbus ] || ln -s /run/dbus /var/run/dbus
+[ -S /run/dbus/system_bus_socket ] || dbus-daemon --system --fork --nopidfile 2>/root/dbus-system.log || true
+export DBUS_SYSTEM_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
+if [ ! -S "$XDG_RUNTIME_DIR/bus" ]; then
+  dbus-daemon --session --fork --address="unix:path=$XDG_RUNTIME_DIR/bus" 2>/dev/null || true
+fi
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+
+# 2. Start WebLinux Wayland window server (wlserver) so WebGL2 canvas & wayland-0 exist
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  if [ -x /run/hostnode/hostnode ] && [ -d /run/wlserver ]; then
+    echo "page" > "$XDG_RUNTIME_DIR/wlserver.shell"
+    HOSTNODE_HOME=/run/wlserver /run/hostnode/hostnode > /root/wlserver.log 2>&1 &
+    i=0
+    while [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ] && [ $i -lt 50 ]; do
+      sleep 0.1
+      i=$((i + 1))
+    done
+  fi
+fi
+
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  echo "[Ubuntu GNOME Launcher ERROR] Wayland display socket $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY did not start" >&2
+  exit 1
+fi
+
+echo "[Ubuntu GNOME Launcher] Wayland display $WAYLAND_DISPLAY ready. Launching GNOME Shell 46..."
+nohup gnome-shell --nested --wayland --no-x11 --wayland-display=wayland-1 > /root/gnome-shell.log 2>&1 &
+sleep 2
+echo "[Ubuntu GNOME Launcher] GNOME Shell 46 session started (PID $!)."
+EOF
+chmod +x /ubuntu/usr/local/bin/ubuntu-gnome-session
+fi`;
+
+    const ubuntuKdeSessionScript =
+`if [ -d /ubuntu ]; then
+cat <<'EOF' > /ubuntu/usr/local/bin/ubuntu-kde-session
+#!/bin/sh
+echo "[Ubuntu KDE Launcher] Initializing Ubuntu 24.04.5 LTS KDE Plasma 5.27 Session..." > /root/ubuntu-kde-session.log
+MISSING=""
+for b in plasmashell konsole dolphin; do
+  if ! command -v "$b" >/dev/null 2>&1; then MISSING="$MISSING $b"; fi
+done
+if [ -n "$MISSING" ]; then
+  echo "[Ubuntu KDE Launcher ERROR] Required KDE components missing: $MISSING" | tee -a /root/ubuntu-kde-session.log >&2
+  exit 127
+fi
+echo "[Ubuntu KDE Launcher] Preflight verified: plasmashell, konsole, dolphin installed." | tee -a /root/ubuntu-kde-session.log
+
+export HOME=/root USER=root SHELL=/bin/bash LANG=C.UTF-8
+export XDG_RUNTIME_DIR=/tmp/runtime-root
+export WAYLAND_DISPLAY=wayland-0
+export DISPLAY=:0
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=KDE
+export KDE_FULL_SESSION=true
+export KDE_SESSION_VERSION=5
+export QT_QPA_PLATFORM=wayland
+export QT_QUICK_BACKEND=software
+export QMLSCENE_DEVICE=softwarecontext
+export LIBGL_ALWAYS_SOFTWARE=1
+export QV4_FORCE_INTERPRETER=1
+export NO_AT_BRIDGE=1
+mkdir -p -m 700 "$XDG_RUNTIME_DIR"
+
+# 1. Disable non-functional setuid UDisks2 D-Bus activation (avoids 30-40s Dolphin/file-dialog timeouts)
+rm -f /usr/share/dbus-1/system-services/org.freedesktop.UDisks2.service 2>/dev/null || true
+
+# 2. System & session D-Bus
+grep -q '^messagebus:' /etc/passwd 2>/dev/null || echo 'messagebus:x:100:101:D-Bus:/nonexistent:/usr/sbin/nologin' >> /etc/passwd
+grep -q '^messagebus:' /etc/group 2>/dev/null || echo 'messagebus:x:101:' >> /etc/group
+mkdir -p /run/dbus /var/run
+[ -e /var/run/dbus ] || ln -s /run/dbus /var/run/dbus
+[ -S /run/dbus/system_bus_socket ] || dbus-daemon --system --fork --nopidfile > /root/dbus.log 2>&1 || true
+export DBUS_SYSTEM_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
+if [ ! -S "$XDG_RUNTIME_DIR/bus" ]; then
+  dbus-daemon --session --fork --address="unix:path=$XDG_RUNTIME_DIR/bus" >> /root/dbus.log 2>&1 || true
+fi
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+
+# 3. Start WebLinux GPU server (rvgpu -> WebGL2/WebGPU) if available
+if [ -x /run/hostnode/hostnode ] && [ -f /run/rvgpu/boot.js ] && [ ! -S "$XDG_RUNTIME_DIR/rvgpu-0" ]; then
+  rm -f "$XDG_RUNTIME_DIR/rvgpu-0.ready" "$XDG_RUNTIME_DIR/rvgpu-0.none"
+  HOSTNODE_HOME=/run/rvgpu /run/hostnode/hostnode > /root/rvgpu.log 2>&1 &
+  g=0
+  while [ ! -f "$XDG_RUNTIME_DIR/rvgpu-0.ready" ] && [ ! -f "$XDG_RUNTIME_DIR/rvgpu-0.none" ] && [ $g -lt 20 ]; do
+    sleep 0.1
+    g=$((g + 1))
+  done
+fi
+if [ -f "$XDG_RUNTIME_DIR/rvgpu-0.ready" ]; then
+  export GALLIUM_DRIVER=virpipe
+  export VTEST_SOCKET_NAME="$XDG_RUNTIME_DIR/rvgpu-0"
+  unset LIBGL_ALWAYS_SOFTWARE
+  echo "[Ubuntu KDE Launcher] rvgpu active ($VTEST_SOCKET_NAME, GALLIUM_DRIVER=virpipe)" >> /root/ubuntu-kde-session.log
+fi
+
+# 4. Build KService menu cache only if missing (run in background to avoid blocking compositor startup)
+if ! ls /root/.cache/ksycoca5_* >/dev/null 2>&1 && command -v kbuildsycoca5 >/dev/null 2>&1; then
+  kbuildsycoca5 >> /root/ubuntu-kde-session.log 2>&1 &
+fi
+
+# 3. Start WebLinux Wayland/KWin compositor (wlserver in WLSERVER_SHELL=plasma mode)
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  if [ -x /run/hostnode/hostnode ] && [ -d /run/wlserver ]; then
+    echo "plasma" > "$XDG_RUNTIME_DIR/wlserver.shell"
+    WLSERVER_SHELL=plasma HOSTNODE_HOME=/run/wlserver /run/hostnode/hostnode > /root/kwin.log 2>&1 &
+    i=0
+    while [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ] && [ $i -lt 50 ]; do
+      sleep 0.1
+      i=$((i + 1))
+    done
+  fi
+fi
+
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  echo "[Ubuntu KDE Launcher ERROR] Wayland display socket $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY did not start" | tee -a /root/ubuntu-kde-session.log >&2
+  exit 1
+fi
+
+echo "[Ubuntu KDE Launcher] Wayland display $WAYLAND_DISPLAY ready. Launching Plasma 5.27..." | tee -a /root/ubuntu-kde-session.log
+nohup plasmashell --no-respawn > /root/plasma-shell.log 2> /root/qt.log &
+sleep 2
+echo "[Ubuntu KDE Launcher] Plasma 5.27 session started (PID $!)." | tee -a /root/ubuntu-kde-session.log
+EOF
+chmod +x /ubuntu/usr/local/bin/ubuntu-kde-session
+fi`;
 
     await this.runCommand(gnomeSessionScript, 5000);
     await this.runCommand(xfceSessionScript, 5000);
-    this.log(`[Desktop Launcher] Provisioned /usr/local/bin/weblinux-gnome-session and weblinux-xfce-session.`);
+    await this.runCommand(ubuntuGnomeSessionScript, 5000);
+    await this.runCommand(ubuntuKdeSessionScript, 5000);
+    this.log(`[Desktop Launcher] Provisioned desktop session entrypoints.`);
   }
 
   public async switchDesktop(targetDesktop: any): Promise<void> {

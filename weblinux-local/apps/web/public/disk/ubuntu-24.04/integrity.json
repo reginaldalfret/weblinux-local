@@ -1,0 +1,17 @@
+{
+  "distributionId": "ubuntu-24.04",
+  "rootfsFormat": "ext4",
+  "imageFilename": "ubuntu-24.04.ext4",
+  "imageSize": 2147483648,
+  "chunkSize": 1048576,
+  "chunkCount": 2048,
+  "nonZeroChunkCount": 85,
+  "fullImageSha256": "5857dce5f4bcee138863b2cb5932c6a37ef15ec971ddf4cfc66167668a820a09",
+  "filesystemUuid": "26d1825c-643e-4807-957c-56a7c666c6dd",
+  "blockSize": 4096,
+  "architecture": "riscv64",
+  "sourceArchiveFilename": "ubuntu-base-24.04.5-base-riscv64.tar.gz",
+  "sourceArchiveSha256": "651c516f291259ec913caa1efd0cfff738cd223adfc6617c884f07af487f08cf",
+  "buildTimestamp": "2026-11-24T14:31:48.459Z",
+  "manifestSchemaVersion": "1.0.0"
+}

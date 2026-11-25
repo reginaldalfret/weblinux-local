@@ -4,6 +4,15 @@
  */
 
 import { StorageUsageInfo, ImportResult } from '../types';
+import { OPFS_META_TOTAL_SIZE, decodeMetaSlot } from '../storage/OpfsDurability';
+
+export interface QuotaCheckResult {
+  ok: boolean;
+  quotaBytes: number;
+  usageBytes: number;
+  availableBytes: number;
+  warning: string | null;
+}
 
 export class OpfsManager {
   private static instance: OpfsManager;
@@ -107,6 +116,53 @@ export class OpfsManager {
       opfsSupported: isSupported,
       disks,
     };
+  }
+
+  public async checkQuotaForOperation(estimatedBytes: number): Promise<QuotaCheckResult> {
+    if (typeof navigator === 'undefined' || !navigator.storage || !navigator.storage.estimate) {
+      return { ok: true, quotaBytes: 0, usageBytes: 0, availableBytes: 0, warning: null };
+    }
+    const est = await navigator.storage.estimate();
+    const quotaBytes = est.quota || 0;
+    const usageBytes = est.usage || 0;
+    const availableBytes = Math.max(0, quotaBytes - usageBytes);
+    let warning: string | null = null;
+    let ok = true;
+
+    if (quotaBytes > 0 && estimatedBytes > availableBytes) {
+      ok = false;
+      warning = `Insufficient browser storage quota: need ${Math.round(estimatedBytes / 1048576)} MiB, only ${Math.round(availableBytes / 1048576)} MiB available.`;
+    } else if (quotaBytes > 0 && ((usageBytes + estimatedBytes) / quotaBytes) >= 0.85) {
+      warning = `Storage usage will exceed 85% of browser quota (${Math.round(((usageBytes + estimatedBytes) / quotaBytes) * 100)}%).`;
+    }
+    return { ok, quotaBytes, usageBytes, availableBytes, warning };
+  }
+
+  public async inspectDiskMetadata(diskName: string): Promise<{ exists: boolean; generation: number; dirty: boolean; places: number }> {
+    if (!this.isSupported()) {
+      return { exists: false, generation: 0, dirty: false, places: 0 };
+    }
+    try {
+      const root = await navigator.storage.getDirectory();
+      const dirName = diskName.startsWith('disk-') ? diskName : `disk-${diskName}`;
+      const dir = await root.getDirectoryHandle(dirName);
+      const metaHandle = await dir.getFileHandle('meta');
+      const file = await metaHandle.getFile();
+      if (file.size < OPFS_META_TOTAL_SIZE) {
+        return { exists: true, generation: 0, dirty: false, places: 0 };
+      }
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const slotA = decodeMetaSlot(bytes.subarray(0, 64));
+      const slotB = decodeMetaSlot(bytes.subarray(64, 128));
+      const valid = [slotA, slotB].filter(s => s.valid && !s.dirty).sort((a, b) => b.generation - a.generation);
+      if (valid.length > 0) {
+        return { exists: true, generation: valid[0].generation, dirty: false, places: valid[0].places };
+      }
+      const anyDirty = (slotA.valid && slotA.dirty) || (slotB.valid && slotB.dirty);
+      return { exists: true, generation: Math.max(slotA.generation, slotB.generation), dirty: anyDirty, places: 0 };
+    } catch {
+      return { exists: false, generation: 0, dirty: false, places: 0 };
+    }
   }
 
   public async resetDisk(diskName: string): Promise<boolean> {

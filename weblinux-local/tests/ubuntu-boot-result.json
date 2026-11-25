@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-11-24T17:38:56.548Z",
+  "bootSuccess": true,
+  "results": {
+    "OS Release": {
+      "command": "ubuntu cat /etc/os-release",
+      "output": "input: Wasm pointer as /devices/virtual/input/input1\ninput: Wasm host as /devices/virtual/input/input2\nNET: Registered PF_INET6 protocol family\nSegment Routing with IPv6\nIn-situ OAM (IOAM) with IPv6\nsit: IPv6, IPv4 and MPLS over IPv4 tunneling driver\nNET: Registered PF_PACKET protocol family\nALSA device list:\n  #0: Wasm audio (the browser's Web Audio)\nFreeing unused kernel image (initmem) memory: 52K\nThis architecture does not have kernel memory protection.\nRun /init as init process\nubuntu cat /etc/os-release; echo __rcal4bq2jmjfj_$?\nmount (50) used greatest stack depth: 15720 bytes left\nmknod (52) used greatest stack depth: 15712 bytes left\nmknod (62) used greatest stack depth: 14720 bytes left\nEXT4-fs (wda): mounted filesystem 26d1825c-643e-4807-957c-56a7c666c6dd r/w with ordered data mode. Quota mode: disabled.\nmount (86) used greatest stack depth: 14216 bytes left\nEXT4-fs (wdb): mounted filesystem cb3bea2a-b092-4de5-ad57-b78aeb0ac313 r/w with ordered data mode. Quota mode: disabled.\nEXT4-fs (wdb): unmounting filesystem cb3bea2a-b092-4de5-ad57-b78aeb0ac313.\nEXT4-fs (wdb): mounted filesystem cb3bea2a-b092-4de5-ad57-b78aeb0ac313 r/w with ordered data mode. Quota mode: disabled.\nautostart: Ubuntu 24.04.5 LTS (Noble Numbat) RISC-V 64-bit CLI ready.\n~ # ubuntu cat /etc/os-release; echo __rcal4bq2jmjfj_$?\nPRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo",
+      "exitCode": 0
+    },
+    "Kernel Version": {
+      "command": "ubuntu uname -a",
+      "output": "Linux rv 6.6.0 #1 SMP rv riscv64 riscv64 riscv64 GNU/Linux",
+      "exitCode": 0
+    },
+    "User Identity": {
+      "command": "ubuntu id",
+      "output": "uid=0(root) gid=0(root) groups=0(root)",
+      "exitCode": 0
+    },
+    "Filesystem Mounts": {
+      "command": "ubuntu df -h",
+      "output": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/wda        2.0G   77M  1.8G   5% /\n/dev/wdb         16G   36K   16G   1% /root\nnone            2.0G   72M  1.9G   4% /dev\nnone            2.0G   72M  1.9G   4% /run\nnone            2.0G   72M  1.9G   4% /tmp",
+      "exitCode": 0
+    },
+    "DPKG Version": {
+      "command": "ubuntu dpkg --version",
+      "output": "Debian 'dpkg' package management program version 1.22.6 (riscv64).\nThis is free software; see the GNU General Public License version 2 or\nlater for copying conditions. There is NO warranty.",
+      "exitCode": 0
+    },
+    "APT Version": {
+      "command": "ubuntu apt --version",
+      "output": "apt 2.8.3 (riscv64)",
+      "exitCode": 0
+    },
+    "Ubuntu Directory Contents": {
+      "command": "ls -la /ubuntu",
+      "output": "drwxr-xr-x   18 0        0             4096 Nov 24 14:29 \u001b[1;34m.\u001b[m\ndrwxr-xr-x   19 0        0                0 Nov 24 17:38 \u001b[1;34m..\u001b[m\nlrwxrwxrwx    1 0        0                7 Nov 24 14:25 \u001b[1;36mbin\u001b[m -> \u001b[1;34musr/bin\u001b[m\ndrwxr-xr-x    2 0        0             4096 Apr 22  2024 \u001b[1;34mboot\u001b[m\ndrwxr-xr-x    6 0        0                0 Nov 24 17:38 \u001b[1;34mdev\u001b[m\ndrwxr-xr-x   32 0        0             4096 Nov 24 17:38 \u001b[1;34metc\u001b[m\ndrwxr-xr-x    2 0        0             4096 Apr 22  2024 \u001b[1;34mhome\u001b[m\nlrwxrwxrwx    1 0        0                7 Nov 24 14:25 \u001b[1;36mlib\u001b[m -> \u001b[1;34musr/lib\u001b[m\ndrwx------    2 0        0            16384 Nov 24 14:29 \u001b[1;34mlost+found\u001b[m\ndrwxr-xr-x    2 0        0             4096 Sep  8 01:05 \u001b[1;34mmedia\u001b[m\ndrwxr-xr-x    2 0        0             4096 Sep  8 01:05 \u001b[1;34mmnt\u001b[m\ndrwxr-xr-x    2 0        0             4096 Sep  8 01:05 \u001b[1;34mopt\u001b[m\ndr-xr-xr-x  114 0        0                0 Nov 24 17:38 \u001b[1;34mproc\u001b[m\ndrwxr-xr-x    3 0        0             4096 Jan  1  1970 \u001b[1;34mroot\u001b[m\ndrwxr-xr-x    2 0        0                0 Nov 24 17:38 \u001b[1;34mrun\u001b[m\nlrwxrwxrwx    1 0        0                8 Nov 24 14:25 \u001b[1;36msbin\u001b[m -> \u001b[1;34musr/sbin\u001b[m\ndrwxr-xr-x    2 0        0             4096 Sep  8 01:05 \u001b[1;34msrv\u001b[m\ndr-xr-xr-x   11 0        0                0 Jan  1  1970 \u001b[1;34msys\u001b[m\ndrwxrwxrwt    2 0        0                0 Nov 24 17:38 \u001b[1;34mtmp\u001b[m\ndrwxr-xr-x   11 0        0             4096 Sep  8 01:05 \u001b[1;34musr\u001b[m\ndrwxr-xr-x   11 0        0             4096 Sep  8 03:07 \u001b[1;34mvar\u001b[m",
+      "exitCode": 0
+    },
+    "Write Persistence Test": {
+      "command": "echo \"WebLinux Ubuntu 24.04.5 Persistence Verified\" > /ubuntu/root/phase6-test.txt && cat /ubuntu/root/phase6-test.txt",
+      "output": "xt; echo __rcgwa6zzm7is_$?\nWebLinux Ubuntu 24.04.5 Persistence Verified",
+      "exitCode": 0
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "distributionId": "ubuntu-24.04-kde",
+  "rootfsFormat": "ext4",
+  "imageFilename": "ubuntu-24.04-kde.ext4",
+  "imageSize": 3221225472,
+  "chunkSize": 1048576,
+  "chunkCount": 3072,
+  "nonZeroChunkCount": 1326,
+  "fullImageSha256": "9dde9d0a613c860428ed1a7b3432370f79e03ada91ae54635063dec95400bb2e",
+  "buildTimestamp": "2026-11-25T07:01:23.363Z"
+}

@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-11-24T19:12:57.040Z",
+  "distribution": "Ubuntu 24.04.5 LTS",
+  "desktop": "GNOME 46 (Experimental)",
+  "browser": "Microsoft Edge",
+  "results": {
+    "OS Release": {
+      "command": "ubuntu cat /etc/os-release",
+      "output": "mknod (56) used greatest stack depth: 15712 bytes left\nmknod (64) used greatest stack depth: 14720 bytes left\nEXT4-fs (wda): mounted filesystem 57f55339-762f-4d76-a40e-fa536b13847b r/w with ordered data mode. Quota mode: disabled.\nmount (86) used greatest stack depth: 14216 bytes left\nEXT4-fs (wdb): mounted filesystem cb3bea2a-b092-4de5-ad57-b78aeb0ac313 r/w with ordered data mode. Quota mode: disabled.\nEXT4-fs (wdb): unmounting filesystem cb3bea2a-b092-4de5-ad57-b78aeb0ac313.\nEXT4-fs (wdb): mounted filesystem cb3bea2a-b092-4de5-ad57-b78aeb0ac313 r/w with ordered data mode. Quota mode: disabled.\nautostart: Ubuntu 24.04.5 LTS (Noble Numbat) RISC-V 64-bit runtime ready.\nif [ -d /debian ]; then\ncat <<'EOF' > /debian/usr/local/bin/weblinux-xfce-session\n#!/bin/sh\necho \"[XFCE Launcher] Initializing XFCE 4.20 Wayland Session...\"\nMISSING=\"\"\nfor b in labwc xfce4-session; do\n  if ! command -v \"$b\" >/dev/null 2>&1; then MISSING=\"$MISSING $b\"; fi\ndone\nif [ -n \"$MISSING\" ]; then\n  echo \"[XFCE Launcher ERROR] Required XFCE components missing: $MISSING\" >&2\n  echo \"[XFCE Launcher ERROR] Status: BLOCKED - Package set unavailable on riscv64 NOMMU image.\" >&2\n  exit 127\nfi\nexport XDG_CURRENT_DESKTOP=XFCE XDG_SESSION_TYPE=wayland GDK_BACKEND=wayland\nexec labwc -s xfce4-session\nEOF\nchmod +x /debian/usr/local/bin/weblinux-xfce-session\nfi; echo __rcjq13lxo5gz_$?\n~ # if [ -d /debian ]; then\n> cat <<'EOF' > /debian/usr/local/bin/weblinux-gnome-session\n> #!/bin/sh\n> echo \"[GNOME Launcher] Initializing GNOME 48 Wayland Session...\"\n> MISSING=\"\"\n> for b in gnome-shell mutter; do\n>   if ! command -v \"$b\" >/dev/null 2>&1; then MISSING=\"$MISSING $b\"; fi\n> done\n> if [ -n \"$MISSING\" ]; then\n>   echo \"[GNOME Launcher ERROR] Required GNOME components missing: $MISSING\" >&2\n>   echo \"[GNOME Launcher ERROR] Status: BLOCKED - Package set unavailable on riscv64 NOMMU image.\" >&2\n>   exit 127\n> fi\n> export XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_TYPE=wayland GDK_BACKEND=wayland\n> mutter --wayland --nested --wayland-display=wayland-1 &\n> sleep 1\n> export WAYLAND_DISPLAY=wayland-1\n> exec gnome-shell --wayland\n> EOF\n> chmod +x /debian/usr/local/bin/weblinux-gnome-session\n> fi; echo __rcua3a2nbra0e_$?\n__rcua3a2nbra0e_0\n~ # ubuntu cat /etc/os-release; echo __rc65stc0hd2dm_$?\nPRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo",
+      "exitCode": 0
+    },
+    "Kernel Version": {
+      "command": "ubuntu uname -a",
+      "output": "> cat <<'EOF' > /ubuntu/usr/local/bin/ubuntu-gnome-session\n> #!/bin/sh\n> echo \"[Ubuntu GNOME Launcher] Initializing Ubuntu 24.04.5 LTS GNOME 46 Session...\"\n> MISSING=\"\"\n> for b in gnome-shell mutter; do\n>   if ! command -v \"$b\" >/dev/null 2>&1; then MISSING=\"$MISSING $b\"; fi\n> done\n> if [ -n \"$MISSING\" ]; then\n>   echo \"[Ubuntu GNOME Launcher ERROR] Required GNOME components missing: $MISSING\" >&2\n>   echo \"[Ubuntu GNOME Launcher ERROR] Status: BLOCKED - Package set unavailable.\" >&2\n>   exit 127\n> fi\n> echo \"[Ubuntu GNOME Launcher] Preflight verified: gnome-shell and mutter are installed.\"\n> \n> export GJS_DISABLE_JIT=1\n> export JS_DISABLE_JIT=1\n> export LIBGL_ALWAYS_SOFTWARE=1\n> export NO_AT_BRIDGE=1\n> export XDG_CURRENT_DESKTOP=GNOME\n> export XDG_SESSION_TYPE=wayland\n> export GDK_BACKEND=wayland\n> export XDG_RUNTIME_DIR=/tmp/runtime-root\n> export WAYLAND_DISPLAY=wayland-0\n> mkdir -p -m 700 \"$XDG_RUNTIME_DIR\"\n> \n> # 1. Start system & session D-Bus if not running\n> mkdir -p /run/dbus\n> [ -e /run/dbus/pid ] || dbus-daemon --system --fork 2>/dev/null || true\n> if [ ! -S \"$XDG_RUNTIME_DIR/bus\" ]; then\n>   dbus-daemon --session --fork --address=\"unix:path=$XDG_RUNTIME_DIR/bus\" 2>/dev/null || true\n> fi\n> export DBUS_SESSION_BUS_ADDRESS=\"unix:path=$XDG_RUNTIME_DIR/bus\"\n> \n> # 2. Start WebLinux Wayland window server (wlserver) so WebGL2 canvas & wayland-0 exist\n> if [ ! -S \"$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY\" ]; then\n>   if [ -x /run/hostnode/hostnode ] && [ -d /run/wlserver ]; then\n>     echo \"page\" > \"$XDG_RUNTIME_DIR/wlserver.shell\"\n>     HOSTNODE_HOME=/run/wlserver /run/hostnode/hostnode > /root/wlserver.log 2>&1 &\n>     i=0\n>     while [ ! -S \"$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY\" ] && [ $i -lt 50 ]; do\n>       sleep 0.1\n>       i=$((i + 1))\n>     done\n>   fi\n> fi\n> \n> if [ ! -S \"$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY\" ]; then\n>   echo \"[Ubuntu GNOME Launcher ERROR] Wayland display socket $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY did not start\" >&2\n>   exit 1\n> fi\n> \n> echo \"[Ubuntu GNOME Launcher] Wayland display $WAYLAND_DISPLAY ready. Launching GNOME Shell 46...\"\n> nohup gnome-shell --nested --wayland > /root/gnome-shell.log 2>&1 &\n> sleep 2\n> echo \"[Ubuntu GNOME Launcher] GNOME Shell 46 session started (PID $!).\"\n> EOF\n> chmod +x /ubuntu/usr/local/bin/ubuntu-gnome-session\n> fi; echo __rcqgaizzs5xkk_$?\n__rcqgaizzs5xkk_0\n~ # ubuntu uname -a; echo __rczz4g79mp2x_$?\nubuntu /usr/local/bin/ubuntu-gnome-session; echo __rc8k0s8ljynj_$?\nLinux rv 6.6.0 #1 SMP rv riscv64 riscv64 riscv64 GNU/Linux",
+      "exitCode": 0
+    },
+    "Filesystem Mounts (3GB root on wda)": {
+      "command": "ubuntu df -h",
+      "output": "[Ubuntu GNOME Launcher] Initializing Ubuntu 24.04.5 LTS GNOME 46 Session...\n[Ubuntu GNOME Launcher] Preflight verified: gnome-shell and mutter are installed.\n[Ubuntu GNOME Launcher] Wayland display wayland-0 ready. Launching GNOME Shell 46...\n[Ubuntu GNOME Launcher] GNOME Shell 46 session started (PID 198).\n__rc8k0s8ljynj_0\n~ # ubuntu df -h; echo __rcdxvj8wlkp85_$?\nFilesystem      Size  Used Avail Use% Mounted on\n/dev/wda        2.9G  757M  2.1G  27% /\n/dev/wdb         16G   56K   16G   1% /root\nnone            2.0G  206M  1.8G  11% /dev\nnone            2.0G  206M  1.8G  11% /run\nnone            2.0G  206M  1.8G  11% /tmp\nrootfs          2.0G  206M  1.8G  11% /run/rvgpu",
+      "exitCode": 0
+    },
+    "GNOME Binary Audit (which)": {
+      "command": "ubuntu which gnome-shell mutter nautilus gjs dbus-daemon xwayland",
+      "output": "/usr/bin/gnome-shell\n/usr/bin/mutter\n/usr/bin/gjs\n/usr/bin/dbus-daemon",
+      "exitCode": 1
+    },
+    "GNOME Shell Version": {
+      "command": "ubuntu gnome-shell --version",
+      "output": "GNOME Shell 46.0",
+      "exitCode": 0
+    },
+    "Mutter Version": {
+      "command": "ubuntu mutter --version",
+      "output": "mutter 46.2",
+      "exitCode": 0
+    },
+    "GJS Version": {
+      "command": "ubuntu gjs -v",
+      "output": "Unknown option -v\n\nUsage:\n  gjs [OPTION…]\n\nHelp Options:\n  -h, --help                       Show help options\n\nApplication Options:\n  --version                        Print GJS version and exit\n  --jsversion                      Print version of the JS engine and exit\n  -c, --command=COMMAND            Program passed in as a string\n  -C, --coverage-prefix=PREFIX     Add the prefix PREFIX to the list of files to generate coverage info for\n  --coverage-output=DIR            Write coverage output to a directory DIR. This option is mandatory when using --coverage-prefix\n  -I, --include-path=DIR           Add the directory DIR to the list of directories to search for js files.\n  -m, --module                     Execute the file as a module.\n  --profile=FILE                   Enable the profiler and write output to FILE (default: gjs-$PID.syscap)\n  -d, --debugger                   Start in debug mode",
+      "exitCode": 1
+    },
+    "GJS NOMMU Execution Test": {
+      "command": "ubuntu env GJS_DISABLE_JIT=1 JS_DISABLE_JIT=1 gjs -c 'print(\"NOMMU GJS SUCCESS: 40 + 2 =\", 40 + 2)'",
+      "output": "iolo_$?\n/bin/bash: -c: line 1: syntax error near unexpected token `('\n/bin/bash: -c: line 1: `env GJS_DISABLE_JIT=1 JS_DISABLE_JIT=1 gjs -c print(\"NOMMU GJS SUCCESS: 40 + 2 =\", 40 + 2)'",
+      "exitCode": 2
+    },
+    "DPKG Package Verification": {
+      "command": "ubuntu dpkg -l | grep -E \"gnome-shell|mutter|gjs|nautilus\" | head -n 10",
+      "output": "ii  gir1.2-mutter-14:riscv64               46.2-1ubuntu0.24.04.18               riscv64      GObject introspection data for Mutter\nii  gjs                                    1.80.2-1build2                       riscv64      Mozilla-based javascript bindings for the GNOME platform (cli tool)\nii  gnome-shell                            46.0-0ubuntu6~24.04.17               riscv64      graphical shell for the GNOME desktop\nii  gnome-shell-common                     46.0-0ubuntu6~24.04.17               all          common files for the GNOME graphical shell\nii  libgjs0g:riscv64                       1.80.2-1build2                       riscv64      Mozilla-based javascript bindings for the GNOME platform\nii  libmutter-14-0:riscv64                 46.2-1ubuntu0.24.04.18               riscv64      window manager library from the Mutter window manager\nii  mutter                                 46.2-1ubuntu0.24.04.18               riscv64      Example window manager using GNOME's window manager library\nii  mutter-common                          46.2-1ubuntu0.24.04.18               all          shared files for the Mutter window manager\nii  mutter-common-bin                      46.2-1ubuntu0.24.04.18               riscv64      shared programs for the Mutter window manager",
+      "exitCode": 0
+    },
+    "D-Bus Machine ID Verification": {
+      "command": "ubuntu cat /etc/machine-id",
+      "output": "75368b8d3caa42aa8816ddf1c13ea89b",
+      "exitCode": 0
+    },
+    "GSettings Schema Verification": {
+      "command": "ubuntu gsettings list-schemas | grep -i org.gnome.shell | head -n 5",
+      "output": "org.gnome.shell\norg.gnome.shell.app-switcher\norg.gnome.shell.keybindings\norg.gnome.shell.ubuntu\norg.gnome.shell.weather",
+      "exitCode": 0
+    },
+    "Write Persistence Test": {
+      "command": "echo \"Ubuntu GNOME 46 Verified\" > /ubuntu/root/gnome-verified.txt && cat /ubuntu/root/gnome-verified.txt",
+      "output": "keo1sghi_$?\nUbuntu GNOME 46 Verified",
+      "exitCode": 0
+    },
+    "GNOME Session Check": {
+      "rc": 0,
+      "ms": 3830,
+      "out": "[Ubuntu GNOME Launcher] Initializing Ubuntu 24.04.5 LTS GNOME 46 Session...\n[Ubuntu GNOME Launcher] Preflight verified: gnome-shell and mutter are installed.\n[Ubuntu GNOME Launcher] Wayland display wayland-0 ready. Launching GNOME Shell 46...\n[Ubuntu GNOME Launcher] GNOME Shell 46 session started (PID 249).",
+      "exitCode": 0,
+      "stdout": "[Ubuntu GNOME Launcher] Initializing Ubuntu 24.04.5 LTS GNOME 46 Session...\n[Ubuntu GNOME Launcher] Preflight verified: gnome-shell and mutter are installed.\n[Ubuntu GNOME Launcher] Wayland display wayland-0 ready. Launching GNOME Shell 46...\n[Ubuntu GNOME Launcher] GNOME Shell 46 session started (PID 249).",
+      "executionTimeMs": 3830,
+      "timedOut": false
+    }
+  },
+  "screenshots": [
+    "01-distro-selector-ubuntu.png",
+    "02-ubuntu-gnome-selector.png",
+    "03-ubuntu-gnome-booting.png",
+    "04-ubuntu-gnome-session.png",
+    "05-ubuntu-gnome-terminal.png"
+  ]
+}

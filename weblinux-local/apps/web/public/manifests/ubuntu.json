@@ -1,35 +1,47 @@
 {
   "id": "ubuntu",
-  "name": "Ubuntu Noble Numbat (RISC-V Port)",
-  "releaseVersion": "24.04 LTS",
+  "name": "Ubuntu Noble Numbat (RISC-V 64-bit)",
+  "releaseVersion": "24.04.5 LTS",
   "architecture": "riscv64",
-  "kernelCompatibility": "linux-wasm64_nommu-6.1",
-  "defaultDesktop": "icewm",
-  "supportedDesktops": ["icewm", "kde-plasma"],
+  "kernelCompatibility": "linux-wasm64_nommu-7.0",
+  "defaultDesktop": "cli",
+  "supportedDesktops": ["cli", "ubuntu-gnome"],
   "packageManager": "apt",
   "filesystemLayout": {
     "rootMount": "/ubuntu",
     "homeMount": "/home/ubuntu"
   },
   "imageSource": {
-    "baseUri": "/images/ubuntu/",
+    "baseUri": "/disk/ubuntu-24.04/",
     "chunkSize": 1048576,
-    "totalSizeBytes": 8589934592,
-    "id": "ubuntu-24-04-riscv64-candidate"
+    "totalSizeBytes": 2147483648,
+    "id": "5857dce5f4bcee138863b2cb5932c6a37ef15ec971ddf4cfc66167668a820a09",
+    "fullImageSha256": "5857dce5f4bcee138863b2cb5932c6a37ef15ec971ddf4cfc66167668a820a09",
+    "filesystemUuid": "26d1825c-643e-4807-957c-56a7c666c6dd"
   },
   "integrity": {
-    "chunksCount": 8192
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "41c43f6f0f7e14119d6011a1441e8b1c8da883967909ff30732e964046dcf537",
+    "initrdUncompressedSha256": "71c0ddb7192ef269e3ee2bccdd80d8162ba1ac11ad9d2f5e67d504d8444ea1f7",
+    "kernelSize": 7380050,
+    "initrdSize": 15055753,
+    "initrdUncompressedSize": 36645888,
+    "chunksCount": 2048,
+    "nonZeroChunksCount": 85,
+    "bootChunksCount": 33,
+    "sourceArchive": "ubuntu-base-24.04.5-base-riscv64.tar.gz",
+    "sourceArchiveSha256": "651c516f291259ec913caa1efd0cfff738cd223adfc6617c884f07af487f08cf"
   },
   "runtimeRequirements": {
-    "minMemoryMB": 4096,
-    "recommendedMemoryMB": 8192,
-    "minCores": 4,
-    "recommendedCores": 8,
+    "minMemoryMB": 2048,
+    "recommendedMemoryMB": 2048,
+    "minCores": 2,
+    "recommendedCores": 4,
     "requiresSharedArrayBuffer": true,
     "requiresCrossOriginIsolated": true,
     "requiresWebGL2": true,
     "requiresOPFS": true,
-    "estimatedDiskMB": 2500
+    "estimatedDiskMB": 2048
   },
   "licensing": {
     "baseLicense": "GPL-2.0-or-later, Canonical Open Source",
@@ -37,5 +49,5 @@
     "licenseDocUrl": "/docs/LICENSING.md"
   },
   "validationStatus": "experimental",
-  "notes": "Experimental port under development. Investigating Ubuntu RISC-V minimal rootfs compatibility with NOMMU memory model."
+  "notes": "Genuine Ubuntu 24.04.5 LTS Noble rootfs generated from official Canonical Base archive. Chunks verified byte-for-byte against ext4 image. Boot validation pending Phase 6.3/6.4."
 }

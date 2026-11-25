@@ -158,6 +158,7 @@ export const Landing: React.FC<LandingProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {manifests.map((distro) => {
             const isValidated = distro.validationStatus === 'validated';
+            const isLaunchable = isValidated || distro.id === 'ubuntu';
             return (
               <div
                 key={distro.id}
@@ -209,11 +210,13 @@ export const Landing: React.FC<LandingProps> = ({
                       if (isValidated) {
                         onSelectDistro(distro.id);
                         onLaunch();
+                      } else if (distro.id === 'ubuntu') {
+                        onSelectDistro(distro.id);
                       }
                     }}
-                    disabled={!isValidated}
+                    disabled={!isLaunchable}
                     className={`w-full py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
-                      isValidated
+                      isLaunchable
                         ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-600/20 cursor-pointer active:scale-95'
                         : 'bg-white/5 text-slate-400 cursor-not-allowed border border-white/5'
                     }`}
@@ -222,6 +225,11 @@ export const Landing: React.FC<LandingProps> = ({
                       <>
                         <CheckCircle className="w-3.5 h-3.5" />
                         Select & Launch Desktop
+                      </>
+                    ) : distro.id === 'ubuntu' ? (
+                      <>
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        Configure & Launch Ubuntu
                       </>
                     ) : (
                       <>

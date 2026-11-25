@@ -87,10 +87,21 @@ export const App: React.FC = () => {
       await adapter.initialize();
 
       // 2. Load chosen manifest
-      const activeManifest = await adapter.loadManifest(selectedDistro);
+      const manifestId =
+        selectedDistro === 'ubuntu' && selectedDesktop === 'ubuntu-gnome'
+          ? 'ubuntu-gnome'
+          : selectedDistro === 'ubuntu' && selectedDesktop === 'ubuntu-kde'
+          ? 'ubuntu-kde'
+          : selectedDistro;
+      const activeManifest = await adapter.loadManifest(manifestId as DistributionId);
 
       // Check validation policy: do not allow booting placeholder or unvalidated images
-      if (activeManifest.validationStatus !== 'validated') {
+      if (
+        activeManifest.validationStatus !== 'validated' &&
+        activeManifest.id !== 'ubuntu' &&
+        activeManifest.id !== 'ubuntu-gnome' &&
+        activeManifest.id !== 'ubuntu-kde'
+      ) {
         throw new Error(
           `${activeManifest.name} is currently an unvalidated port (status: ${activeManifest.validationStatus.toUpperCase()}). To protect your environment, only validated distributions (Debian GNU/Linux 13) can be launched.`
         );
@@ -103,14 +114,16 @@ export const App: React.FC = () => {
       const screenCanvas = (document.getElementById('screen') as HTMLCanvasElement) || document.createElement('canvas');
       const displayContainer = document.getElementById('display') || document.createElement('div');
 
+      const targetDesktop = selectedDesktop;
+
       await adapter.boot({
         manifest: activeManifest,
-        desktop: selectedDesktop,
+        desktop: targetDesktop,
         enableAudio: true,
         enableNetworking: false, // Safe offline by default
         enableGpu: true,
         gpuExecutor: 'vrend',
-        autostartDesktop: true,
+        autostartDesktop: targetDesktop !== 'cli',
         screenCanvas,
         displayContainer,
       });
@@ -175,12 +188,14 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Page Content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 min-h-0 flex flex-col">
         {currentPage === 'landing' && (
           <Landing
             onLaunch={handleLaunch}
             onSelectDistro={(id) => {
               setSelectedDistro(id as DistributionId);
+              if (id === 'ubuntu') setSelectedDesktop('ubuntu-kde');
+              else if (id === 'debian') setSelectedDesktop('kde-plasma');
               setCurrentPage('desktops');
             }}
             manifests={manifests}
@@ -193,13 +208,18 @@ export const App: React.FC = () => {
           <DistributionSelector
             manifests={manifests}
             selectedDistro={selectedDistro}
-            onSelect={(id) => setSelectedDistro(id)}
+            onSelect={(id) => {
+              setSelectedDistro(id);
+              if (id === 'ubuntu') setSelectedDesktop('ubuntu-kde');
+              else if (id === 'debian') setSelectedDesktop('kde-plasma');
+            }}
             onProceed={() => setCurrentPage('desktops')}
           />
         )}
 
         {currentPage === 'desktops' && (
           <DesktopSelector
+            selectedDistro={selectedDistro}
             selectedDesktop={selectedDesktop}
             onSelect={(id) => setSelectedDesktop(id)}
             onLaunch={handleLaunch}
@@ -208,7 +228,7 @@ export const App: React.FC = () => {
 
         {/* Persistent Desktop / Boot Viewport */}
         {(currentPage === 'boot' || currentPage === 'desktop') && (
-          <div className="relative flex-1 w-full h-full flex flex-col overflow-hidden">
+          <div className="relative flex-1 min-h-0 w-full h-full flex flex-col overflow-hidden">
             {currentPage === 'boot' && (
               <div className="absolute inset-0 z-50 bg-[#090a0f] overflow-y-auto">
                 <BootScreen

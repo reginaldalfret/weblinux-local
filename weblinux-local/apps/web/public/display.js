@@ -505,9 +505,12 @@
     } else {
       const parent = stage && stage.parentElement;
       if (parent && parent.id !== "rv-host" && parent !== document.body) {
+        const sbox = stage.getBoundingClientRect();
         const pbox = parent.getBoundingClientRect();
-        w = Math.floor(pbox.width || window.innerWidth);
-        h = Math.floor(pbox.height || (window.innerHeight - pbox.top));
+        const barEl = document.getElementById("rv-bar");
+        const barH = (barEl && barEl.parentElement === parent) ? barEl.getBoundingClientRect().height : 0;
+        w = Math.floor(sbox.width || pbox.width || window.innerWidth);
+        h = Math.floor((sbox.height > 100 ? sbox.height : (pbox.height - barH)) || (window.innerHeight - pbox.top - barH));
       } else {
         // All of the window's width (less the page's margins) and the rest of its height below the bar.
         const box = stage.getBoundingClientRect();

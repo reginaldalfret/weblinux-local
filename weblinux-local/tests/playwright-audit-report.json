@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-11-22T22:58:46.148Z",
+  "playwrightVersion": "1.65.1",
+  "browser": "Microsoft Edge",
+  "checks": {
+    "serverOnline": true,
+    "coopHeaderValid": true,
+    "coepHeaderValid": true,
+    "landingPageLoaded": true,
+    "linuxKernelBooted": true,
+    "autostartDetected": true,
+    "waylandCompositorActive": true,
+    "canvasMounted": true,
+    "plasmaSplashPresented": true,
+    "desktopWallpaperPresented": true
+  },
+  "guestInfo": {
+    "Kernel Version": "Linux rv 6.6.0 #1 SMP rv riscv64 GNU/Linux",
+    "Uptime & Load": "22:59:47 up 0 min,  0 users,  load average: 2.28, 0.62, 0.21",
+    "Memory Usage": "total        used        free      shared  buff/cache   available\nMem:            4026        1064        2747           0         512        2961\nSwap:              0           0           0",
+    "CPU Architecture": "Architecture:           riscv64\n  Byte Order:           Little Endian\nCPU(s):                 64\n  On-line CPU(s) list:  0-3,58-63\n  Off-line CPU(s) list: 4-57\nVendor ID:              0x0\n  Model name:           rvwasm,rv\n    CPU family:         0x0\n    Model:              0x100\n    Thread(s) per core: 1\n    Core(s) per socket: 1\n    Socket(s):          10",
+    "Active Processes": "root       119  1.4  0.0      0     0 ?        S    22:58   0:00 /bin/sh /usr/local/bin/desktop wayland plasma-native\nroot       166  5.9  0.0      0     0 ?        S<l  22:58   0:03 /usr/bin/pulseaudio --daemonize=yes --exit-idle-time=-1 --log-target=file:/root/sound.log -L module-alsa-card device_id=0 name=wasm card_name=wasm\nmessage+   174  1.0  0.0      0     0 ?        Ss   22:59   0:00 /usr/bin/dbus-daemon --system --fork\nroot       178  6.5  0.0      0     0 ?        Ss   22:59   0:02 /usr/bin/dbus-daemon --session --fork --address=unix:path=/tmp/runtime-root/bus --print-pid=3\nroot       182  7.1  0.0      0     0 ?        S    22:59   0:03 wlserver\nroot       224 91.6  0.0      0     0 ?        Sl   22:59   0:33 /opt/nq/plasmashell --no-respawn\nroot       282 45.4  0.0      0     0 ?        S+   22:59   0:00 grep -E desktop|wlserver|dbus|plasma|pulseaudio"
+  },
+  "screenshots": {
+    "landingPage": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-verification\\01-landing-page.png",
+    "booting": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-verification\\02-boot-screen.png",
+    "splashScreen": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-verification\\03-plasma-splash.png",
+    "finalDesktop": "e:\\Web-Linux\\weblinux-local\\tests\\screenshots\\playwright-verification\\04-live-debian-kde-desktop.png"
+  },
+  "summary": "ALL_CHECKS_PASSED"
+}
