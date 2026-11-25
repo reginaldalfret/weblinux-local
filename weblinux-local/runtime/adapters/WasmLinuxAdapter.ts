@@ -331,20 +331,30 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.log(`[Initrd] Image verified: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
 
       // 5. Configure disk subsystem
-      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce, root-ubuntu-gnome, root-ubuntu-kde
+      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-firefox-kde-plasma, root-ubuntu-gnome, root-ubuntu-kde, root-ubuntu-kde-epiphany
       const isUbuntuGnome = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-gnome') && options.desktop === 'ubuntu-gnome';
+      const isUbuntuKdeEpiphany = options.manifest.id === 'ubuntu-kde-epiphany' && options.desktop === 'ubuntu-kde';
       const isUbuntuKde = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-kde') && options.desktop === 'ubuntu-kde';
+      const isDebianFirefox = options.manifest.id === 'debian-firefox' && options.desktop === 'kde-plasma';
       const rootUrl = isUbuntuGnome
         ? '/disk/ubuntu-24.04-gnome/'
+        : isUbuntuKdeEpiphany
+        ? '/disk/ubuntu-24.04-kde-epiphany/'
         : isUbuntuKde
         ? '/disk/ubuntu-24.04-kde/'
+        : isDebianFirefox
+        ? '/disk/debian-13-firefox/'
         : (options.manifest.imageSource.baseUri || '/disk/release/');
       const rootDiskId = isUbuntuGnome
         ? 'root-ubuntu-gnome'
+        : isUbuntuKdeEpiphany
+        ? 'root-ubuntu-kde-epiphany'
         : isUbuntuKde
         ? 'root-ubuntu-kde'
+        : isDebianFirefox
+        ? 'root-debian-firefox'
         : `root-${options.manifest.id}-${options.desktop}`;
-      const homeDiskId = `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde') ? 'ubuntu' : options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
+      const homeDiskId = `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde' || options.manifest.id === 'ubuntu-kde-epiphany') ? 'ubuntu' : (options.manifest.id === 'debian-firefox' ? 'debian' : options.manifest.id)}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
         {
@@ -618,7 +628,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     }
 
     // Allow guest kernel sync to issue flush before coordinated OPFS shutdown
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 1500));
 
     if (this.activeOs && typeof this.activeOs.terminate === 'function') {
       try {

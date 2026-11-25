@@ -16,7 +16,7 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
   onSelect,
   onLaunch,
 }) => {
-  const isUbuntu = selectedDistro === 'ubuntu';
+  const isUbuntu = selectedDistro === 'ubuntu' || selectedDistro === 'ubuntu-kde-epiphany';
   const desktopList: DesktopProfile[] = isUbuntu
     ? [DEBIAN_DESKTOP_PROFILES['ubuntu-kde']]
     : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome' && p.id !== 'ubuntu-kde');

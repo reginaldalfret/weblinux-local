@@ -38,7 +38,7 @@ export const App: React.FC = () => {
 
   // Load distribution manifests
   useEffect(() => {
-    const distroIds: DistributionId[] = ['debian', 'ubuntu', 'fedora', 'arch', 'kali-lab'];
+    const distroIds: DistributionId[] = ['debian', 'debian-firefox', 'ubuntu', 'ubuntu-kde-epiphany', 'fedora', 'arch', 'kali-lab'];
     Promise.allSettled(distroIds.map(id => adapter.loadManifest(id)))
       .then(results => {
         const loaded: DistributionManifest[] = [];
@@ -100,7 +100,9 @@ export const App: React.FC = () => {
         activeManifest.validationStatus !== 'validated' &&
         activeManifest.id !== 'ubuntu' &&
         activeManifest.id !== 'ubuntu-gnome' &&
-        activeManifest.id !== 'ubuntu-kde'
+        activeManifest.id !== 'ubuntu-kde' &&
+        activeManifest.id !== 'ubuntu-kde-epiphany' &&
+        activeManifest.id !== 'debian-firefox'
       ) {
         throw new Error(
           `${activeManifest.name} is currently an unvalidated port (status: ${activeManifest.validationStatus.toUpperCase()}). To protect your environment, only validated distributions (Debian GNU/Linux 13) can be launched.`
@@ -120,7 +122,8 @@ export const App: React.FC = () => {
         manifest: activeManifest,
         desktop: targetDesktop,
         enableAudio: true,
-        enableNetworking: false, // Safe offline by default
+        enableNetworking: true,
+        networkRelayUri: 'ws://127.0.0.1:8081',
         enableGpu: true,
         gpuExecutor: 'vrend',
         autostartDesktop: targetDesktop !== 'cli',
@@ -194,8 +197,8 @@ export const App: React.FC = () => {
             onLaunch={handleLaunch}
             onSelectDistro={(id) => {
               setSelectedDistro(id as DistributionId);
-              if (id === 'ubuntu') setSelectedDesktop('ubuntu-kde');
-              else if (id === 'debian') setSelectedDesktop('kde-plasma');
+              if (id === 'ubuntu' || id === 'ubuntu-kde-epiphany') setSelectedDesktop('ubuntu-kde');
+              else if (id === 'debian' || id === 'debian-firefox') setSelectedDesktop('kde-plasma');
               setCurrentPage('desktops');
             }}
             manifests={manifests}
@@ -210,8 +213,8 @@ export const App: React.FC = () => {
             selectedDistro={selectedDistro}
             onSelect={(id) => {
               setSelectedDistro(id);
-              if (id === 'ubuntu') setSelectedDesktop('ubuntu-kde');
-              else if (id === 'debian') setSelectedDesktop('kde-plasma');
+              if (id === 'ubuntu' || id === 'ubuntu-kde-epiphany') setSelectedDesktop('ubuntu-kde');
+              else if (id === 'debian' || id === 'debian-firefox') setSelectedDesktop('kde-plasma');
             }}
             onProceed={() => setCurrentPage('desktops')}
           />

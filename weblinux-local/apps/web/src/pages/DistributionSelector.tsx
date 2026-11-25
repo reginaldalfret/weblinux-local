@@ -46,7 +46,7 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
         {manifests.map((distro) => {
           const isSelected = selectedDistro === distro.id;
           const isValidated = distro.validationStatus === 'validated';
-          const isSelectable = isValidated || distro.id === 'ubuntu';
+          const isSelectable = isValidated || distro.id === 'ubuntu' || distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany';
 
           return (
             <div
@@ -66,7 +66,9 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-2xl">
                     {distro.id === 'debian' ? '🌀' :
+                     distro.id === 'debian-firefox' ? '🦊' :
                      distro.id === 'ubuntu' ? '🟠' :
+                     distro.id === 'ubuntu-kde-epiphany' ? '🌐' :
                      distro.id === 'fedora' ? '🔵' :
                      distro.id === 'arch' ? '🏹' : '🐉'}
                   </div>
@@ -75,12 +77,12 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
                     className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border ${
                       isValidated
                         ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                        : distro.id === 'ubuntu'
+                        : (distro.id === 'ubuntu' || distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany')
                         ? 'bg-purple-500/10 text-purple-300 border-purple-500/30'
                         : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
                     }`}
                   >
-                    {isValidated ? 'Validated' : distro.id === 'ubuntu' ? 'Experimental CLI' : 'Experimental Port'}
+                    {isValidated ? 'Validated' : (distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany') ? 'Native Browser' : distro.id === 'ubuntu' ? 'Experimental CLI' : 'Experimental Port'}
                   </span>
                 </div>
 

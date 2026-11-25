@@ -3,7 +3,7 @@
  * Provides an independent abstraction layer over the underlying WebAssembly Linux kernel.
  */
 
-export type DistributionId = 'debian' | 'ubuntu' | 'fedora' | 'arch' | 'kali-lab' | 'ubuntu-gnome' | 'ubuntu-kde';
+export type DistributionId = 'debian' | 'debian-firefox' | 'ubuntu' | 'ubuntu-kde-epiphany' | 'fedora' | 'arch' | 'kali-lab' | 'ubuntu-gnome' | 'ubuntu-kde';
 
 export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce' | 'cli' | 'ubuntu-gnome' | 'ubuntu-kde';
 
