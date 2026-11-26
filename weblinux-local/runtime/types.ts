@@ -3,9 +3,9 @@
  * Provides an independent abstraction layer over the underlying WebAssembly Linux kernel.
  */
 
-export type DistributionId = 'debian' | 'ubuntu' | 'fedora' | 'arch' | 'kali-lab' | 'ubuntu-gnome' | 'ubuntu-kde';
+export type DistributionId = 'debian' | 'debian-firefox' | 'ubuntu' | 'ubuntu-kde-epiphany' | 'fedora' | 'arch' | 'arch-kde' | 'opensuse-tumbleweed-kde' | 'kali-lab' | 'ubuntu-gnome' | 'ubuntu-kde';
 
-export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce' | 'cli' | 'ubuntu-gnome' | 'ubuntu-kde';
+export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce' | 'cli' | 'ubuntu-gnome' | 'ubuntu-kde' | 'arch-kde' | 'opensuse-tumbleweed-kde';
 
 export type DesktopProfileStatus = 'validated' | 'experimental' | 'preview' | 'unavailable';
 
@@ -50,7 +50,7 @@ export interface DistributionManifest {
   kernelCompatibility: string;
   defaultDesktop: DesktopEnvironmentId;
   supportedDesktops: DesktopEnvironmentId[];
-  packageManager: 'apt' | 'dnf' | 'pacman' | 'none';
+  packageManager: 'apt' | 'dnf' | 'pacman' | 'zypper' | 'none';
   filesystemLayout: {
     rootMount: string;
     homeMount: string;
@@ -83,6 +83,22 @@ export interface DistributionManifest {
   notes: string;
 }
 
+export type GraphicsMode = 'software' | 'experimental-rvgpu' | 'automatic';
+
+export interface GraphicsCapabilities {
+  mode: GraphicsMode;
+  webgl2: boolean;
+  webgpu: boolean;
+  executorLoaded: boolean;
+  executorReady: boolean;
+  guestConnected: boolean;
+  activeBackend: 'software' | 'vrend-webgl2' | 'webgpu' | 'proto';
+  renderer?: string;
+  fallbackReason?: string;
+  commandRecords?: number;
+  draws?: number;
+}
+
 export interface BootOptions {
   manifest: DistributionManifest;
   desktop: DesktopEnvironmentId;
@@ -93,6 +109,7 @@ export interface BootOptions {
   networkRelayUri?: string;
   enableGpu: boolean;
   gpuExecutor: 'vrend' | 'webgpu' | 'auto' | 'off';
+  graphicsMode?: GraphicsMode;
   freshRootDisk?: boolean;
   freshHomeDisk?: boolean;
   autostartDesktop: boolean;
@@ -127,6 +144,7 @@ export interface RuntimeStatus {
   networkConnected: boolean;
   waylandActive?: boolean;
   shellReady?: boolean;
+  graphics?: GraphicsCapabilities;
   error?: string;
 }
 

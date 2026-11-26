@@ -28,16 +28,20 @@ export default defineConfig({
           if (rawUrl.startsWith('/disk/')) {
             const diskSubpath = rawUrl.replace(/^\/disk\//, '');
             const localPublicDiskFile = path.resolve(__dirname, 'public/disk', diskSubpath);
+            const dDiskFile = path.join('D:\\weblinux-disks', diskSubpath);
+            const resolvedLocalDiskFile = fs.existsSync(localPublicDiskFile)
+              ? localPublicDiskFile
+              : (fs.existsSync(dDiskFile) ? dDiskFile : '');
             const targetUrl = `https://plasmaontheweb.com/disk/${diskSubpath}`;
             const localCacheFile = path.join(DISK_CACHE_DIR, diskSubpath.replace(/\//g, '_'));
 
             res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
             res.setHeader('Access-Control-Allow-Origin', '*');
 
-            // 1.1 First check if the file exists directly in public/disk/
-            if (fs.existsSync(localPublicDiskFile)) {
+            // 1.1 First check if the file exists directly in public/disk/ or WSL disk store
+            if (resolvedLocalDiskFile) {
               try {
-                const stat = fs.statSync(localPublicDiskFile);
+                const stat = fs.statSync(resolvedLocalDiskFile);
                 if (stat.isFile()) {
                   const totalSize = stat.size;
                   const etag = `"${stat.size}-${Math.floor(stat.mtimeMs)}"`;
@@ -66,13 +70,13 @@ export default defineConfig({
                     res.statusCode = 206;
                     res.setHeader('Content-Range', `bytes ${start}-${end}/${totalSize}`);
                     res.setHeader('Content-Length', end - start + 1);
-                    fs.createReadStream(localPublicDiskFile, { start, end }).pipe(res);
+                    fs.createReadStream(resolvedLocalDiskFile, { start, end }).pipe(res);
                     return;
                   }
 
                   res.statusCode = 200;
                   res.setHeader('Content-Length', totalSize);
-                  fs.createReadStream(localPublicDiskFile).pipe(res);
+                  fs.createReadStream(resolvedLocalDiskFile).pipe(res);
                   return;
                 }
               } catch (readErr) {
@@ -165,15 +169,22 @@ export default defineConfig({
           if (rawUrl.startsWith('/disk/')) {
             const diskSubpath = rawUrl.replace(/^\/disk\//, '');
             const localPublicDiskFile = path.resolve(__dirname, 'public/disk', diskSubpath);
+            const localDDiskFile = path.resolve('D:/weblinux-disks', diskSubpath);
             const targetUrl = `https://plasmaontheweb.com/disk/${diskSubpath}`;
             const localCacheFile = path.join(DISK_CACHE_DIR, diskSubpath.replace(/\//g, '_'));
 
             res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
             res.setHeader('Access-Control-Allow-Origin', '*');
 
-            if (fs.existsSync(localPublicDiskFile)) {
+            const diskFileToServe = fs.existsSync(localPublicDiskFile)
+              ? localPublicDiskFile
+              : fs.existsSync(localDDiskFile)
+              ? localDDiskFile
+              : null;
+
+            if (diskFileToServe) {
               try {
-                const fileBuf = fs.readFileSync(localPublicDiskFile);
+                const fileBuf = fs.readFileSync(diskFileToServe);
                 res.setHeader('Content-Type', diskSubpath.endsWith('.json') ? 'application/json' : 'application/octet-stream');
                 res.setHeader('Content-Length', fileBuf.length);
                 res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');

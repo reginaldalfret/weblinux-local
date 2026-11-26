@@ -1,0 +1,56 @@
+{
+  "id": "arch-kde",
+  "name": "Arch Linux RISC-V (Community Port + KDE Plasma 6)",
+  "releaseVersion": "Rolling (2026-08-27 + pacman -Syu)",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-7.0",
+  "defaultDesktop": "arch-kde",
+  "supportedDesktops": [
+    "arch-kde"
+  ],
+  "packageManager": "pacman",
+  "filesystemLayout": {
+    "rootMount": "/arch",
+    "homeMount": "/home/root"
+  },
+  "imageSource": {
+    "baseUri": "/disk/arch-kde/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 5368709120,
+    "manifestUri": "/disk/arch-kde/manifest.json",
+    "id": "033d28bf64c340696bf2f2a9ddf5e475",
+    "fullImageSha256": "033d28bf64c340696bf2f2a9ddf5e475903ec4fee225d1434f8a08745e5d15dd",
+    "filesystemUuid": "2de12b0d-95e2-4370-aabd-29606fdfc918"
+  },
+  "integrity": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "4912ec21db2a813002708a68571228e42badb8b2c587030e110f3cea2a3d1be7",
+    "initrdUncompressedSha256": "68e7c63c8f6405b4123ec9ec2a8864c159e7be3aca91f6f1f52da3725d186887",
+    "kernelSize": 7380050,
+    "initrdSize": 15056582,
+    "initrdUncompressedSize": 36652544,
+    "chunksCount": 5120,
+    "nonZeroChunksCount": 3644,
+    "bootChunksCount": 64,
+    "sourceArchive": "archriscv-2026-08-27.tar.zst",
+    "sourceArchiveSha256": "a2045c8b62232db2f60d8e4db610dbb5d9e12856dab0ba08634ad3d7cb7ad498"
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 2048,
+    "recommendedMemoryMB": 2048,
+    "minCores": 2,
+    "recommendedCores": 4,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 5120
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later, Arch Linux RISC-V Community Port",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Arch Linux RISC-V (RV64GC / LP64D) community port with signed KDE Plasma 6.8.3, KWin 6.8.3, Qt 6.12.0, Konsole 26.08.3, and Dolphin 26.08.3."
+}

@@ -1,0 +1,7 @@
+{
+  "distributionId": "ubuntu-24.04-kde-epiphany",
+  "imageSize": 3758096384,
+  "chunkCount": 3584,
+  "nonZeroChunkCount": 1862,
+  "fullImageSha256": "7321ea53b91a9c396a8262a7015dd79479b120dcec0389166455813e7626c266"
+}

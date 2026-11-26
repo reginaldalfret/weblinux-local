@@ -5,7 +5,10 @@
   "architecture": "riscv64",
   "kernelCompatibility": "linux-wasm64_nommu-6.1",
   "defaultDesktop": "icewm",
-  "supportedDesktops": ["icewm", "kde-plasma"],
+  "supportedDesktops": [
+    "icewm",
+    "kde-plasma"
+  ],
   "packageManager": "apt",
   "filesystemLayout": {
     "rootMount": "/debian",

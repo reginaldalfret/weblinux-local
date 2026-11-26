@@ -1,0 +1,55 @@
+{
+  "id": "debian-firefox",
+  "name": "Debian GNU/Linux 13 (Trixie) + Firefox ESR",
+  "releaseVersion": "13 / trixie",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-6.1",
+  "defaultDesktop": "kde-plasma",
+  "supportedDesktops": [
+    "kde-plasma"
+  ],
+  "packageManager": "apt",
+  "filesystemLayout": {
+    "rootMount": "/debian",
+    "homeMount": "/root",
+    "sharedMount": "/opt/nq-shared"
+  },
+  "imageSource": {
+    "baseUri": "/disk/debian-13-firefox/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 8589934592,
+    "manifestUri": "/disk/debian-13-firefox/manifest.json",
+    "id": "93c5032899e33396c0e97c4800a50817",
+    "fullImageSha256": "93c5032899e33396c0e97c4800a508177df281678a80b92fc365894f4b08cde0"
+  },
+  "integrity": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "4912ec21db2a813002708a68571228e42badb8b2c587030e110f3cea2a3d1be7",
+    "initrdUncompressedSha256": "68e7c63c8f6405b4123ec9ec2a8864c159e7be3aca91f6f1f52da3725d186887",
+    "kernelSize": 7380050,
+    "initrdSize": 15056582,
+    "initrdUncompressedSize": 36652544,
+    "chunksCount": 8192,
+    "nonZeroChunksCount": 4209,
+    "bootChunksCount": 64
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 2048,
+    "recommendedMemoryMB": 2048,
+    "minCores": 2,
+    "recommendedCores": 4,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresWebGPU": false,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 4209
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later, DFSG Compliant",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Debian 13 Trixie riscv64 with KDE Plasma 6 and native Firefox ESR (153.5.1esr) configured for NOMMU execution."
+}

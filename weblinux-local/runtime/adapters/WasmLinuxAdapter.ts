@@ -15,6 +15,8 @@ import {
   DownloadProgress,
   ImportResult,
   StorageUsageInfo,
+  GraphicsMode,
+  GraphicsCapabilities,
 } from '../types';
 import { OpfsManager } from '../filesystem/OpfsManager';
 import { DEBIAN_DESKTOP_PROFILES } from '../profiles/desktopProfiles';
@@ -46,6 +48,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   private resolveShellReady: ((val: boolean) => void) | null = null;
   private cachedKernelBuffer: ArrayBuffer | null = null;
   private cachedInitrdBuffer: ArrayBuffer | null = null;
+  private graphicsMode: GraphicsMode = 'automatic';
 
   public static getInstance(): WasmLinuxAdapter {
     if (!WasmLinuxAdapter.instance) {
@@ -161,8 +164,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         id: 'initrd',
         name: 'Initial Ramdisk (BusyBox + rv)',
         path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
-        expectedSize: manifest.integrity.initrdSize || 15056774,
-        expectedSha256: manifest.integrity.initrdSha256 || '84c49e2936fdbb2e30b83bd7a6067ccd2b76cd97b71171f1c9dbff54704a8c95',
+        expectedSize: manifest.integrity.initrdSize || 15056582,
+        expectedSha256: manifest.integrity.initrdSha256 || '4912ec21db2a813002708a68571228e42badb8b2c587030e110f3cea2a3d1be7',
       },
     ];
 
@@ -328,20 +331,44 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.log(`[Initrd] Image verified: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
 
       // 5. Configure disk subsystem
-      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-gnome, root-debian-xfce, root-ubuntu-gnome, root-ubuntu-kde
+      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-firefox, root-ubuntu-gnome, root-ubuntu-kde, root-ubuntu-kde-epiphany, root-arch-kde
       const isUbuntuGnome = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-gnome') && options.desktop === 'ubuntu-gnome';
+      const isUbuntuKdeEpiphany = options.manifest.id === 'ubuntu-kde-epiphany' && options.desktop === 'ubuntu-kde';
       const isUbuntuKde = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-kde') && options.desktop === 'ubuntu-kde';
+      const isDebianFirefox = options.manifest.id === 'debian-firefox' && options.desktop === 'kde-plasma';
+      const isArchKde = options.manifest.id === 'arch-kde' && options.desktop === 'arch-kde';
+      const isOpenSuseKde = options.manifest.id === 'opensuse-tumbleweed-kde' && options.desktop === 'opensuse-tumbleweed-kde';
       const rootUrl = isUbuntuGnome
         ? '/disk/ubuntu-24.04-gnome/'
+        : isUbuntuKdeEpiphany
+        ? '/disk/ubuntu-24.04-kde-epiphany/'
         : isUbuntuKde
         ? '/disk/ubuntu-24.04-kde/'
+        : isDebianFirefox
+        ? '/disk/debian-13-firefox/'
+        : isArchKde
+        ? '/disk/arch-kde/'
+        : isOpenSuseKde
+        ? '/disk/opensuse-tumbleweed-kde/'
         : (options.manifest.imageSource.baseUri || '/disk/release/');
       const rootDiskId = isUbuntuGnome
         ? 'root-ubuntu-gnome'
+        : isUbuntuKdeEpiphany
+        ? 'root-ubuntu-kde-epiphany'
         : isUbuntuKde
         ? 'root-ubuntu-kde'
+        : isDebianFirefox
+        ? 'root-debian-firefox'
+        : isArchKde
+        ? 'root-arch-kde'
+        : isOpenSuseKde
+        ? 'root-opensuse-tumbleweed-kde'
         : `root-${options.manifest.id}-${options.desktop}`;
-      const homeDiskId = `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde') ? 'ubuntu' : options.manifest.id}`; // Persistent home shared across desktop sessions on /dev/wdb
+      const homeDiskId = isArchKde
+        ? 'home-arch-kde'
+        : isOpenSuseKde
+        ? 'home-opensuse-tumbleweed-kde'
+        : `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde' || options.manifest.id === 'ubuntu-kde-epiphany') ? 'ubuntu' : (options.manifest.id === 'debian-firefox' ? 'debian' : options.manifest.id)}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
         {
@@ -429,8 +456,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         (window as any).linuxOs = this.activeOs;
 
-        // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27)
-        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde') && options.autostartDesktop) {
+        // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27, Arch KDE 6, openSUSE Tumbleweed KDE 6)
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde' || options.desktop === 'arch-kde' || options.desktop === 'opensuse-tumbleweed-kde') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -444,7 +471,31 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           // Provision dedicated session launcher scripts
           await this.provisionDesktopLaunchers();
 
-          if (options.desktop === 'ubuntu-kde') {
+          if (options.desktop === 'opensuse-tumbleweed-kde') {
+            this.log(`[Desktop Launcher] Executing verified openSUSE Tumbleweed KDE Plasma 6 session script: /usr/local/bin/opensuse-kde-session`);
+            const launchRes = await this.runCommand(`opensuse-kde /usr/local/bin/opensuse-kde-session`, 25000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'openSUSE KDE launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else if (options.desktop === 'arch-kde') {
+            this.log(`[Desktop Launcher] Executing verified Arch KDE Plasma 6 session script: /usr/local/bin/arch-kde-session`);
+            const launchRes = await this.runCommand(`arch-kde /usr/local/bin/arch-kde-session`, 25000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Arch KDE launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else if (options.desktop === 'ubuntu-kde') {
             this.log(`[Desktop Launcher] Executing verified Ubuntu KDE Plasma session script: /usr/local/bin/ubuntu-kde-session`);
             const launchRes = await this.runCommand(`ubuntu-kde /usr/local/bin/ubuntu-kde-session`, 25000);
             if (launchRes.exitCode !== 0) {
@@ -601,6 +652,17 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.uptimeTimer = null;
     }
 
+    if (this.status.shellReady && this.activeOs) {
+      try {
+        await this.runCommand(
+          'killall -9 plasmashell kbuildsycoca6 dolphin konsole kioworker dbus-daemon 2>/dev/null; sleep 0.5; sync; umount /opensuse/root 2>/dev/null || mount -o remount,ro /opensuse/root 2>/dev/null; umount /arch/root 2>/dev/null || mount -o remount,ro /arch/root 2>/dev/null; umount /ubuntu/root 2>/dev/null || mount -o remount,ro /ubuntu/root 2>/dev/null; umount /debian/root 2>/dev/null || mount -o remount,ro /debian/root 2>/dev/null; sync',
+          8000
+        );
+      } catch {
+        // Fallback to raw key_input below
+      }
+    }
+
     try {
       if (this.activeOs && this.activeOs.key_input) {
         this.activeOs.key_input('sync\r');
@@ -615,7 +677,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     }
 
     // Allow guest kernel sync to issue flush before coordinated OPFS shutdown
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 1500));
 
     if (this.activeOs && typeof this.activeOs.terminate === 'function') {
       try {
@@ -815,8 +877,11 @@ fi
 if [ -f "$XDG_RUNTIME_DIR/rvgpu-0.ready" ]; then
   export GALLIUM_DRIVER=virpipe
   export VTEST_SOCKET_NAME="$XDG_RUNTIME_DIR/rvgpu-0"
-  unset LIBGL_ALWAYS_SOFTWARE
-  echo "[Ubuntu KDE Launcher] rvgpu active ($VTEST_SOCKET_NAME, GALLIUM_DRIVER=virpipe)" >> /root/ubuntu-kde-session.log
+  unset LIBGL_ALWAYS_SOFTWARE QT_QUICK_BACKEND QMLSCENE_DEVICE
+  export QSG_INFO=1
+  echo "[Ubuntu KDE Launcher] rvgpu active ($VTEST_SOCKET_NAME, GALLIUM_DRIVER=virpipe, OpenGL QSG)" >> /root/ubuntu-kde-session.log
+else
+  echo "[Ubuntu KDE Launcher] rvgpu unavailable; using software QML fallback" >> /root/ubuntu-kde-session.log
 fi
 
 # 4. Build KService menu cache only if missing (run in background to avoid blocking compositor startup)
@@ -982,6 +1047,65 @@ fi`;
       await this.opfsManager.resetAll();
     }
     this.log(`[Storage] Reset operation executed on ${diskName || 'all disks'}.`);
+  }
+
+  public setGraphicsMode(mode: GraphicsMode): void {
+    this.graphicsMode = mode;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        window.localStorage.setItem('weblinux_graphics_mode', mode);
+      } catch {
+        // Ignore storage errors
+      }
+    }
+    this.updateStatus({ graphics: this.getGraphicsCapabilities() });
+  }
+
+  public getGraphicsMode(): GraphicsMode {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const saved = window.localStorage.getItem('weblinux_graphics_mode') as GraphicsMode | null;
+        if (saved === 'software' || saved === 'experimental-rvgpu' || saved === 'automatic') {
+          this.graphicsMode = saved;
+        }
+      } catch {
+        // Ignore
+      }
+    }
+    return this.graphicsMode;
+  }
+
+  public getGraphicsCapabilities(): GraphicsCapabilities {
+    const win = typeof window !== 'undefined' ? (window as any) : {};
+    const rvGpu = win.rvGpu;
+    const stats = rvGpu?.stats;
+    const d = win.rvDisplay;
+    const webgl2 = !!(d && d.gl) || this.getDiagnostics().hasWebGL2;
+    const webgpu = typeof navigator !== 'undefined' && !!(navigator as any).gpu;
+    const executorLoaded = !!rvGpu;
+    const startErrors: string[] = Array.isArray(stats?.startErrors) ? stats.startErrors : [];
+    const executorReady = !!(stats?.readyKind && startErrors.length === 0 && !stats?.deviceLost);
+    const execStats = stats?.exec;
+    const guestConnected = !!(execStats && (execStats.records > 0 || execStats.submits > 0));
+    let activeBackend: GraphicsCapabilities['activeBackend'] = 'software';
+    if (this.getGraphicsMode() !== 'software' && executorReady) {
+      if (stats.readyKind === 'webgpu') activeBackend = 'webgpu';
+      else if (stats.readyKind === 'vrend') activeBackend = 'vrend-webgl2';
+      else if (stats.readyKind === 'proto') activeBackend = 'proto';
+    }
+    return {
+      mode: this.getGraphicsMode(),
+      webgl2,
+      webgpu,
+      executorLoaded,
+      executorReady,
+      guestConnected,
+      activeBackend,
+      renderer: stats?.workerRenderer || stats?.renderer || undefined,
+      fallbackReason: startErrors[0] || stats?.fallback || stats?.deviceLost || undefined,
+      commandRecords: execStats?.records ?? 0,
+      draws: execStats?.draws ?? 0,
+    };
   }
 
   public onStateChange(listener: (status: RuntimeStatus) => void): () => void {
