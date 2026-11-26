@@ -1,53 +1,56 @@
-{
-  "id": "ubuntu-gnome",
-  "name": "Ubuntu 24.04.5 LTS (Noble Numbat GNOME 46)",
-  "releaseVersion": "24.04.5 LTS",
-  "architecture": "riscv64",
-  "kernelCompatibility": "linux-wasm64_nommu-7.0",
-  "defaultDesktop": "ubuntu-gnome",
-  "supportedDesktops": ["ubuntu-gnome", "cli"],
-  "packageManager": "apt",
-  "filesystemLayout": {
-    "rootMount": "/ubuntu",
-    "homeMount": "/home/ubuntu"
-  },
-  "imageSource": {
-    "baseUri": "/disk/ubuntu-24.04-gnome/",
-    "chunkSize": 1048576,
-    "totalSizeBytes": 3221225472,
-    "id": "6e83ffacc25bfefe08cdaada8b4771ac",
-    "fullImageSha256": "6e83ffacc25bfefe08cdaada8b4771acc5e422a171ba7506840fc38fa0094a0e",
-    "filesystemUuid": "57f55339-762f-4d76-a40e-fa536b13847b"
-  },
-  "integrity": {
-    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
-    "initrdSha256": "41c43f6f0f7e14119d6011a1441e8b1c8da883967909ff30732e964046dcf537",
-    "initrdUncompressedSha256": "71c0ddb7192ef269e3ee2bccdd80d8162ba1ac11ad9d2f5e67d504d8444ea1f7",
-    "kernelSize": 7380050,
-    "initrdSize": 15055753,
-    "initrdUncompressedSize": 36645888,
-    "chunksCount": 3072,
-    "nonZeroChunksCount": 776,
-    "bootChunksCount": 40,
-    "sourceArchive": "ubuntu-base-24.04.5-base-riscv64.tar.gz",
-    "sourceArchiveSha256": "651c516f291259ec913caa1efd0cfff738cd223adfc6617c884f07af487f08cf"
-  },
-  "runtimeRequirements": {
-    "minMemoryMB": 2048,
-    "recommendedMemoryMB": 2048,
-    "minCores": 2,
-    "recommendedCores": 4,
-    "requiresSharedArrayBuffer": true,
-    "requiresCrossOriginIsolated": true,
-    "requiresWebGL2": true,
-    "requiresOPFS": true,
-    "estimatedDiskMB": 3072
-  },
-  "licensing": {
-    "baseLicense": "GPL-2.0-or-later, Canonical Open Source",
-    "redistributionAllowed": true,
-    "licenseDocUrl": "/docs/LICENSING.md"
-  },
-  "validationStatus": "experimental",
-  "verificationSignature": "Canonical Official Port - riscv64 NOMMU"
+﻿{
+    "id":  "ubuntu-gnome",
+    "name":  "Ubuntu 24.04.5 LTS (Noble Numbat GNOME 46)",
+    "releaseVersion":  "24.04.5 LTS",
+    "architecture":  "riscv64",
+    "kernelCompatibility":  "linux-wasm64_nommu-7.0",
+    "defaultDesktop":  "ubuntu-gnome",
+    "supportedDesktops":  [
+                              "ubuntu-gnome",
+                              "cli"
+                          ],
+    "packageManager":  "apt",
+    "filesystemLayout":  {
+                             "rootMount":  "/ubuntu",
+                             "homeMount":  "/home/ubuntu"
+                         },
+    "imageSource":  {
+                        "baseUri":  "/disk/ubuntu-24.04-gnome/",
+                        "chunkSize":  1048576,
+                        "totalSizeBytes":  3221225472,
+                        "id":  "6e83ffacc25bfefe08cdaada8b4771ac",
+                        "fullImageSha256":  "6e83ffacc25bfefe08cdaada8b4771acc5e422a171ba7506840fc38fa0094a0e",
+                        "filesystemUuid":  "57f55339-762f-4d76-a40e-fa536b13847b"
+                    },
+    "integrity":  {
+                      "kernelSha256":  "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+                      "initrdSha256":  "e3738b20d9899773cc1024b343e53760c372683a19947b92380d17d5751ce139",
+                      "initrdUncompressedSha256":  "fe6ce11c8b1cf61fdbe43e399ec005be665ce4b40fc9c8fa35465aae1c7a477a",
+                      "kernelSize":  7380050,
+                      "initrdSize":  15060899,
+                      "initrdUncompressedSize":  36648960,
+                      "chunksCount":  3072,
+                      "nonZeroChunksCount":  776,
+                      "bootChunksCount":  40,
+                      "sourceArchive":  "ubuntu-base-24.04.5-base-riscv64.tar.gz",
+                      "sourceArchiveSha256":  "651c516f291259ec913caa1efd0cfff738cd223adfc6617c884f07af487f08cf"
+                  },
+    "runtimeRequirements":  {
+                                "minMemoryMB":  2048,
+                                "recommendedMemoryMB":  2048,
+                                "minCores":  2,
+                                "recommendedCores":  4,
+                                "requiresSharedArrayBuffer":  true,
+                                "requiresCrossOriginIsolated":  true,
+                                "requiresWebGL2":  true,
+                                "requiresOPFS":  true,
+                                "estimatedDiskMB":  3072
+                            },
+    "licensing":  {
+                      "baseLicense":  "GPL-2.0-or-later, Canonical Open Source",
+                      "redistributionAllowed":  true,
+                      "licenseDocUrl":  "/docs/LICENSING.md"
+                  },
+    "validationStatus":  "experimental",
+    "verificationSignature":  "Canonical Official Port - riscv64 NOMMU"
 }

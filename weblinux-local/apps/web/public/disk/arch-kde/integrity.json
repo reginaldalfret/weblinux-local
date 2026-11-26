@@ -1,0 +1,7 @@
+{
+  "distributionId": "arch-kde",
+  "imageSize": 5368709120,
+  "chunkCount": 5120,
+  "nonZeroChunkCount": 3644,
+  "fullImageSha256": "7b17baecf646ba347cf2a83d2f15f9dcee49326a24a85798b7ffa47ec2ac0aed"
+}

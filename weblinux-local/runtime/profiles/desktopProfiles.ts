@@ -169,5 +169,31 @@ export const DEBIAN_DESKTOP_PROFILES: Record<string, DesktopProfile> = {
       'Experimental Ubuntu graphical profile'
     ],
     previewImage: '/screenshots/phase6/04-ubuntu-kde-desktop.png'
+  },
+  'arch-kde': {
+    id: 'arch-kde',
+    name: 'Arch KDE Plasma 6',
+    version: '6.8.3',
+    tagline: 'Arch Linux RISC-V Rolling KDE Plasma 6 Desktop',
+    description: 'Authentic Arch Linux RISC-V (RV64GC / LP64D) community port running KDE Plasma 6.8.3, Qt 6.12.0, KWin 6.8.3, Konsole 26.08.3, and Dolphin 26.08.3 with pacman 7.1 package management.',
+    distributionId: 'arch-kde',
+    status: 'experimental',
+    sessionCommand: 'arch-kde /usr/local/bin/arch-kde-session',
+    compositor: 'wlserver / KWin 6.8.3',
+    rootfsManifestId: 'arch-kde',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Arch Linux RISC-V (RV64GC / LP64D) userspace',
+      'KDE Plasma 6.8.3 & Qt 6.12.0 over Wayland',
+      'Konsole 26.08.3 Terminal & Dolphin 26.08.3 File Manager',
+      'Pacman 7.1.0 package manager with signed repos',
+      'Isolated root-arch-kde + persistent home-arch-kde'
+    ],
+    knownLimitations: [
+      'Community-maintained RISC-V port (experimental)',
+      'Software QML fallback when RVGPU is unavailable'
+    ],
+    previewImage: '/screenshots/phase9/arch-kde-desktop.png'
   }
 };

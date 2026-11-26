@@ -38,7 +38,7 @@ export const App: React.FC = () => {
 
   // Load distribution manifests
   useEffect(() => {
-    const distroIds: DistributionId[] = ['debian', 'debian-firefox', 'ubuntu', 'ubuntu-kde-epiphany', 'fedora', 'arch', 'kali-lab'];
+    const distroIds: DistributionId[] = ['debian', 'debian-firefox', 'ubuntu', 'ubuntu-kde-epiphany', 'arch-kde', 'fedora', 'arch', 'kali-lab'];
     Promise.allSettled(distroIds.map(id => adapter.loadManifest(id)))
       .then(results => {
         const loaded: DistributionManifest[] = [];
@@ -102,7 +102,8 @@ export const App: React.FC = () => {
         activeManifest.id !== 'ubuntu-gnome' &&
         activeManifest.id !== 'ubuntu-kde' &&
         activeManifest.id !== 'ubuntu-kde-epiphany' &&
-        activeManifest.id !== 'debian-firefox'
+        activeManifest.id !== 'debian-firefox' &&
+        activeManifest.id !== 'arch-kde'
       ) {
         throw new Error(
           `${activeManifest.name} is currently an unvalidated port (status: ${activeManifest.validationStatus.toUpperCase()}). To protect your environment, only validated distributions (Debian GNU/Linux 13) can be launched.`
@@ -199,6 +200,7 @@ export const App: React.FC = () => {
               setSelectedDistro(id as DistributionId);
               if (id === 'ubuntu' || id === 'ubuntu-kde-epiphany') setSelectedDesktop('ubuntu-kde');
               else if (id === 'debian' || id === 'debian-firefox') setSelectedDesktop('kde-plasma');
+              else if (id === 'arch-kde') setSelectedDesktop('arch-kde');
               setCurrentPage('desktops');
             }}
             manifests={manifests}
@@ -215,6 +217,7 @@ export const App: React.FC = () => {
               setSelectedDistro(id);
               if (id === 'ubuntu' || id === 'ubuntu-kde-epiphany') setSelectedDesktop('ubuntu-kde');
               else if (id === 'debian' || id === 'debian-firefox') setSelectedDesktop('kde-plasma');
+              else if (id === 'arch-kde') setSelectedDesktop('arch-kde');
             }}
             onProceed={() => setCurrentPage('desktops')}
           />

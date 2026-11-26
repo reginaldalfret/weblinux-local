@@ -164,8 +164,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         id: 'initrd',
         name: 'Initial Ramdisk (BusyBox + rv)',
         path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
-        expectedSize: manifest.integrity.initrdSize || 15056774,
-        expectedSha256: manifest.integrity.initrdSha256 || '84c49e2936fdbb2e30b83bd7a6067ccd2b76cd97b71171f1c9dbff54704a8c95',
+        expectedSize: manifest.integrity.initrdSize || 15060899,
+        expectedSha256: manifest.integrity.initrdSha256 || 'e3738b20d9899773cc1024b343e53760c372683a19947b92380d17d5751ce139',
       },
     ];
 
@@ -331,11 +331,12 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       this.log(`[Initrd] Image verified: ${Math.round(initrdBuffer.byteLength / 1024 / 1024)} MiB.`);
 
       // 5. Configure disk subsystem
-      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-firefox-kde-plasma, root-ubuntu-gnome, root-ubuntu-kde, root-ubuntu-kde-epiphany
+      // Root disk identity isolates desktop profiles: root-debian-kde-plasma, root-debian-firefox, root-ubuntu-gnome, root-ubuntu-kde, root-ubuntu-kde-epiphany, root-arch-kde
       const isUbuntuGnome = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-gnome') && options.desktop === 'ubuntu-gnome';
       const isUbuntuKdeEpiphany = options.manifest.id === 'ubuntu-kde-epiphany' && options.desktop === 'ubuntu-kde';
       const isUbuntuKde = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-kde') && options.desktop === 'ubuntu-kde';
       const isDebianFirefox = options.manifest.id === 'debian-firefox' && options.desktop === 'kde-plasma';
+      const isArchKde = options.manifest.id === 'arch-kde' && options.desktop === 'arch-kde';
       const rootUrl = isUbuntuGnome
         ? '/disk/ubuntu-24.04-gnome/'
         : isUbuntuKdeEpiphany
@@ -344,6 +345,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? '/disk/ubuntu-24.04-kde/'
         : isDebianFirefox
         ? '/disk/debian-13-firefox/'
+        : isArchKde
+        ? '/disk/arch-kde/'
         : (options.manifest.imageSource.baseUri || '/disk/release/');
       const rootDiskId = isUbuntuGnome
         ? 'root-ubuntu-gnome'
@@ -353,8 +356,12 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? 'root-ubuntu-kde'
         : isDebianFirefox
         ? 'root-debian-firefox'
+        : isArchKde
+        ? 'root-arch-kde'
         : `root-${options.manifest.id}-${options.desktop}`;
-      const homeDiskId = `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde' || options.manifest.id === 'ubuntu-kde-epiphany') ? 'ubuntu' : (options.manifest.id === 'debian-firefox' ? 'debian' : options.manifest.id)}`; // Persistent home shared across desktop sessions on /dev/wdb
+      const homeDiskId = isArchKde
+        ? 'home-arch-kde'
+        : `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde' || options.manifest.id === 'ubuntu-kde-epiphany') ? 'ubuntu' : (options.manifest.id === 'debian-firefox' ? 'debian' : options.manifest.id)}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
         {
@@ -443,7 +450,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         (window as any).linuxOs = this.activeOs;
 
         // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27)
-        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde') && options.autostartDesktop) {
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde' || options.desktop === 'arch-kde') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -457,7 +464,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           // Provision dedicated session launcher scripts
           await this.provisionDesktopLaunchers();
 
-          if (options.desktop === 'ubuntu-kde') {
+          if (options.desktop === 'arch-kde') {
+            this.log(`[Desktop Launcher] Executing verified Arch KDE Plasma 6 session script: /usr/local/bin/arch-kde-session`);
+            const launchRes = await this.runCommand(`arch-kde /usr/local/bin/arch-kde-session`, 25000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Arch KDE launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else if (options.desktop === 'ubuntu-kde') {
             this.log(`[Desktop Launcher] Executing verified Ubuntu KDE Plasma session script: /usr/local/bin/ubuntu-kde-session`);
             const launchRes = await this.runCommand(`ubuntu-kde /usr/local/bin/ubuntu-kde-session`, 25000);
             if (launchRes.exitCode !== 0) {

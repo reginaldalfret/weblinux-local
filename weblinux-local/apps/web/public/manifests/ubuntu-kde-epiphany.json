@@ -1,52 +1,55 @@
-{
-  "id": "ubuntu-kde-epiphany",
-  "name": "Ubuntu 24.04.5 LTS KDE + Epiphany Web",
-  "releaseVersion": "24.04.5 LTS",
-  "architecture": "riscv64",
-  "kernelCompatibility": "linux-wasm64_nommu-7.0",
-  "defaultDesktop": "ubuntu-kde",
-  "supportedDesktops": ["ubuntu-kde", "cli"],
-  "packageManager": "apt",
-  "filesystemLayout": {
-    "rootMount": "/ubuntu",
-    "homeMount": "/home/ubuntu"
-  },
-  "imageSource": {
-    "baseUri": "/disk/ubuntu-24.04-kde-epiphany/",
-    "chunkSize": 1048576,
-    "totalSizeBytes": 3758096384,
-    "id": "7321ea53b91a9c396a8262a7015dd79479b120dcec0389166455813e7626c266",
-    "fullImageSha256": "7321ea53b91a9c396a8262a7015dd79479b120dcec0389166455813e7626c266"
-  },
-  "integrity": {
-    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
-    "initrdSha256": "41c43f6f0f7e14119d6011a1441e8b1c8da883967909ff30732e964046dcf537",
-    "initrdUncompressedSha256": "71c0ddb7192ef269e3ee2bccdd80d8162ba1ac11ad9d2f5e67d504d8444ea1f7",
-    "kernelSize": 7380050,
-    "initrdSize": 15055753,
-    "initrdUncompressedSize": 36645888,
-    "chunksCount": 3584,
-    "nonZeroChunksCount": 1862,
-    "bootChunksCount": 52,
-    "sourceArchive": "ubuntu-base-24.04.5-base-riscv64.tar.gz",
-    "sourceArchiveSha256": "651c516f291259ec913caa1efd0cfff738cd223adfc6617c884f07af487f08cf"
-  },
-  "runtimeRequirements": {
-    "minMemoryMB": 2048,
-    "recommendedMemoryMB": 2048,
-    "minCores": 2,
-    "recommendedCores": 4,
-    "requiresSharedArrayBuffer": true,
-    "requiresCrossOriginIsolated": true,
-    "requiresWebGL2": true,
-    "requiresOPFS": true,
-    "estimatedDiskMB": 3584
-  },
-  "licensing": {
-    "baseLicense": "GPL-2.0-or-later, Canonical Open Source",
-    "redistributionAllowed": true,
-    "licenseDocUrl": "/docs/LICENSING.md"
-  },
-  "validationStatus": "experimental",
-  "notes": "Ubuntu 24.04.5 LTS KDE Plasma 5.27 with native RISC-V 64-bit Epiphany Web (WebKitGTK 6) browser."
+﻿{
+    "id":  "ubuntu-kde-epiphany",
+    "name":  "Ubuntu 24.04.5 LTS KDE + Epiphany Web",
+    "releaseVersion":  "24.04.5 LTS",
+    "architecture":  "riscv64",
+    "kernelCompatibility":  "linux-wasm64_nommu-7.0",
+    "defaultDesktop":  "ubuntu-kde",
+    "supportedDesktops":  [
+                              "ubuntu-kde",
+                              "cli"
+                          ],
+    "packageManager":  "apt",
+    "filesystemLayout":  {
+                             "rootMount":  "/ubuntu",
+                             "homeMount":  "/home/ubuntu"
+                         },
+    "imageSource":  {
+                        "baseUri":  "/disk/ubuntu-24.04-kde-epiphany/",
+                        "chunkSize":  1048576,
+                        "totalSizeBytes":  3758096384,
+                        "id":  "7321ea53b91a9c396a8262a7015dd79479b120dcec0389166455813e7626c266",
+                        "fullImageSha256":  "7321ea53b91a9c396a8262a7015dd79479b120dcec0389166455813e7626c266"
+                    },
+    "integrity":  {
+                      "kernelSha256":  "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+                      "initrdSha256":  "e3738b20d9899773cc1024b343e53760c372683a19947b92380d17d5751ce139",
+                      "initrdUncompressedSha256":  "fe6ce11c8b1cf61fdbe43e399ec005be665ce4b40fc9c8fa35465aae1c7a477a",
+                      "kernelSize":  7380050,
+                      "initrdSize":  15060899,
+                      "initrdUncompressedSize":  36648960,
+                      "chunksCount":  3584,
+                      "nonZeroChunksCount":  1862,
+                      "bootChunksCount":  52,
+                      "sourceArchive":  "ubuntu-base-24.04.5-base-riscv64.tar.gz",
+                      "sourceArchiveSha256":  "651c516f291259ec913caa1efd0cfff738cd223adfc6617c884f07af487f08cf"
+                  },
+    "runtimeRequirements":  {
+                                "minMemoryMB":  2048,
+                                "recommendedMemoryMB":  2048,
+                                "minCores":  2,
+                                "recommendedCores":  4,
+                                "requiresSharedArrayBuffer":  true,
+                                "requiresCrossOriginIsolated":  true,
+                                "requiresWebGL2":  true,
+                                "requiresOPFS":  true,
+                                "estimatedDiskMB":  3584
+                            },
+    "licensing":  {
+                      "baseLicense":  "GPL-2.0-or-later, Canonical Open Source",
+                      "redistributionAllowed":  true,
+                      "licenseDocUrl":  "/docs/LICENSING.md"
+                  },
+    "validationStatus":  "experimental",
+    "notes":  "Ubuntu 24.04.5 LTS KDE Plasma 5.27 with native RISC-V 64-bit Epiphany Web (WebKitGTK 6) browser."
 }

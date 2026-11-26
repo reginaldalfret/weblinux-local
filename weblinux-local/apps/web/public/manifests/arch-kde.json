@@ -1,0 +1,56 @@
+﻿{
+    "id":  "arch-kde",
+    "name":  "Arch Linux RISC-V (Community Port + KDE Plasma 6)",
+    "releaseVersion":  "Rolling (2026-08-27 + pacman -Syu)",
+    "architecture":  "riscv64",
+    "kernelCompatibility":  "linux-wasm64_nommu-7.0",
+    "defaultDesktop":  "arch-kde",
+    "supportedDesktops":  [
+                              "arch-kde"
+                          ],
+    "packageManager":  "pacman",
+    "filesystemLayout":  {
+                             "rootMount":  "/arch",
+                             "homeMount":  "/home/root"
+                         },
+    "imageSource":  {
+                        "baseUri":  "/disk/arch-kde/",
+                        "chunkSize":  1048576,
+                        "totalSizeBytes":  5368709120,
+                        "manifestUri":  "/disk/arch-kde/manifest.json",
+                        "id":  "7b17baecf646ba347cf2a83d2f15f9dce",
+                        "fullImageSha256":  "7b17baecf646ba347cf2a83d2f15f9dcee49326a24a85798b7ffa47ec2ac0aed",
+                        "filesystemUuid":  "e1c0a792-3418-402e-b56b-ebe690e1b8e2"
+                    },
+    "integrity":  {
+                      "kernelSha256":  "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+                      "initrdSha256":  "e3738b20d9899773cc1024b343e53760c372683a19947b92380d17d5751ce139",
+                      "initrdUncompressedSha256":  "fe6ce11c8b1cf61fdbe43e399ec005be665ce4b40fc9c8fa35465aae1c7a477a",
+                      "kernelSize":  7380050,
+                      "initrdSize":  15060899,
+                      "initrdUncompressedSize":  36648960,
+                      "chunksCount":  5120,
+                      "nonZeroChunksCount":  3644,
+                      "bootChunksCount":  64,
+                      "sourceArchive":  "archriscv-2026-08-27.tar.zst",
+                      "sourceArchiveSha256":  "a2045c8b62232db2f60d8e4db610dbb5d9e12856dab0ba08634ad3d7cb7ad498"
+                  },
+    "runtimeRequirements":  {
+                                "minMemoryMB":  2048,
+                                "recommendedMemoryMB":  2048,
+                                "minCores":  2,
+                                "recommendedCores":  4,
+                                "requiresSharedArrayBuffer":  true,
+                                "requiresCrossOriginIsolated":  true,
+                                "requiresWebGL2":  true,
+                                "requiresOPFS":  true,
+                                "estimatedDiskMB":  5120
+                            },
+    "licensing":  {
+                      "baseLicense":  "GPL-2.0-or-later, Arch Linux RISC-V Community Port",
+                      "redistributionAllowed":  true,
+                      "licenseDocUrl":  "/docs/LICENSING.md"
+                  },
+    "validationStatus":  "experimental",
+    "notes":  "Arch Linux RISC-V (RV64GC / LP64D) community port with signed KDE Plasma 6.8.3, KWin 6.8.3, Qt 6.12.0, Konsole 26.08.3, and Dolphin 26.08.3."
+}

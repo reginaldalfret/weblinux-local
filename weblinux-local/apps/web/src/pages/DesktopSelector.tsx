@@ -17,9 +17,12 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
   onLaunch,
 }) => {
   const isUbuntu = selectedDistro === 'ubuntu' || selectedDistro === 'ubuntu-kde-epiphany';
+  const isArch = selectedDistro === 'arch-kde';
   const desktopList: DesktopProfile[] = isUbuntu
     ? [DEBIAN_DESKTOP_PROFILES['ubuntu-kde']]
-    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome' && p.id !== 'ubuntu-kde');
+    : isArch
+    ? [DEBIAN_DESKTOP_PROFILES['arch-kde']]
+    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome' && p.id !== 'ubuntu-kde' && p.id !== 'arch-kde');
 
   const getStatusBadge = (status: DesktopProfileStatus) => {
     switch (status) {
@@ -51,8 +54,8 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
     return status === 'validated' || status === 'experimental';
   };
 
-  const currentSelectedProfile = (isUbuntu ? DEBIAN_DESKTOP_PROFILES['ubuntu-kde'] : DEBIAN_DESKTOP_PROFILES[selectedDesktop]) || desktopList[0];
-  const canLaunchCurrent = isLaunchable(currentSelectedProfile.status) || currentSelectedProfile.id === 'ubuntu-kde';
+  const currentSelectedProfile = (isUbuntu ? DEBIAN_DESKTOP_PROFILES['ubuntu-kde'] : isArch ? DEBIAN_DESKTOP_PROFILES['arch-kde'] : DEBIAN_DESKTOP_PROFILES[selectedDesktop]) || desktopList[0];
+  const canLaunchCurrent = isLaunchable(currentSelectedProfile.status) || currentSelectedProfile.id === 'ubuntu-kde' || currentSelectedProfile.id === 'arch-kde';
 
   return (
     <div className="max-w-6xl mx-auto px-4 lg:px-8 py-12">
