@@ -10,8 +10,8 @@ OCI_DIR="${BUILD_DIR}/oci"
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-curl -fSL -C - -O "${BASE}/${NAME}.sha256"
-curl -fSL -C - -O "${BASE}/${NAME}"
+curl -fSL --proto '=https' --tlsv1.2 -C - -O "${BASE}/${NAME}.sha256"
+curl -fSL --proto '=https' --tlsv1.2 -C - -O "${BASE}/${NAME}"
 
 echo "=== CHECKSUM ==="
 cat "${NAME}.sha256"
@@ -19,9 +19,9 @@ sha256sum -c "${NAME}.sha256"
 
 rm -rf "$OCI_DIR" "$ROOTFS"
 mkdir -p "$OCI_DIR" "$ROOTFS"
-tar -xJf "$NAME" -C "$OCI_DIR"
+tar --no-same-owner -xJf "$NAME" -C "$OCI_DIR"
 
-# Extract OCI image layer blob(s)
+# Extract OCI image layer blob(s) safely
 python3 - <<'PY'
 import json, os, subprocess
 oci = "/root/fedora-build/oci"
@@ -33,7 +33,7 @@ for layer in manifest["layers"]:
     l_digest = layer["digest"].split(":")[1]
     blob = os.path.join(oci, "blobs", "sha256", l_digest)
     print("Extracting layer:", l_digest)
-    subprocess.run(["tar", "-xf", blob, "-C", rootfs], check=True)
+    subprocess.run(["tar", "--no-overwrite-dir", "-xf", blob, "-C", rootfs], check=True)
 PY
 
 echo "=== EXTRACTED ROOTFS ==="
