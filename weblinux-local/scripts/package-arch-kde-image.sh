@@ -115,7 +115,9 @@ if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
 fi
 
 echo "[Arch KDE Launcher] Wayland display $WAYLAND_DISPLAY ready. Launching Plasma 6.8.3..." | tee -a /root/arch-kde-session.log
-nohup plasmashell --no-respawn > /root/plasma-shell.log 2> /root/qt.log &
+# Keep gpuserver (rvgpu-0) active for virpipe GL apps (es2_info, es2gears_wayland),
+# while running plasmashell (Qt 6.12 QRhi) on software QML so it does not drop the rvgpu fd.
+QT_QUICK_BACKEND=software QMLSCENE_DEVICE=softwarecontext LIBGL_ALWAYS_SOFTWARE=1 nohup plasmashell --no-respawn > /root/plasma-shell.log 2> /root/qt.log &
 sleep 2
 echo "[Arch KDE Launcher] Plasma 6.8.3 session started (PID $!)." | tee -a /root/arch-kde-session.log
 EOF

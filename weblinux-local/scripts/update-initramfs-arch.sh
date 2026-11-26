@@ -81,7 +81,7 @@ if [ ! -e $D/proc/self ]; then
 	ln -s /proc/self/fd/2 $D/dev/stderr 2> /dev/null
 fi
 
-ENV="HOME=/root SHELL=/bin/bash USER=root LOGNAME=root TERM=${TERM:-xterm-256color} LANG=C.UTF-8 PATH=/run/hostopen/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ENV="HOME=/root SHELL=/bin/bash USER=root LOGNAME=root TERM=${TERM:-xterm-256color} LANG=C.UTF-8 XDG_RUNTIME_DIR=/tmp/runtime-root WAYLAND_DISPLAY=wayland-0 QT_QPA_PLATFORM=wayland DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/runtime-root/bus PATH=/run/hostopen/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 if [ $# -eq 0 ]; then
 	exec chroot $D /usr/bin/env -i $ENV /bin/bash -l
 fi

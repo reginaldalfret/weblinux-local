@@ -1,53 +1,53 @@
-﻿{
-    "id":  "debian",
-    "name":  "Debian GNU/Linux (Trixie)",
-    "releaseVersion":  "13 / trixie",
-    "architecture":  "riscv64",
-    "kernelCompatibility":  "linux-wasm64_nommu-6.1",
-    "defaultDesktop":  "kde-plasma",
-    "supportedDesktops":  [
-                              "kde-plasma",
-                              "icewm"
-                          ],
-    "packageManager":  "apt",
-    "filesystemLayout":  {
-                             "rootMount":  "/debian",
-                             "homeMount":  "/root",
-                             "sharedMount":  "/opt/nq-shared"
-                         },
-    "imageSource":  {
-                        "baseUri":  "/disk/release/",
-                        "chunkSize":  1048576,
-                        "totalSizeBytes":  8589934592,
-                        "manifestUri":  "/disk/release/manifest.json",
-                        "id":  "21dd6321337e178c4ac19c27d790403a"
-                    },
-    "integrity":  {
-                      "kernelSha256":  "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
-                      "initrdSha256":  "e3738b20d9899773cc1024b343e53760c372683a19947b92380d17d5751ce139",
-                      "initrdUncompressedSha256":  "fe6ce11c8b1cf61fdbe43e399ec005be665ce4b40fc9c8fa35465aae1c7a477a",
-                      "kernelSize":  7380050,
-                      "initrdSize":  15060899,
-                      "initrdUncompressedSize":  36648960,
-                      "chunksCount":  8192
-                  },
-    "runtimeRequirements":  {
-                                "minMemoryMB":  4096,
-                                "recommendedMemoryMB":  8192,
-                                "minCores":  4,
-                                "recommendedCores":  8,
-                                "requiresSharedArrayBuffer":  true,
-                                "requiresCrossOriginIsolated":  true,
-                                "requiresWebGL2":  true,
-                                "requiresWebGPU":  false,
-                                "requiresOPFS":  true,
-                                "estimatedDiskMB":  2048
-                            },
-    "licensing":  {
-                      "baseLicense":  "GPL-2.0-or-later, DFSG Compliant",
-                      "redistributionAllowed":  true,
-                      "licenseDocUrl":  "/docs/LICENSING.md"
-                  },
-    "validationStatus":  "validated",
-    "notes":  "Debian trixie riscv64 runtime with native WebAssembly KDE Plasma 6 shell and IceWM lightweight profile. Validated in browser E2E execution tests with full OPFS persistence."
+{
+  "id": "debian",
+  "name": "Debian GNU/Linux (Trixie)",
+  "releaseVersion": "13 / trixie",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-6.1",
+  "defaultDesktop": "kde-plasma",
+  "supportedDesktops": [
+    "kde-plasma",
+    "icewm"
+  ],
+  "packageManager": "apt",
+  "filesystemLayout": {
+    "rootMount": "/debian",
+    "homeMount": "/root",
+    "sharedMount": "/opt/nq-shared"
+  },
+  "imageSource": {
+    "baseUri": "/disk/release/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 8589934592,
+    "manifestUri": "/disk/release/manifest.json",
+    "id": "21dd6321337e178c4ac19c27d790403a"
+  },
+  "integrity": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "105348fadbaba819926deb48ae7c47d7305d311218546ca69fe4b99382570ce9",
+    "initrdUncompressedSha256": "a11200e2f9dca4c7d3b58acd35d7467b93b5696d2b90b1d69ccf3143cd6a0aef",
+    "kernelSize": 7380050,
+    "initrdSize": 15058602,
+    "initrdUncompressedSize": 36648960,
+    "chunksCount": 8192
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 4096,
+    "recommendedMemoryMB": 8192,
+    "minCores": 4,
+    "recommendedCores": 8,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresWebGPU": false,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 2048
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later, DFSG Compliant",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "validated",
+  "notes": "Debian trixie riscv64 runtime with native WebAssembly KDE Plasma 6 shell and IceWM lightweight profile. Validated in browser E2E execution tests with full OPFS persistence."
 }

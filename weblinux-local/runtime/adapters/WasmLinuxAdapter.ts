@@ -164,8 +164,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         id: 'initrd',
         name: 'Initial Ramdisk (BusyBox + rv)',
         path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
-        expectedSize: manifest.integrity.initrdSize || 15060899,
-        expectedSha256: manifest.integrity.initrdSha256 || 'e3738b20d9899773cc1024b343e53760c372683a19947b92380d17d5751ce139',
+        expectedSize: manifest.integrity.initrdSize || 15060761,
+        expectedSha256: manifest.integrity.initrdSha256 || '105348fadbaba819926deb48ae7c47d7305d311218546ca69fe4b99382570ce9',
       },
     ];
 
@@ -631,6 +631,17 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     if (this.uptimeTimer) {
       clearInterval(this.uptimeTimer);
       this.uptimeTimer = null;
+    }
+
+    if (this.status.shellReady && this.activeOs) {
+      try {
+        await this.runCommand(
+          'killall -9 plasmashell kbuildsycoca6 dolphin konsole kioworker dbus-daemon 2>/dev/null; sleep 0.5; sync; umount /arch/root 2>/dev/null || mount -o remount,ro /arch/root 2>/dev/null; umount /ubuntu/root 2>/dev/null || mount -o remount,ro /ubuntu/root 2>/dev/null; umount /debian/root 2>/dev/null || mount -o remount,ro /debian/root 2>/dev/null; sync',
+          8000
+        );
+      } catch {
+        // Fallback to raw key_input below
+      }
     }
 
     try {
