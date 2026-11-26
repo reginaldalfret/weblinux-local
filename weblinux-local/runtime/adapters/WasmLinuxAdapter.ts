@@ -164,8 +164,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         id: 'initrd',
         name: 'Initial Ramdisk (BusyBox + rv)',
         path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
-        expectedSize: manifest.integrity.initrdSize || 15056582,
-        expectedSha256: manifest.integrity.initrdSha256 || '4912ec21db2a813002708a68571228e42badb8b2c587030e110f3cea2a3d1be7',
+        expectedSize: manifest.integrity.initrdSize || 15060476,
+        expectedSha256: manifest.integrity.initrdSha256 || '0670b429976ee9024b85f0b5522eca125c6a741e14aabfa985054b56dff9c88c',
       },
     ];
 
@@ -338,6 +338,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       const isDebianFirefox = options.manifest.id === 'debian-firefox' && options.desktop === 'kde-plasma';
       const isArchKde = options.manifest.id === 'arch-kde' && options.desktop === 'arch-kde';
       const isOpenSuseKde = options.manifest.id === 'opensuse-tumbleweed-kde' && options.desktop === 'opensuse-tumbleweed-kde';
+      const isFedoraKde = options.manifest.id === 'fedora-kde' && options.desktop === 'fedora-kde';
       const rootUrl = isUbuntuGnome
         ? '/disk/ubuntu-24.04-gnome/'
         : isUbuntuKdeEpiphany
@@ -350,6 +351,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? '/disk/arch-kde/'
         : isOpenSuseKde
         ? '/disk/opensuse-tumbleweed-kde/'
+        : isFedoraKde
+        ? '/disk/fedora-kde/'
         : (options.manifest.imageSource.baseUri || '/disk/release/');
       const rootDiskId = isUbuntuGnome
         ? 'root-ubuntu-gnome'
@@ -363,11 +366,15 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? 'root-arch-kde'
         : isOpenSuseKde
         ? 'root-opensuse-tumbleweed-kde'
+        : isFedoraKde
+        ? 'root-fedora-kde'
         : `root-${options.manifest.id}-${options.desktop}`;
       const homeDiskId = isArchKde
         ? 'home-arch-kde'
         : isOpenSuseKde
         ? 'home-opensuse-tumbleweed-kde'
+        : isFedoraKde
+        ? 'home-fedora-kde'
         : `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde' || options.manifest.id === 'ubuntu-kde-epiphany') ? 'ubuntu' : (options.manifest.id === 'debian-firefox' ? 'debian' : options.manifest.id)}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
@@ -456,8 +463,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         (window as any).linuxOs = this.activeOs;
 
-        // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27, Arch KDE 6, openSUSE Tumbleweed KDE 6)
-        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde' || options.desktop === 'arch-kde' || options.desktop === 'opensuse-tumbleweed-kde') && options.autostartDesktop) {
+        // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27, Arch KDE 6, openSUSE Tumbleweed KDE 6, Fedora 45 KDE 6)
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde' || options.desktop === 'arch-kde' || options.desktop === 'opensuse-tumbleweed-kde' || options.desktop === 'fedora-kde') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -471,7 +478,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           // Provision dedicated session launcher scripts
           await this.provisionDesktopLaunchers();
 
-          if (options.desktop === 'opensuse-tumbleweed-kde') {
+          if (options.desktop === 'fedora-kde') {
+            this.log(`[Desktop Launcher] Executing verified Fedora 45 KDE Plasma 6 session script: /usr/local/bin/fedora-kde-session`);
+            const launchRes = await this.runCommand(`fedora-kde /usr/local/bin/fedora-kde-session`, 25000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Fedora KDE launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else if (options.desktop === 'opensuse-tumbleweed-kde') {
             this.log(`[Desktop Launcher] Executing verified openSUSE Tumbleweed KDE Plasma 6 session script: /usr/local/bin/opensuse-kde-session`);
             const launchRes = await this.runCommand(`opensuse-kde /usr/local/bin/opensuse-kde-session`, 25000);
             if (launchRes.exitCode !== 0) {
@@ -655,7 +674,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     if (this.status.shellReady && this.activeOs) {
       try {
         await this.runCommand(
-          'killall -9 plasmashell kbuildsycoca6 dolphin konsole kioworker dbus-daemon 2>/dev/null; sleep 0.5; sync; umount /opensuse/root 2>/dev/null || mount -o remount,ro /opensuse/root 2>/dev/null; umount /arch/root 2>/dev/null || mount -o remount,ro /arch/root 2>/dev/null; umount /ubuntu/root 2>/dev/null || mount -o remount,ro /ubuntu/root 2>/dev/null; umount /debian/root 2>/dev/null || mount -o remount,ro /debian/root 2>/dev/null; sync',
+          'killall -9 plasmashell kbuildsycoca6 dolphin konsole kioworker dbus-daemon 2>/dev/null; sleep 0.5; sync; umount /fedora/root 2>/dev/null || mount -o remount,ro /fedora/root 2>/dev/null; umount /opensuse/root 2>/dev/null || mount -o remount,ro /opensuse/root 2>/dev/null; umount /arch/root 2>/dev/null || mount -o remount,ro /arch/root 2>/dev/null; umount /ubuntu/root 2>/dev/null || mount -o remount,ro /ubuntu/root 2>/dev/null; umount /debian/root 2>/dev/null || mount -o remount,ro /debian/root 2>/dev/null; sync',
           8000
         );
       } catch {
