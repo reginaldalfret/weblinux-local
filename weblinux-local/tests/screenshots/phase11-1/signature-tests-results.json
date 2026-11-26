@@ -1,0 +1,88 @@
+{
+  "timestamp": "2026-11-26T20:03:30.234Z",
+  "wslExitCode": 0,
+  "passed": 8,
+  "failed": 0,
+  "results": [
+    {
+      "id": "Test A",
+      "name": "Valid trusted package",
+      "input": "fedora-gpg-keys-45-1.noarch.rpm",
+      "command": "rpmkeys --checksig && dnf5 --setopt=localpkg_gpgcheck=1 install",
+      "expected": "Exit 0 and digests signatures OK",
+      "exitCode": 0,
+      "status": "PASS",
+      "actual": "/tmp/fedora-sig-test-work/pkgs/fedora-gpg-keys-45-1.noarch.rpm: digests signatures OK"
+    },
+    {
+      "id": "Test B",
+      "name": "Unsigned RPM",
+      "input": "weblinux-sigtest-1.0-1.noarch.rpm",
+      "command": "dnf5 --setopt=localpkg_gpgcheck=1 install unsigned.rpm",
+      "expected": "Non-zero exit with OpenPGP unsigned rejection",
+      "exitCode": 1,
+      "status": "PASS",
+      "actual": "Updating and loading repositories:\nRepositories loaded.\nPackage           Arch   Version Repository        Size\nInstalling:\n weblinux-sigtest noarch 0:1.0-1 @commandline   8.0   B\n\nTransaction Summary:\n Installing:         1 package\n\nTotal size of inbound packages is 7 KiB. Need to download 0 B.\nAfter this operation, 8 B extra will be used (install 8 B, remove 0 B).\nRunning transaction\nTransaction failed: Signature verification failed.\nOpenPGP check for package \"weblinux-sigtest-1.0-1.noarch\" (/tmp/fedora-sig-test-work/rpmbuild/RPMS/noarch/weblinux-sigtest-1.0-1.noarch.rpm) from repo \"@commandline\" has failed: The package is not signed."
+    },
+    {
+      "id": "Test C",
+      "name": "Wrong signing key",
+      "input": "weblinux-sigtest-wrongkey.rpm",
+      "command": "dnf5 --setopt=localpkg_gpgcheck=1 install wrongkey.rpm",
+      "expected": "Non-zero exit with untrusted key / OpenPGP rejection",
+      "exitCode": 1,
+      "status": "PASS",
+      "actual": "Updating and loading repositories:\nRepositories loaded.\nPackage           Arch   Version Repository        Size\nInstalling:\n weblinux-sigtest noarch 0:1.0-1 @commandline   8.0   B\n\nTransaction Summary:\n Installing:         1 package\n\nTotal size of inbound packages is 7 KiB. Need to download 0 B.\nAfter this operation, 8 B extra will be used (install 8 B, remove 0 B).\nRunning transaction\nTransaction failed: Signature verification failed.\nOpenPGP check for package \"weblinux-sigtest-1.0-1.noarch\" (/tmp/fedora-sig-test-work/pkgs/weblinux-sigtest-wrongkey.rpm) from repo \"@commandline\" has failed: The repository does not have any OpenPGP keys configured."
+    },
+    {
+      "id": "Test D",
+      "name": "Corrupted RPM",
+      "input": "fedora-gpg-keys-corrupt.rpm",
+      "command": "rpmkeys --checksig && dnf5 --setopt=localpkg_gpgcheck=1 reinstall corrupt.rpm",
+      "expected": "Non-zero exit with digest/signature tamper failure",
+      "exitCode": 1,
+      "status": "PASS",
+      "actual": "/tmp/fedora-sig-test-work/pkgs/fedora-gpg-keys-corrupt.rpm: DIGESTS SIGNATURES NOT OK | Updating and loading repositories:\nRepositories loaded.\nPackage                      Arch   Version Repository        Size\nReinstalling:\n fedora-gpg-keys             noarch 0:45-1  @commandline 130.3 KiB\n   replacing fedora-gpg-keys noarch 0:45-1  @commandline 130.3 KiB\n\nTransaction Summary:\n Reinstalling:       1 package\n Replacing:          1 package\n\nTotal size of inbound packages is 144 KiB. Need to download 0 B.\nAfter this operation, 0 B extra will be used (install 130 KiB, remove 130 KiB).\nRunning transaction\nTransaction failed: Signature verification failed.\nOpenPGP check for package \"fedora-gpg-keys-45-1.noarch\" (/tmp/fedora-sig-test-work/pkgs/fedora-gpg-keys-corrupt.rpm) from repo \"@commandline\" has failed: Problem occurred when opening the package."
+    },
+    {
+      "id": "Test E",
+      "name": "Repository metadata signature check",
+      "input": "f45/latest/riscv64/repodata/repomd.xml.asc",
+      "command": "curl repomd.xml.asc && dnf5 repo info fedora",
+      "expected": "Documented limitation: repomd.xml.asc absent (404), Verify repodata=false, TLS active",
+      "exitCode": 0,
+      "status": "PASS",
+      "actual": "HTTP 404 for repomd.xml.asc; Verify repodata: false (distinct limitation recorded)"
+    },
+    {
+      "id": "Test F",
+      "name": "Repository downgrade / staging isolation",
+      "input": "fedora-staging & fedora-koji",
+      "command": "dnf5 repo list --all && dnf5 repoquery shim-unsigned-riscv64",
+      "expected": "Staging & koji disabled; staging-only packages excluded",
+      "exitCode": 0,
+      "status": "PASS",
+      "actual": "fedora-staging=disabled, fedora-koji=disabled, shim-unsigned-riscv64 not resolvable"
+    },
+    {
+      "id": "Test G",
+      "name": "DNF configuration regression",
+      "input": "/etc/dnf/repos.override.d/99-weblinux-security.repo",
+      "command": "dnf5 repo info fedora",
+      "expected": "Verify packages=true, Skip if unavailable=false, fedora-45-primary key set",
+      "exitCode": 0,
+      "status": "PASS",
+      "actual": "Verify packages: true; Skip if unavailable: false; Keys: RPM-GPG-KEY-fedora-45-primary"
+    },
+    {
+      "id": "Test H",
+      "name": "Script regression",
+      "input": "scripts/fetch-fedora-riscv-rootfs.sh, scripts/build-fedora-kde-rootfs.sh, scripts/update-initramfs-fedora.sh, scripts/package-fedora-kde-image.sh",
+      "command": "Static scan for --nogpgcheck / --nosignature / gpgcheck=0 / rpm --nodeps",
+      "expected": "Zero signature bypasses in Fedora scripts",
+      "exitCode": 0,
+      "status": "PASS",
+      "actual": "0 bypasses found across 4 Fedora scripts"
+    }
+  ]
+}
