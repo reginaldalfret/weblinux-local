@@ -71,6 +71,7 @@ cyrus-sasl-gssapi-2.1.28-13.1.riscv64
 cyrus-sasl-plain-2.1.28-13.1.riscv64
 dbus-1-1.14.10-5.1.riscv64
 dbus-1-common-1.14.10-5.1.noarch
+dbus-1-daemon-1.14.10-5.1.riscv64
 dbus-1-tools-1.14.10-5.1.riscv64
 dbus-broker-37-2.1.riscv64
 dbus-broker-block-restart-37-2.1.noarch

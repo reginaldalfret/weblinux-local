@@ -38,7 +38,7 @@ if [ ! -e /opensuse/dev/pts/ptmx ]; then
 	mount -t devpts none /opensuse/dev/pts -o newinstance,ptmxmode=0666 2>/dev/null || \
 	mount -t devpts none /opensuse/dev/pts 2>/dev/null || true
 fi
-if [ ! -d /opensuse/run/dbus ]; then
+if ! grep -q " /opensuse/run " /proc/mounts 2>/dev/null; then
 	mount -t tmpfs none /opensuse/run 2>/dev/null || true
 	mkdir -p /opensuse/run/dbus /opensuse/run/lock
 fi

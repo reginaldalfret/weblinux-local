@@ -24,9 +24,9 @@ chroot "$R" /usr/bin/qemu-riscv64-static /usr/bin/bash -c "
   set -euo pipefail
   export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-  # Verify signed openSUSE repos and install Dolphin (never --no-gpg-checks)
+  # Verify signed openSUSE repos and install Dolphin + dbus-1-daemon (never --no-gpg-checks)
   zypper --non-interactive --gpg-auto-import-keys refresh
-  zypper --non-interactive install --no-recommends dolphin
+  zypper --non-interactive install --no-recommends dolphin dbus-1-daemon
   zypper --non-interactive install --no-recommends Mesa-demo-egl 2>/dev/null || true
 
   # Lock root account so no default password remains active

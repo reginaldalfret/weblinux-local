@@ -18,16 +18,16 @@
     "chunkSize": 1048576,
     "totalSizeBytes": 5905580032,
     "manifestUri": "/disk/opensuse-tumbleweed-kde/manifest.json",
-    "id": "2d414ffd47fb92b656435f39fb6833f1",
-    "fullImageSha256": "2d414ffd47fb92b656435f39fb6833f11e985182d02d036072b89d65e69064af",
-    "filesystemUuid": "f7aa26e4-7387-4df9-9932-2616449c29ec"
+    "id": "63d9098cb1914468c92cf29cb3f6572e",
+    "fullImageSha256": "63d9098cb1914468c92cf29cb3f6572e36efa92949aafd84d78f4da48669b7b4",
+    "filesystemUuid": "b5b43e7b-73c3-43e0-95bd-e6149ace6cc3"
   },
   "integrity": {
     "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
-    "initrdSha256": "c9502ab6708dc54b78840d807c420ca65c39184ded35190e30efa7fb84be1d8e",
-    "initrdUncompressedSha256": "bda3e6fbdb3d1cf7e58a0d54c5fc4d6d563aac36a7c9d9007368c2b51c1daf0c",
+    "initrdSha256": "62ad6b10dccb6744e1bf4a0de9744790cd4f70e2e324ea49af528c5530a14284",
+    "initrdUncompressedSha256": "b5f9e63705fe42b87e82765b2c7d624f490a1f9ed062a4ae8a20fb448fda34e4",
     "kernelSize": 7380050,
-    "initrdSize": 15057988,
+    "initrdSize": 15059446,
     "initrdUncompressedSize": 36652544,
     "chunksCount": 5632,
     "nonZeroChunksCount": 4114,

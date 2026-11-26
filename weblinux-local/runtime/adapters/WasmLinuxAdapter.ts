@@ -164,8 +164,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         id: 'initrd',
         name: 'Initial Ramdisk (BusyBox + rv)',
         path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
-        expectedSize: manifest.integrity.initrdSize || 15057988,
-        expectedSha256: manifest.integrity.initrdSha256 || 'c9502ab6708dc54b78840d807c420ca65c39184ded35190e30efa7fb84be1d8e',
+        expectedSize: manifest.integrity.initrdSize || 15059446,
+        expectedSha256: manifest.integrity.initrdSha256 || '62ad6b10dccb6744e1bf4a0de9744790cd4f70e2e324ea49af528c5530a14284',
       },
     ];
 
