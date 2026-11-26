@@ -32,7 +32,7 @@ TOTAL = SIZE // PIECE
 for d in (CHUNKS, PUB):
     os.makedirs(d, exist_ok=True)
 for f in os.listdir(CHUNKS):
-    if f.endswith(".bin"):
+    if f.endswith(".bin") or (len(f) == 6 and f.isdigit()):
         os.remove(os.path.join(CHUNKS, f))
 
 hashes = []
@@ -50,7 +50,7 @@ with open(IMG, "rb") as fp:
             hashes.append(h)
             present_bits[i] = 1
             nonzero += 1
-            with open(os.path.join(CHUNKS, f"{i:04x}.bin"), "wb") as out:
+            with open(os.path.join(CHUNKS, f"{i:06d}"), "wb") as out:
                 out.write(buf)
         else:
             hashes.append("")
@@ -91,7 +91,7 @@ recon_hash = hashlib.sha256()
 zero_buf = b"\x00" * PIECE
 for i in range(TOTAL):
     if present_bits[i]:
-        with open(os.path.join(CHUNKS, f"{i:04x}.bin"), "rb") as cf:
+        with open(os.path.join(CHUNKS, f"{i:06d}"), "rb") as cf:
             recon_hash.update(cf.read())
     else:
         recon_hash.update(zero_buf)
