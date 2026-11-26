@@ -221,5 +221,31 @@ export const DEBIAN_DESKTOP_PROFILES: Record<string, DesktopProfile> = {
       'Software QML rendering fallback for Qt 6.12 Plasma Shell'
     ],
     previewImage: '/screenshots/phase10/opensuse-kde-desktop.png'
+  },
+  'fedora-kde': {
+    id: 'fedora-kde',
+    name: 'Fedora 45 KDE Plasma 6',
+    version: '6.7.4',
+    tagline: 'Fedora 45 RISC-V Community Build with KDE Plasma 6',
+    description: 'Authentic Fedora 45 RISC-V (RV64GC / LP64D) userspace running KDE Plasma 6.7.4, Qt 6.11.1, KWin 6.7.4, Konsole 26.08.0, and Dolphin 26.08.0 with RPM 6.1.0 and DNF5 5.4.3.0.',
+    distributionId: 'fedora-kde',
+    status: 'experimental',
+    sessionCommand: 'fedora-kde /usr/local/bin/fedora-kde-session',
+    compositor: 'wlserver / KWin 6.7.4',
+    rootfsManifestId: 'fedora-kde',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Fedora 45 RISC-V (RV64GC / LP64D) userspace',
+      'KDE Plasma 6.7.4 & Qt 6.11.1 over Wayland',
+      'Konsole 26.08.0 Terminal & Dolphin 26.08.0 File Manager',
+      'RPM 6.1.0 & DNF5 5.4.3.0 package management',
+      'Isolated root-fedora-kde + persistent home-fedora-kde'
+    ],
+    knownLimitations: [
+      'Community secondary architecture (experimental)',
+      'Software QML rendering fallback for Qt 6.11 Plasma Shell'
+    ],
+    previewImage: '/screenshots/phase11/fedora-kde-desktop.png'
   }
 };

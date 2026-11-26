@@ -1,0 +1,56 @@
+{
+  "id": "fedora-kde",
+  "name": "Fedora 45 RISC-V (Community Build + KDE Plasma 6)",
+  "releaseVersion": "45 (Prerelease 20261022.0)",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-7.0",
+  "defaultDesktop": "fedora-kde",
+  "supportedDesktops": [
+    "fedora-kde"
+  ],
+  "packageManager": "dnf",
+  "filesystemLayout": {
+    "rootMount": "/fedora",
+    "homeMount": "/home/root"
+  },
+  "imageSource": {
+    "baseUri": "/disk/fedora-kde/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 3489660928,
+    "manifestUri": "/disk/fedora-kde/manifest.json",
+    "id": "41ce9df26a9a1137ed159e78bae59b6e",
+    "fullImageSha256": "41ce9df26a9a1137ed159e78bae59b6ee39b05d6d462383ce74d61b426cb2bbc",
+    "filesystemUuid": "5426ccde-a921-48ad-bb5d-e96b5126ae63"
+  },
+  "integrity": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "0670b429976ee9024b85f0b5522eca125c6a741e14aabfa985054b56dff9c88c",
+    "initrdUncompressedSha256": "c3d5628dd252615218249ce0539cdb53e7547824d82721b069d8d8e87eb704d5",
+    "kernelSize": 7380050,
+    "initrdSize": 15060476,
+    "initrdUncompressedSize": 36656128,
+    "chunksCount": 3328,
+    "nonZeroChunksCount": 1927,
+    "bootChunksCount": 64,
+    "sourceArchive": "Fedora-Container-Base-Generic-45-20261022.0.riscv64.oci.tar.xz",
+    "sourceArchiveSha256": "bfc2ad635a352818a8d250fde1175193f76a96ace071b569f67abd3124020f8e"
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 2048,
+    "recommendedMemoryMB": 2048,
+    "minCores": 2,
+    "recommendedCores": 4,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 3328
+  },
+  "licensing": {
+    "baseLicense": "MIT / GPL-2.0-or-later, Fedora 45 RISC-V Community Build",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Fedora 45 RISC-V Community Build with KDE Plasma 6.7.4, KWin 6.7.4, Qt 6.11.1, Konsole 26.08.0, Dolphin 26.08.0, RPM 6.1.0, and DNF5 5.4.3.0."
+}
