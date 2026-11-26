@@ -164,8 +164,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         id: 'initrd',
         name: 'Initial Ramdisk (BusyBox + rv)',
         path: '/runtime/initramfs-wasm64_nommu.cpio.gz',
-        expectedSize: manifest.integrity.initrdSize || 15060761,
-        expectedSha256: manifest.integrity.initrdSha256 || '105348fadbaba819926deb48ae7c47d7305d311218546ca69fe4b99382570ce9',
+        expectedSize: manifest.integrity.initrdSize || 15057988,
+        expectedSha256: manifest.integrity.initrdSha256 || 'c9502ab6708dc54b78840d807c420ca65c39184ded35190e30efa7fb84be1d8e',
       },
     ];
 
@@ -337,6 +337,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       const isUbuntuKde = (options.manifest.id === 'ubuntu' || options.manifest.id === 'ubuntu-kde') && options.desktop === 'ubuntu-kde';
       const isDebianFirefox = options.manifest.id === 'debian-firefox' && options.desktop === 'kde-plasma';
       const isArchKde = options.manifest.id === 'arch-kde' && options.desktop === 'arch-kde';
+      const isOpenSuseKde = options.manifest.id === 'opensuse-tumbleweed-kde' && options.desktop === 'opensuse-tumbleweed-kde';
       const rootUrl = isUbuntuGnome
         ? '/disk/ubuntu-24.04-gnome/'
         : isUbuntuKdeEpiphany
@@ -347,6 +348,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? '/disk/debian-13-firefox/'
         : isArchKde
         ? '/disk/arch-kde/'
+        : isOpenSuseKde
+        ? '/disk/opensuse-tumbleweed-kde/'
         : (options.manifest.imageSource.baseUri || '/disk/release/');
       const rootDiskId = isUbuntuGnome
         ? 'root-ubuntu-gnome'
@@ -358,9 +361,13 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? 'root-debian-firefox'
         : isArchKde
         ? 'root-arch-kde'
+        : isOpenSuseKde
+        ? 'root-opensuse-tumbleweed-kde'
         : `root-${options.manifest.id}-${options.desktop}`;
       const homeDiskId = isArchKde
         ? 'home-arch-kde'
+        : isOpenSuseKde
+        ? 'home-opensuse-tumbleweed-kde'
         : `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde' || options.manifest.id === 'ubuntu-kde-epiphany') ? 'ubuntu' : (options.manifest.id === 'debian-firefox' ? 'debian' : options.manifest.id)}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
@@ -449,8 +456,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
         (window as any).linuxOs = this.activeOs;
 
-        // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27)
-        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde' || options.desktop === 'arch-kde') && options.autostartDesktop) {
+        // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27, Arch KDE 6, openSUSE Tumbleweed KDE 6)
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde' || options.desktop === 'arch-kde' || options.desktop === 'opensuse-tumbleweed-kde') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -464,7 +471,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           // Provision dedicated session launcher scripts
           await this.provisionDesktopLaunchers();
 
-          if (options.desktop === 'arch-kde') {
+          if (options.desktop === 'opensuse-tumbleweed-kde') {
+            this.log(`[Desktop Launcher] Executing verified openSUSE Tumbleweed KDE Plasma 6 session script: /usr/local/bin/opensuse-kde-session`);
+            const launchRes = await this.runCommand(`opensuse-kde /usr/local/bin/opensuse-kde-session`, 25000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'openSUSE KDE launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else if (options.desktop === 'arch-kde') {
             this.log(`[Desktop Launcher] Executing verified Arch KDE Plasma 6 session script: /usr/local/bin/arch-kde-session`);
             const launchRes = await this.runCommand(`arch-kde /usr/local/bin/arch-kde-session`, 25000);
             if (launchRes.exitCode !== 0) {
@@ -636,7 +655,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
     if (this.status.shellReady && this.activeOs) {
       try {
         await this.runCommand(
-          'killall -9 plasmashell kbuildsycoca6 dolphin konsole kioworker dbus-daemon 2>/dev/null; sleep 0.5; sync; umount /arch/root 2>/dev/null || mount -o remount,ro /arch/root 2>/dev/null; umount /ubuntu/root 2>/dev/null || mount -o remount,ro /ubuntu/root 2>/dev/null; umount /debian/root 2>/dev/null || mount -o remount,ro /debian/root 2>/dev/null; sync',
+          'killall -9 plasmashell kbuildsycoca6 dolphin konsole kioworker dbus-daemon 2>/dev/null; sleep 0.5; sync; umount /opensuse/root 2>/dev/null || mount -o remount,ro /opensuse/root 2>/dev/null; umount /arch/root 2>/dev/null || mount -o remount,ro /arch/root 2>/dev/null; umount /ubuntu/root 2>/dev/null || mount -o remount,ro /ubuntu/root 2>/dev/null; umount /debian/root 2>/dev/null || mount -o remount,ro /debian/root 2>/dev/null; sync',
           8000
         );
       } catch {

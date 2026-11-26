@@ -38,7 +38,7 @@ export const App: React.FC = () => {
 
   // Load distribution manifests
   useEffect(() => {
-    const distroIds: DistributionId[] = ['debian', 'debian-firefox', 'ubuntu', 'ubuntu-kde-epiphany', 'arch-kde', 'fedora', 'arch', 'kali-lab'];
+    const distroIds: DistributionId[] = ['debian', 'debian-firefox', 'ubuntu', 'ubuntu-kde-epiphany', 'arch-kde', 'opensuse-tumbleweed-kde', 'fedora', 'arch', 'kali-lab'];
     Promise.allSettled(distroIds.map(id => adapter.loadManifest(id)))
       .then(results => {
         const loaded: DistributionManifest[] = [];
@@ -103,7 +103,8 @@ export const App: React.FC = () => {
         activeManifest.id !== 'ubuntu-kde' &&
         activeManifest.id !== 'ubuntu-kde-epiphany' &&
         activeManifest.id !== 'debian-firefox' &&
-        activeManifest.id !== 'arch-kde'
+        activeManifest.id !== 'arch-kde' &&
+        activeManifest.id !== 'opensuse-tumbleweed-kde'
       ) {
         throw new Error(
           `${activeManifest.name} is currently an unvalidated port (status: ${activeManifest.validationStatus.toUpperCase()}). To protect your environment, only validated distributions (Debian GNU/Linux 13) can be launched.`
@@ -201,6 +202,7 @@ export const App: React.FC = () => {
               if (id === 'ubuntu' || id === 'ubuntu-kde-epiphany') setSelectedDesktop('ubuntu-kde');
               else if (id === 'debian' || id === 'debian-firefox') setSelectedDesktop('kde-plasma');
               else if (id === 'arch-kde') setSelectedDesktop('arch-kde');
+              else if (id === 'opensuse-tumbleweed-kde') setSelectedDesktop('opensuse-tumbleweed-kde');
               setCurrentPage('desktops');
             }}
             manifests={manifests}
@@ -218,6 +220,7 @@ export const App: React.FC = () => {
               if (id === 'ubuntu' || id === 'ubuntu-kde-epiphany') setSelectedDesktop('ubuntu-kde');
               else if (id === 'debian' || id === 'debian-firefox') setSelectedDesktop('kde-plasma');
               else if (id === 'arch-kde') setSelectedDesktop('arch-kde');
+              else if (id === 'opensuse-tumbleweed-kde') setSelectedDesktop('opensuse-tumbleweed-kde');
             }}
             onProceed={() => setCurrentPage('desktops')}
           />

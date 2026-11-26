@@ -1,0 +1,56 @@
+{
+  "id": "opensuse-tumbleweed-kde",
+  "name": "openSUSE Tumbleweed RISC-V (KDE Plasma 6)",
+  "releaseVersion": "Tumbleweed Snapshot 20261106",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-7.0",
+  "defaultDesktop": "opensuse-tumbleweed-kde",
+  "supportedDesktops": [
+    "opensuse-tumbleweed-kde"
+  ],
+  "packageManager": "zypper",
+  "filesystemLayout": {
+    "rootMount": "/opensuse",
+    "homeMount": "/home/root"
+  },
+  "imageSource": {
+    "baseUri": "/disk/opensuse-tumbleweed-kde/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 5905580032,
+    "manifestUri": "/disk/opensuse-tumbleweed-kde/manifest.json",
+    "id": "2d414ffd47fb92b656435f39fb6833f1",
+    "fullImageSha256": "2d414ffd47fb92b656435f39fb6833f11e985182d02d036072b89d65e69064af",
+    "filesystemUuid": "f7aa26e4-7387-4df9-9932-2616449c29ec"
+  },
+  "integrity": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "c9502ab6708dc54b78840d807c420ca65c39184ded35190e30efa7fb84be1d8e",
+    "initrdUncompressedSha256": "bda3e6fbdb3d1cf7e58a0d54c5fc4d6d563aac36a7c9d9007368c2b51c1daf0c",
+    "kernelSize": 7380050,
+    "initrdSize": 15057988,
+    "initrdUncompressedSize": 36652544,
+    "chunksCount": 5632,
+    "nonZeroChunksCount": 4114,
+    "bootChunksCount": 64,
+    "sourceArchive": "openSUSE-Tumbleweed-RISC-V-KDE.riscv64-rootfs.riscv64-2026.07.14-Snapshot20261106.tar.xz",
+    "sourceArchiveSha256": "94062099bd52c92eb2bbfc37d3aea8e3adab285ffaa5c666bae686820f7ca607"
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 2048,
+    "recommendedMemoryMB": 2048,
+    "minCores": 2,
+    "recommendedCores": 4,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 5632
+  },
+  "licensing": {
+    "baseLicense": "GPL-2.0-or-later, openSUSE Tumbleweed RISC-V Ports",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Authentic openSUSE Tumbleweed RISC-V (RV64GC / LP64D, Snapshot 20261106) with KDE Plasma 6.8.2, KWin 6.8.2, Qt 6.12.0, Konsole 26.08.3, Dolphin 26.08.3, RPM 4.20.1, and Zypper 1.14.102."
+}

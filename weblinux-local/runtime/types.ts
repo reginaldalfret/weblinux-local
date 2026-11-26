@@ -3,9 +3,9 @@
  * Provides an independent abstraction layer over the underlying WebAssembly Linux kernel.
  */
 
-export type DistributionId = 'debian' | 'debian-firefox' | 'ubuntu' | 'ubuntu-kde-epiphany' | 'fedora' | 'arch' | 'arch-kde' | 'kali-lab' | 'ubuntu-gnome' | 'ubuntu-kde';
+export type DistributionId = 'debian' | 'debian-firefox' | 'ubuntu' | 'ubuntu-kde-epiphany' | 'fedora' | 'arch' | 'arch-kde' | 'opensuse-tumbleweed-kde' | 'kali-lab' | 'ubuntu-gnome' | 'ubuntu-kde';
 
-export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce' | 'cli' | 'ubuntu-gnome' | 'ubuntu-kde' | 'arch-kde';
+export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce' | 'cli' | 'ubuntu-gnome' | 'ubuntu-kde' | 'arch-kde' | 'opensuse-tumbleweed-kde';
 
 export type DesktopProfileStatus = 'validated' | 'experimental' | 'preview' | 'unavailable';
 
@@ -50,7 +50,7 @@ export interface DistributionManifest {
   kernelCompatibility: string;
   defaultDesktop: DesktopEnvironmentId;
   supportedDesktops: DesktopEnvironmentId[];
-  packageManager: 'apt' | 'dnf' | 'pacman' | 'none';
+  packageManager: 'apt' | 'dnf' | 'pacman' | 'zypper' | 'none';
   filesystemLayout: {
     rootMount: string;
     homeMount: string;

@@ -195,5 +195,31 @@ export const DEBIAN_DESKTOP_PROFILES: Record<string, DesktopProfile> = {
       'Software QML fallback when RVGPU is unavailable'
     ],
     previewImage: '/screenshots/phase9/arch-kde-desktop.png'
+  },
+  'opensuse-tumbleweed-kde': {
+    id: 'opensuse-tumbleweed-kde',
+    name: 'openSUSE Tumbleweed KDE Plasma 6',
+    version: '6.8.2',
+    tagline: 'openSUSE Tumbleweed RISC-V Rolling KDE Plasma 6 Desktop',
+    description: 'Authentic openSUSE Tumbleweed RISC-V (RV64GC / LP64D, Snapshot 20261106) running KDE Plasma 6.8.2, Qt 6.12.0, KWin 6.8.2, Konsole 26.08.3, and Dolphin 26.08.3 with RPM 4.20.1 & Zypper 1.14.102.',
+    distributionId: 'opensuse-tumbleweed-kde',
+    status: 'experimental',
+    sessionCommand: 'opensuse-kde /usr/local/bin/opensuse-kde-session',
+    compositor: 'wlserver / KWin 6.8.2',
+    rootfsManifestId: 'opensuse-tumbleweed-kde',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'openSUSE Tumbleweed RISC-V (RV64GC / LP64D) userspace',
+      'KDE Plasma 6.8.2 & Qt 6.12.0 over Wayland',
+      'Konsole 26.08.3 Terminal & Dolphin 26.08.3 File Manager',
+      'Zypper 1.14.102 & RPM 4.20.1 with GPG-signed repositories',
+      'Isolated root-opensuse-tumbleweed-kde + persistent home-opensuse-tumbleweed-kde'
+    ],
+    knownLimitations: [
+      'Experimental RISC-V community port on Linux 6.6.0 NOMMU',
+      'Software QML rendering fallback for Qt 6.12 Plasma Shell'
+    ],
+    previewImage: '/screenshots/phase10/opensuse-kde-desktop.png'
   }
 };

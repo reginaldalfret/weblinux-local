@@ -5,7 +5,9 @@
   "architecture": "riscv64",
   "kernelCompatibility": "linux-wasm64_nommu-6.1",
   "defaultDesktop": "icewm",
-  "supportedDesktops": ["icewm"],
+  "supportedDesktops": [
+    "icewm"
+  ],
   "packageManager": "pacman",
   "filesystemLayout": {
     "rootMount": "/arch",

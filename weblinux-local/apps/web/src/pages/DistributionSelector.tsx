@@ -46,7 +46,7 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
         {manifests.map((distro) => {
           const isSelected = selectedDistro === distro.id;
           const isValidated = distro.validationStatus === 'validated';
-          const isSelectable = isValidated || distro.id === 'ubuntu' || distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany' || distro.id === 'arch-kde';
+          const isSelectable = isValidated || distro.id === 'ubuntu' || distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany' || distro.id === 'arch-kde' || distro.id === 'opensuse-tumbleweed-kde';
 
           return (
             <div
@@ -70,6 +70,7 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
                      distro.id === 'ubuntu' ? '🟠' :
                      distro.id === 'ubuntu-kde-epiphany' ? '🌐' :
                      distro.id === 'arch-kde' ? '🏹' :
+                     distro.id === 'opensuse-tumbleweed-kde' ? '🦎' :
                      distro.id === 'fedora' ? '🔵' :
                      distro.id === 'arch' ? '🏹' : '🐉'}
                   </div>
@@ -78,12 +79,12 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
                     className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border ${
                       isValidated
                         ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                        : (distro.id === 'ubuntu' || distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany' || distro.id === 'arch-kde')
+                        : (distro.id === 'ubuntu' || distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany' || distro.id === 'arch-kde' || distro.id === 'opensuse-tumbleweed-kde')
                         ? 'bg-purple-500/10 text-purple-300 border-purple-500/30'
                         : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
                     }`}
                   >
-                    {isValidated ? 'Validated' : (distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany') ? 'Native Browser' : distro.id === 'arch-kde' ? 'Experimental KDE 6' : distro.id === 'ubuntu' ? 'Experimental CLI' : 'Experimental Port'}
+                    {isValidated ? 'Validated' : (distro.id === 'debian-firefox' || distro.id === 'ubuntu-kde-epiphany') ? 'Native Browser' : (distro.id === 'arch-kde' || distro.id === 'opensuse-tumbleweed-kde') ? 'Experimental KDE 6' : distro.id === 'ubuntu' ? 'Experimental CLI' : 'Experimental Port'}
                   </span>
                 </div>
 

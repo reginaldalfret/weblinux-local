@@ -24,11 +24,11 @@
   },
   "integrity": {
     "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
-    "initrdSha256": "105348fadbaba819926deb48ae7c47d7305d311218546ca69fe4b99382570ce9",
-    "initrdUncompressedSha256": "a11200e2f9dca4c7d3b58acd35d7467b93b5696d2b90b1d69ccf3143cd6a0aef",
+    "initrdSha256": "c9502ab6708dc54b78840d807c420ca65c39184ded35190e30efa7fb84be1d8e",
+    "initrdUncompressedSha256": "bda3e6fbdb3d1cf7e58a0d54c5fc4d6d563aac36a7c9d9007368c2b51c1daf0c",
     "kernelSize": 7380050,
-    "initrdSize": 15058602,
-    "initrdUncompressedSize": 36648960,
+    "initrdSize": 15057988,
+    "initrdUncompressedSize": 36652544,
     "chunksCount": 8192,
     "nonZeroChunksCount": 4209,
     "bootChunksCount": 64
