@@ -31,7 +31,10 @@ fi
 if [ ! -c /opensuse/dev/null ]; then
 	mount -t tmpfs none /opensuse/dev 2>/dev/null || true
 	cp -a /dev/null /dev/zero /dev/urandom /dev/random /dev/tty /dev/console /dev/ptmx /opensuse/dev/ 2>/dev/null || true
-	mkdir -p /opensuse/dev/pts /opensuse/dev/shm
+	mkdir -p /opensuse/dev/pts /opensuse/dev/shm /opensuse/dev/input
+	mknod -m 660 /opensuse/dev/input/event0 c 13 64 2>/dev/null || true
+	mknod -m 660 /opensuse/dev/input/event1 c 13 65 2>/dev/null || true
+	mknod -m 660 /opensuse/dev/input/event2 c 13 66 2>/dev/null || true
 	chmod 1777 /opensuse/dev/shm 2>/dev/null || true
 fi
 if [ ! -e /opensuse/dev/pts/ptmx ]; then
@@ -47,10 +50,9 @@ if ! grep -q " /opensuse/tmp " /proc/mounts 2>/dev/null; then
 fi
 
 for dir in hostnode wlserver rvgpu hostopen; do
-	if [ -d "/run/$dir" ] && [ ! -f "/opensuse/run/$dir/.mounted" ]; then
+	if [ -d "/usr/lib/$dir" ] && ! grep -q " /opensuse/run/$dir " /proc/mounts 2>/dev/null; then
 		mkdir -p "/opensuse/run/$dir"
-		mount -o bind "/run/$dir" "/opensuse/run/$dir" 2>/dev/null || cp -a "/run/$dir/." "/opensuse/run/$dir/" 2>/dev/null || true
-		touch "/opensuse/run/$dir/.mounted" 2>/dev/null || true
+		mount -o bind "/usr/lib/$dir" "/opensuse/run/$dir" 2>/dev/null || cp -a "/usr/lib/$dir/." "/opensuse/run/$dir/" 2>/dev/null || true
 	fi
 done
 
