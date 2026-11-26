@@ -21,6 +21,7 @@ aurorae6-6.8.2-1.1.riscv64
 avahi-0.8-45.1.riscv64
 avahi-lang-0.8-45.1.noarch
 babeltrace-1.5.8-4.2.riscv64
+baloo-widgets-26.08.3-1.1.riscv64
 bash-5.3.20-10.1.riscv64
 bash-sh-5.3.20-10.1.noarch
 bc-1.08.2-1.2.riscv64
@@ -91,6 +92,8 @@ dmz-icon-theme-cursors-11.4.0-1.1.noarch
 dnsmasq-2.93-3.1.riscv64
 docbook_4-4.5-145.1.noarch
 docbook-xsl-stylesheets-1.79.2.2-2.1.noarch
+dolphin-26.08.3-1.1.riscv64
+dolphin-part-26.08.3-1.1.riscv64
 dosfstools-4.2-4.2.riscv64
 dracut-112+suse.62.g1b64cef-1.1.riscv64
 dracut-kiwi-lib-10.3.11-1.1.riscv64
@@ -231,6 +234,7 @@ kernel-firmware-usb-network-20261012-1.1.noarch
 keyutils-1.6.3-7.1.riscv64
 kf6-attica-6.31.0-1.1.riscv64
 kf6-baloo-imports-6.31.0-2.1.riscv64
+kf6-baloo-kioslaves-6.31.0-2.1.riscv64
 kf6-breeze-icons-6.31.0-1.1.riscv64
 kf6-frameworkintegration-plugin-6.31.0-1.1.riscv64
 kf6-karchive-6.31.0-1.1.riscv64
@@ -484,6 +488,7 @@ libdevmapper-event1_03-2.03.43_1.02.217-2.1.riscv64
 libdialog15-1.3-14.1.riscv64
 libdisplay-info3-0.3.0-2.1.riscv64
 libdmtx0-0.7.8-1.1.riscv64
+libdolphinvcs6-26.08.3-1.1.riscv64
 libdouble-conversion3-3.4.0-1.1.riscv64
 libdovi3-3.4.0-1.1.riscv64
 libdrm2-2.4.134-2.1.riscv64
@@ -960,6 +965,7 @@ libQt6LabsWavefrontMesh6-6.12.0-3.1.riscv64
 libQt6Location6-6.12.0-1.1.riscv64
 libQt6Multimedia6-6.12.0-1.1.riscv64
 libQt6MultimediaQuick6-6.12.0-1.1.riscv64
+libQt6MultimediaWidgets6-6.12.0-1.1.riscv64
 libQt6Network6-6.12.0-3.1.riscv64
 libQt6OpenGL6-6.12.0-3.1.riscv64
 libQt6OpenGLWidgets6-6.12.0-3.1.riscv64
@@ -1240,6 +1246,7 @@ man-2.13.1-8.1.riscv64
 mdadm-4.5+44.gf732de3f-1.1.riscv64
 media-player-info-26-1.1.noarch
 Mesa-26.2.5-1.1.riscv64
+Mesa-demo-egl-9.0.0-7.1.riscv64
 Mesa-demo-x-9.0.0-7.1.riscv64
 Mesa-dri-26.2.5-1.1.riscv64
 Mesa-libEGL1-26.2.5-1.1.riscv64
