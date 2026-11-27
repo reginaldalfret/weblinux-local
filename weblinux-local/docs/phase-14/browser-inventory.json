@@ -1,0 +1,54 @@
+{
+  "auditDate": "2026-11-27",
+  "sandboxGate": "BLOCKED_SANDBOX_UNAVAILABLE",
+  "kernelCapabilities": {
+    "configSeccomp": false,
+    "userNamespaces": false,
+    "bwrapSlaveMount": false
+  },
+  "distributions": {
+    "debian-13-kde": {
+      "bestCandidate": "epiphany-browser",
+      "version": "48.5-0+deb13u1",
+      "arch": "riscv64",
+      "signatureVerified": true,
+      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+    },
+    "ubuntu-24.04.5-kde": {
+      "bestCandidate": "epiphany-browser",
+      "version": "46.0-2build1",
+      "arch": "riscv64",
+      "signatureVerified": true,
+      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+    },
+    "arch-kde": {
+      "bestCandidate": "chromium",
+      "version": "157.0.8103.78-1",
+      "arch": "riscv64",
+      "signatureVerified": true,
+      "stagingInstalled": true,
+      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+    },
+    "opensuse-tumbleweed-kde": {
+      "bestCandidate": "chromium",
+      "version": "155.0.8059.84-238.1",
+      "arch": "riscv64",
+      "signatureVerified": true,
+      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+    },
+    "fedora-45-kde": {
+      "bestCandidate": "firefox",
+      "version": "154.0-5.fc45",
+      "arch": "riscv64",
+      "signatureVerified": false,
+      "status": "BLOCKED"
+    },
+    "alpine-3.24.4-kde": {
+      "bestCandidate": "epiphany",
+      "version": "50.4-r0",
+      "arch": "riscv64",
+      "signatureVerified": true,
+      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+    }
+  }
+}
