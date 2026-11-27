@@ -1,0 +1,30 @@
+{
+  "targetChromiumVersion": "158.0.8127.88",
+  "targetMilestone": 158,
+  "upstreamCommit": "0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e",
+  "upstreamRepo": "https://chromium.googlesource.com/chromium/src.git",
+  "preflight": {
+    "driveDFreeGiB": 34.41,
+    "driveCFreeGiB": 9.79,
+    "driveEFreeGiB": 64.73,
+    "wslRamGiB": 3.5,
+    "wslSwapGiB": 8.0,
+    "status": "BLOCKED"
+  },
+  "sandboxProbe": {
+    "kernel": "Linux (none) 7.0.0+ #2 SMP Sun Oct 11 22:16:39 UTC 2026 wasm GNU/Linux",
+    "seccompStatusLinePresent": false,
+    "userNamespaceSupported": false,
+    "pidNamespaceSupported": true,
+    "status": "BLOCKED"
+  },
+  "distributions": {
+    "debian-13": { "libc": "glibc", "packageAvailable": false, "status": "BLOCKED" },
+    "ubuntu-24.04.5": { "libc": "glibc", "packageAvailable": false, "status": "BLOCKED" },
+    "arch-kde": { "libc": "glibc", "packageAvailable": false, "status": "BLOCKED" },
+    "opensuse-tumbleweed-kde": { "libc": "glibc", "packageAvailable": "155.0.8059.84 (stale)", "status": "BLOCKED" },
+    "fedora-kde": { "libc": "glibc", "packageAvailable": false, "status": "BLOCKED" },
+    "alpine-kde": { "libc": "musl", "packageAvailable": false, "status": "BLOCKED" }
+  },
+  "finalQualificationStatus": "BLOCKED"
+}
