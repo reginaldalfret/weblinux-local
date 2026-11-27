@@ -1,0 +1,28 @@
+{
+  "release": "Alpine Linux 3.24.4",
+  "branch": "v3.24-stable",
+  "architecture": "riscv64",
+  "abi": "RV64GC / LP64D",
+  "muslVersion": "1.2.6-r3",
+  "kdeVersion": "Plasma 6.6.6",
+  "rootfsFilename": "alpine-minirootfs-3.24.4-riscv64.tar.gz",
+  "rootfsDownloadUrl": "https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/riscv64/alpine-minirootfs-3.24.4-riscv64.tar.gz",
+  "rootfsSha256": "010683db6c73b3ad1c334fc8f93f64ae748ef67ae6d69e964929aeaf8517bff3",
+  "detachedSignatureStatus": "VERIFIED_GOOD_SIGNATURE",
+  "releaseSigningKeyFingerprint": "0482 D840 22F5 2DF1 C4E7 CD43 293A CD09 07D9 495A",
+  "apkTrustedKeys": [
+    "/etc/apk/keys/alpine-devel@lists.alpinelinux.org-60ac2099.rsa.pub",
+    "/etc/apk/keys/alpine-devel@lists.alpinelinux.org-616db30d.rsa.pub"
+  ],
+  "enabledRepositories": [
+    "https://dl-cdn.alpinelinux.org/alpine/v3.24/main",
+    "https://dl-cdn.alpinelinux.org/alpine/v3.24/community"
+  ],
+  "packageSignatureStatus": "ENFORCED_RSA_VERIFIED",
+  "installedPackageCount": 594,
+  "knownLimitations": [
+    "Experimental musl-based RISC-V KDE environment",
+    "Software QML rendering fallback for Qt 6.11 Plasma Shell"
+  ],
+  "finalQualificationStatus": "PASS"
+}
