@@ -37,8 +37,8 @@ const DISTRO_CONFIGS = {
     selectorText: 'Arch Linux RISC-V (Community Port + KDE Plasma 6)',
     chrootCmd: 'arch-root',
     rootMount: '/arch',
-    browserName: 'Chromium',
-    binaryCandidates: ['/usr/bin/chromium', '/usr/lib/chromium/chromium'],
+    browserName: 'Epiphany',
+    binaryCandidates: ['/usr/bin/epiphany', '/usr/bin/chromium'],
     wrapperPath: '/usr/local/bin/weblinux-browser',
     browserHome: '/root/browser-home',
     plasmaWaitMs: 110000,
@@ -52,7 +52,7 @@ const DISTRO_CONFIGS = {
     binaryCandidates: ['/usr/bin/epiphany'],
     wrapperPath: '/usr/local/bin/weblinux-browser',
     browserHome: '/root/browser-home',
-    plasmaWaitMs: 110000,
+    plasmaWaitMs: 145000,
     browserWaitMs: 45000,
   },
   'alpine-kde': {
@@ -181,9 +181,12 @@ async function runGuest(page, innerCmd, timeoutMs = 45000) {
     warmReloadBootSec: null,
     elfAndVersion: '',
     networkCheck: '',
+    initialSha256: '',
     launchOut: '',
     processAndMemory: '',
     persistenceCheck: '',
+    persistedSha256: '',
+    checks: {},
     screenshots: [],
     status: 'FAILED',
     error: null,
@@ -214,16 +217,20 @@ async function runGuest(page, innerCmd, timeoutMs = 45000) {
     result.coldBootSec = Number(((Date.now() - t0) / 1000).toFixed(1));
     console.log(`[${distroId}] Booted in ${result.coldBootSec}s`);
 
-    // Step 2: Inspect browser binary, ELF header, version, user, wrapper
+    // Step 2: Inspect browser binary, ELF header, version, user, wrapper, and /bin/rv
     const inspectScript = `
       echo "=== OS ==="
       grep PRETTY_NAME /etc/os-release || cat /etc/alpine-release
+      echo "=== RV_RUNTIME ==="
+      ls -la /bin/rv 2>&1 || true
       echo "=== WRAPPER ==="
       ls -la ${cfg.wrapperPath} 2>&1 || true
+      [ -x "${cfg.wrapperPath}" ] && echo "WRAPPER_EXECUTABLE_OK" || echo "WRAPPER_MISSING"
       id browser 2>&1 || true
       echo "=== BINARY ==="
       for b in ${cfg.binaryCandidates.join(' ')}; do
         if [ -e "$b" ]; then
+          echo "FOUND_BINARY=$b"
           ls -la "$b"
           readelf -h "$b" 2>/dev/null | grep -E "Class:|Machine:" || file -L "$b" 2>/dev/null || true
           "$b" --version 2>&1 | head -n 3 || true
@@ -249,7 +256,7 @@ async function runGuest(page, innerCmd, timeoutMs = 45000) {
     console.log(`[${distroId}] 4. Waiting ${cfg.plasmaWaitMs / 1000}s for Plasma Wayland desktop...`);
     await page.waitForTimeout(cfg.plasmaWaitMs);
 
-    // Create local JS/CSS/Canvas test page + download verification file
+    // Create local HTML/CSS/JS/Canvas test page, profile/bookmark markers, and download verification file
     const launchScript = `
       cat <<'HTML' > /tmp/p14-test.html
 <!DOCTYPE html>
@@ -272,15 +279,44 @@ async function runGuest(page, innerCmd, timeoutMs = 45000) {
 </html>
 HTML
       chmod 644 /tmp/p14-test.html
-      mkdir -p ${cfg.browserHome}/Downloads ${cfg.browserHome}/.config
+      mkdir -p ${cfg.browserHome}/Downloads ${cfg.browserHome}/.config ${cfg.browserHome}/.local/share/epiphany
       echo "PHASE14_PERSIST_${distroId}" > ${cfg.browserHome}/.config/p14-profile-marker.txt
+      echo "PHASE14_BOOKMARK_${distroId}|https://example.com" > ${cfg.browserHome}/.local/share/epiphany/p14-bookmark.txt
       curl -sL --max-time 12 https://example.com -o ${cfg.browserHome}/Downloads/example.html || true
-      sha256sum ${cfg.browserHome}/Downloads/example.html ${cfg.browserHome}/.config/p14-profile-marker.txt > /tmp/p14-sha.txt 2>&1 || true
+      sha256sum ${cfg.browserHome}/Downloads/example.html ${cfg.browserHome}/.config/p14-profile-marker.txt ${cfg.browserHome}/.local/share/epiphany/p14-bookmark.txt > /tmp/p14-sha.txt 2>&1 || true
+      echo "DOWNLOAD_SHA256=$(sha256sum ${cfg.browserHome}/Downloads/example.html 2>/dev/null | awk '{print $1}')"
       cat /tmp/p14-sha.txt
       if [ -x "${cfg.wrapperPath}" ]; then
         chown -R browser:browser ${cfg.browserHome} 2>/dev/null || true
+        (${cfg.wrapperPath} file:///tmp/p14-test.html >/tmp/p14-browser-local.log 2>&1 </dev/null &)
+        echo "LAUNCHED_WRAPPER_LOCAL"
+      else
+        export GDK_BACKEND=wayland WAYLAND_DISPLAY=wayland-0
+        export XDG_RUNTIME_DIR=/tmp/runtime-root
+        [ -d /tmp/runtime-ubuntu ] && export XDG_RUNTIME_DIR=/tmp/runtime-ubuntu
+        export DBUS_SESSION_BUS_ADDRESS="unix:path=\${XDG_RUNTIME_DIR}/bus"
+        export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 JSC_useJIT=0
+        export WEBKIT_DISABLE_DMABUF_RENDERER=1 WEBKIT_DISABLE_COMPOSITING_MODE=1 LIBGL_ALWAYS_SOFTWARE=1
+        (epiphany file:///tmp/p14-test.html >/tmp/p14-browser-local.log 2>&1 </dev/null &)
+        echo "LAUNCHED_EPIPHANY_FALLBACK_LOCAL"
+      fi
+    `;
+    result.launchOut = await runGuest(page, launchScript, 45000);
+    const initShaMatch = result.launchOut.match(/DOWNLOAD_SHA256=([a-f0-9]{64})/i);
+    result.initialSha256 = initShaMatch ? initShaMatch[1].toLowerCase() : '';
+    console.log(`[${distroId}] 5. Launch (local HTML/CSS/JS/Canvas):\n${result.launchOut}`);
+
+    console.log(`[${distroId}] 5b. Waiting 15s for local Canvas test page render...`);
+    await page.waitForTimeout(15000);
+    const shotLocal = path.join(SCREENSHOT_DIR, `p14-${distroId}-local.png`);
+    if (await safeScreenshot(page, shotLocal)) result.screenshots.push(shotLocal);
+
+    const launchLiveScript = `
+      pkill -u browser 2>/dev/null || killall epiphany badwolf netsurf-gtk firefox chromium WebKitWebProcess WebKitNetworkProcess 2>/dev/null || true
+      sleep 2
+      if [ -x "${cfg.wrapperPath}" ]; then
         (${cfg.wrapperPath} https://example.com >/tmp/p14-browser.log 2>&1 </dev/null &)
-        echo "LAUNCHED_WRAPPER"
+        echo "LAUNCHED_WRAPPER_HTTPS"
       else
         export GDK_BACKEND=wayland WAYLAND_DISPLAY=wayland-0
         export XDG_RUNTIME_DIR=/tmp/runtime-root
@@ -289,18 +325,18 @@ HTML
         export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 JSC_useJIT=0
         export WEBKIT_DISABLE_DMABUF_RENDERER=1 WEBKIT_DISABLE_COMPOSITING_MODE=1 LIBGL_ALWAYS_SOFTWARE=1
         (epiphany https://example.com >/tmp/p14-browser.log 2>&1 </dev/null &)
-        echo "LAUNCHED_EPIPHANY_FALLBACK"
+        echo "LAUNCHED_EPIPHANY_FALLBACK_HTTPS"
       fi
     `;
-    result.launchOut = await runGuest(page, launchScript, 45000);
-    console.log(`[${distroId}] 5. Launch:\n${result.launchOut}`);
+    const liveLaunchOut = await runGuest(page, launchLiveScript, 30000);
+    result.launchOut += '\n' + liveLaunchOut;
 
-    console.log(`[${distroId}] 6. Waiting ${cfg.browserWaitMs / 1000}s for browser render...`);
+    console.log(`[${distroId}] 6. Waiting ${cfg.browserWaitMs / 1000}s for https://example.com render...`);
     await page.waitForTimeout(cfg.browserWaitMs);
 
     const procScript = `
       echo "=== PROCS ==="
-      ps -ef | grep -iE "chromium|epiphany|WebKit" | grep -v grep || true
+      ps -ef | grep -iE "chromium|epiphany|badwolf|netsurf|firefox|WebKitNetworkProcess|WebKitWebProcess|WebKit" | grep -v grep || true
       echo "=== MEMORY ==="
       free -m
       echo "=== BROWSER_LOG ==="
@@ -328,19 +364,41 @@ HTML
 
     const persistScript = `
       echo "=== PERSIST_CHECK ==="
-      ls -la ${cfg.browserHome}/.config/p14-profile-marker.txt ${cfg.browserHome}/Downloads/example.html 2>&1 || true
+      ls -la ${cfg.browserHome}/.config/p14-profile-marker.txt ${cfg.browserHome}/.local/share/epiphany/p14-bookmark.txt ${cfg.browserHome}/Downloads/example.html 2>&1 || true
       cat ${cfg.browserHome}/.config/p14-profile-marker.txt 2>&1 || true
-      sha256sum ${cfg.browserHome}/Downloads/example.html ${cfg.browserHome}/.config/p14-profile-marker.txt 2>&1 || true
+      cat ${cfg.browserHome}/.local/share/epiphany/p14-bookmark.txt 2>&1 || true
+      echo "PERSISTED_SHA256=$(sha256sum ${cfg.browserHome}/Downloads/example.html 2>/dev/null | awk '{print $1}')"
+      sha256sum ${cfg.browserHome}/Downloads/example.html ${cfg.browserHome}/.config/p14-profile-marker.txt ${cfg.browserHome}/.local/share/epiphany/p14-bookmark.txt 2>&1 || true
     `;
     result.persistenceCheck = await runGuest(page, persistScript, 30000);
+    const persShaMatch = result.persistenceCheck.match(/PERSISTED_SHA256=([a-f0-9]{64})/i);
+    result.persistedSha256 = persShaMatch ? persShaMatch[1].toLowerCase() : '';
     console.log(`[${distroId}] 9. Persistence (${result.warmReloadBootSec}s reload):\n${result.persistenceCheck}`);
 
     const shot2 = path.join(SCREENSHOT_DIR, `p14-${distroId}-persisted.png`);
     if (await safeScreenshot(page, shot2)) result.screenshots.push(shot2);
 
-    const hasMarker = result.persistenceCheck.includes(`PHASE14_PERSIST_${distroId}`);
+    const hasBinary = result.elfAndVersion.includes('FOUND_BINARY=') && /RISC-V|riscv64/i.test(result.elfAndVersion);
+    const hasWrapper = result.elfAndVersion.includes('WRAPPER_EXECUTABLE_OK');
     const hasNet = result.networkCheck.includes('HTTP/') && result.networkCheck.includes('RFC1918_BLOCKED_OK');
-    result.status = hasMarker && hasNet ? 'PASS' : 'PARTIAL';
+    const hasProcs = /epiphany|chromium|firefox|WebKit/i.test(result.processAndMemory);
+    const hasMarker = result.persistenceCheck.includes(`PHASE14_PERSIST_${distroId}`);
+    const hasBookmark = result.persistenceCheck.includes(`PHASE14_BOOKMARK_${distroId}`);
+    const hasDownloadSha = Boolean(result.initialSha256) && result.initialSha256 === result.persistedSha256;
+
+    result.checks = {
+      hasBinary,
+      hasWrapper,
+      hasNet,
+      hasProcs,
+      hasMarker,
+      hasBookmark,
+      hasDownloadSha,
+    };
+    result.status = hasBinary && hasNet && hasProcs && hasMarker && hasBookmark && hasDownloadSha ? 'PASS' : 'PARTIAL';
+    if (result.status !== 'PASS') {
+      process.exitCode = 1;
+    }
   } catch (err) {
     result.error = err.message || String(err);
     console.error(`[${distroId}] ERROR:`, result.error);

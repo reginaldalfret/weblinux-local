@@ -18,8 +18,8 @@
     "chunkSize": 1048576,
     "totalSizeBytes": 3288334336,
     "manifestUri": "/disk/alpine-kde/manifest.json",
-    "id": "f154304fced1b1234b205b936c07b827",
-    "fullImageSha256": "f154304fced1b1234b205b936c07b827bda11f1d8aecff5a7b835fd14167a383",
+    "id": "b6705199c468a91cc5abf44a03928c52",
+    "fullImageSha256": "b6705199c468a91cc5abf44a03928c521f3f0a631172926504dd93cfcd8a5e71",
     "filesystemUuid": "f4890b5e-26db-4fe7-8144-53aec9f63a5e"
   },
   "integrity": {
@@ -30,7 +30,7 @@
     "initrdSize": 15064075,
     "initrdUncompressedSize": 36659200,
     "chunksCount": 3136,
-    "nonZeroChunksCount": 1695,
+    "nonZeroChunksCount": 1819,
     "bootChunksCount": 64,
     "sourceArchive": "alpine-minirootfs-3.24.4-riscv64.tar.gz",
     "sourceArchiveSha256": "010683db6c73b3ad1c334fc8f93f64ae748ef67ae6d69e964929aeaf8517bff3"

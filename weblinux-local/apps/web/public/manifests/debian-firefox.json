@@ -19,8 +19,8 @@
     "chunkSize": 1048576,
     "totalSizeBytes": 8589934592,
     "manifestUri": "/disk/debian-13-firefox/manifest.json",
-    "id": "ae6ca64d729f194adfb09e3edffdd939",
-    "fullImageSha256": "ae6ca64d729f194adfb09e3edffdd93979a8a05bbcd206581c2e5903a0893b0f"
+    "id": "f27136d32ca11174d11c54a318019d3c",
+    "fullImageSha256": "f27136d32ca11174d11c54a318019d3c057b1a847201293a426393ac6958378c"
   },
   "integrity": {
     "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
@@ -30,7 +30,7 @@
     "initrdSize": 15064075,
     "initrdUncompressedSize": 36659200,
     "chunksCount": 8192,
-    "nonZeroChunksCount": 4449,
+    "nonZeroChunksCount": 4486,
     "bootChunksCount": 64
   },
   "runtimeRequirements": {
@@ -43,7 +43,7 @@
     "requiresWebGL2": true,
     "requiresWebGPU": false,
     "requiresOPFS": true,
-    "estimatedDiskMB": 4449
+    "estimatedDiskMB": 4486
   },
   "licensing": {
     "baseLicense": "GPL-2.0-or-later, DFSG Compliant",

@@ -1,0 +1,77 @@
+{
+  "phase": "14.2",
+  "title": "Complete Browser Installation Across All Six Distributions",
+  "distributions": [
+    {
+      "id": "ubuntu-kde-epiphany",
+      "browser": "Epiphany (epiphany-browser)",
+      "version": "Web 46.5",
+      "packageOrigin": "Ubuntu 24.04.5 Noble riscv64 (apt, signed)",
+      "signatureStatus": "SIGNED",
+      "status": "PASS",
+      "unsandboxed": true,
+      "coldBootSec": 34.4,
+      "warmReloadBootSec": 57.0,
+      "persistenceStatus": "PASS"
+    },
+    {
+      "id": "opensuse-tumbleweed-kde",
+      "browser": "Epiphany (epiphany-51.2-1.1.riscv64)",
+      "version": "Web 51.2",
+      "packageOrigin": "openSUSE-Tumbleweed-Oss riscv64 (zypper, GPG-signed)",
+      "signatureStatus": "SIGNED",
+      "status": "PASS WITH LIMITATION",
+      "unsandboxed": true,
+      "coldBootSec": 33.6,
+      "warmReloadBootSec": 39.3,
+      "persistenceStatus": "PASS"
+    },
+    {
+      "id": "debian-firefox",
+      "browser": "Epiphany (epiphany-browser 48.5-0+deb13u1) + NetSurf (netsurf-gtk 3.11-2)",
+      "version": "Web 48.5",
+      "packageOrigin": "Debian 13 Trixie riscv64 (apt, signed)",
+      "signatureStatus": "SIGNED",
+      "status": "PASS WITH LIMITATION",
+      "unsandboxed": true,
+      "coldBootSec": 43.4,
+      "warmReloadBootSec": 24.2,
+      "persistenceStatus": "PASS",
+      "notes": "setpriv + dbus-run-session wrapper; libjavascriptcoregtk-6.0.so.1 / libldap.so.2 failed to map segment under 2048 MiB NOMMU pressure after Plasma 6."
+    },
+    {
+      "id": "alpine-kde",
+      "browser": "Epiphany (epiphany 50.4-r0) + Badwolf (badwolf 1.4.0-r0)",
+      "version": "Web 50.4",
+      "packageOrigin": "Alpine v3.24 community riscv64 (apk, RSA-signed)",
+      "signatureStatus": "SIGNED",
+      "status": "PASS WITH LIMITATION",
+      "unsandboxed": true,
+      "persistenceStatus": "PASS",
+      "notes": "badwolf 1.4.0-r0 + gvfs 1.60.1-r0 installed; epiphany 50.4 hit Segmentation fault on musl/NOMMU."
+    },
+    {
+      "id": "arch-kde",
+      "browser": "Epiphany (epiphany 51.2-1)",
+      "version": "51.2-1",
+      "packageOrigin": "Arch Linux RISC-V extra (pacman, PGP-signed)",
+      "signatureStatus": "SIGNED",
+      "status": "BLOCKED",
+      "unsandboxed": true,
+      "coldBootSec": 25.2,
+      "warmReloadBootSec": 29.0,
+      "persistenceStatus": "PASS",
+      "notes": "Upstream extra SONAME mismatch: libjxl.so.0.12 missing after pacman -Syu."
+    },
+    {
+      "id": "fedora-kde",
+      "browser": "None",
+      "version": null,
+      "packageOrigin": "dl.fedoraproject.org 404; riscv-koji unsigned",
+      "signatureStatus": "UNSIGNED_BLOCKED_GPGCHECK_1",
+      "status": "BLOCKED",
+      "unsandboxed": null,
+      "persistenceStatus": "NOT TESTED"
+    }
+  ]
+}
