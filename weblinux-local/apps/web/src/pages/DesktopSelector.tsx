@@ -20,6 +20,7 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
   const isArch = selectedDistro === 'arch-kde';
   const isOpenSuse = selectedDistro === 'opensuse-tumbleweed-kde';
   const isFedora = selectedDistro === 'fedora-kde';
+  const isAlpine = selectedDistro === 'alpine-kde';
   const desktopList: DesktopProfile[] = isUbuntu
     ? [DEBIAN_DESKTOP_PROFILES['ubuntu-kde']]
     : isArch
@@ -28,7 +29,9 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
     ? [DEBIAN_DESKTOP_PROFILES['opensuse-tumbleweed-kde']]
     : isFedora
     ? [DEBIAN_DESKTOP_PROFILES['fedora-kde']]
-    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome' && p.id !== 'ubuntu-kde' && p.id !== 'arch-kde' && p.id !== 'opensuse-tumbleweed-kde' && p.id !== 'fedora-kde');
+    : isAlpine
+    ? [DEBIAN_DESKTOP_PROFILES['alpine-kde']]
+    : Object.values(DEBIAN_DESKTOP_PROFILES).filter(p => p.id !== 'cli' && p.id !== 'ubuntu-gnome' && p.id !== 'ubuntu-kde' && p.id !== 'arch-kde' && p.id !== 'opensuse-tumbleweed-kde' && p.id !== 'fedora-kde' && p.id !== 'alpine-kde');
 
   const getStatusBadge = (status: DesktopProfileStatus) => {
     switch (status) {
@@ -60,8 +63,8 @@ export const DesktopSelector: React.FC<DesktopSelectorProps> = ({
     return status === 'validated' || status === 'experimental';
   };
 
-  const currentSelectedProfile = (isUbuntu ? DEBIAN_DESKTOP_PROFILES['ubuntu-kde'] : isArch ? DEBIAN_DESKTOP_PROFILES['arch-kde'] : isOpenSuse ? DEBIAN_DESKTOP_PROFILES['opensuse-tumbleweed-kde'] : isFedora ? DEBIAN_DESKTOP_PROFILES['fedora-kde'] : DEBIAN_DESKTOP_PROFILES[selectedDesktop]) || desktopList[0];
-  const canLaunchCurrent = isLaunchable(currentSelectedProfile.status) || currentSelectedProfile.id === 'ubuntu-kde' || currentSelectedProfile.id === 'arch-kde' || currentSelectedProfile.id === 'opensuse-tumbleweed-kde' || currentSelectedProfile.id === 'fedora-kde';
+  const currentSelectedProfile = (isUbuntu ? DEBIAN_DESKTOP_PROFILES['ubuntu-kde'] : isArch ? DEBIAN_DESKTOP_PROFILES['arch-kde'] : isOpenSuse ? DEBIAN_DESKTOP_PROFILES['opensuse-tumbleweed-kde'] : isFedora ? DEBIAN_DESKTOP_PROFILES['fedora-kde'] : isAlpine ? DEBIAN_DESKTOP_PROFILES['alpine-kde'] : DEBIAN_DESKTOP_PROFILES[selectedDesktop]) || desktopList[0];
+  const canLaunchCurrent = isLaunchable(currentSelectedProfile.status) || currentSelectedProfile.id === 'ubuntu-kde' || currentSelectedProfile.id === 'arch-kde' || currentSelectedProfile.id === 'opensuse-tumbleweed-kde' || currentSelectedProfile.id === 'fedora-kde' || currentSelectedProfile.id === 'alpine-kde';
 
   return (
     <div className="max-w-6xl mx-auto px-4 lg:px-8 py-12">

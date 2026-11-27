@@ -247,5 +247,31 @@ export const DEBIAN_DESKTOP_PROFILES: Record<string, DesktopProfile> = {
       'Software QML rendering fallback for Qt 6.11 Plasma Shell'
     ],
     previewImage: '/screenshots/phase11/fedora-kde-desktop.png'
+  },
+  'alpine-kde': {
+    id: 'alpine-kde',
+    name: 'Alpine Linux KDE Plasma 6',
+    version: '6.6.6',
+    tagline: 'Alpine Linux 3.24.4 — musl-based RISC-V KDE Plasma environment',
+    description: 'Authentic Alpine Linux 3.24.4 RISC-V (RV64GC / LP64D, musl 1.2.6) userspace running KDE Plasma 6.6.6, Qt 6.11.1, KWin 6.6.6, Konsole 26.04.2, and Dolphin 26.04.2 with signed APK 3.0.9.',
+    distributionId: 'alpine-kde',
+    status: 'experimental',
+    sessionCommand: 'alpine-kde /usr/local/bin/alpine-kde-session',
+    compositor: 'wlserver / KWin 6.6.6',
+    rootfsManifestId: 'alpine-kde',
+    minimumRamMB: 2048,
+    recommendedRamMB: 2048,
+    supportedFeatures: [
+      'Alpine Linux 3.24.4 RISC-V (RV64GC / LP64D, musl 1.2.6)',
+      'KDE Plasma 6.6.6 & Qt 6.11.1 over Wayland',
+      'Konsole 26.04.2 Terminal & Dolphin 26.04.2 File Manager',
+      'APK 3.0.9 package manager with RSA-signed v3.24 repositories',
+      'Isolated root-alpine-kde + persistent home-alpine-kde'
+    ],
+    knownLimitations: [
+      'musl-based RISC-V KDE environment (experimental)',
+      'Software QML rendering fallback for Qt 6.11 Plasma Shell'
+    ],
+    previewImage: '/screenshots/phase13/alpine-kde-desktop.png'
   }
 };
