@@ -1,0 +1,18 @@
+{
+  "distroId": "arch-kde",
+  "browserName": "Chromium",
+  "timestamp": "2026-11-27T09:51:41.269Z",
+  "coldBootSec": 29.1,
+  "warmReloadBootSec": 22.7,
+  "elfAndVersion": "=== OS ===\nPRETTY_NAME=\"Arch Linux\"\n=== WRAPPER ===\n-rwxr-xr-x 1 root root 586 Nov 27 09:07 /usr/local/bin/weblinux-browser\nuid=1000(browser) gid=1000(browser) groups=1000(browser)\n=== BINARY ===\n-rwxr-xr-x 1 root root 10368 Nov 16 17:34 /usr/bin/chromium\n  Class:                             ELF64\n  Machine:                           RISC-V\n/usr/lib/chromium/chromium: error while loading shared libraries: libsimdutf.so.36: cannot open shared object file: No such file or directory",
+  "networkCheck": "=== DNS_HTTPS ===\n2606:4700:10::6814:179a example.com\n2606:4700:10::ac42:93f3 example.com\nHTTP/2 200 \n\ndate: Fri, 27 Nov 2026 09:53:00 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "launchOut": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n6975d41c63b514f2427b057a7205e1d4ff2dfcb454c29f302927dbd9f3214aa9  /root/browser-home/.config/p14-profile-marker.txt\nLAUNCHED_WRAPPER",
+  "processAndMemory": "=== PROCS ===\n=== MEMORY ===\n               total        used        free      shared  buff/cache   available\nMem:            2009         856         970           0         679        1152\nSwap:              0           0           0\n=== BROWSER_LOG ===\n/usr/lib/chromium/chromium: error while loading shared libraries: libsimdutf.so.36: cannot open shared object file: No such file or directory",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 browser browser  25 Nov 27 09:54 /root/browser-home/.config/p14-profile-marker.txt\n-rw-r--r-- 1 browser browser 577 Nov 27 09:54 /root/browser-home/Downloads/example.html\nPHASE14_PERSIST_arch-kde\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n6975d41c63b514f2427b057a7205e1d4ff2dfcb454c29f302927dbd9f3214aa9  /root/browser-home/.config/p14-profile-marker.txt",
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-arch-kde-example.png",
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-arch-kde-persisted.png"
+  ],
+  "status": "PASS",
+  "error": null
+}

@@ -1,0 +1,18 @@
+{
+  "distroId": "ubuntu-kde-epiphany",
+  "browserName": "Epiphany",
+  "timestamp": "2026-11-27T09:46:04.259Z",
+  "coldBootSec": 22.8,
+  "warmReloadBootSec": 65.7,
+  "elfAndVersion": "=== OS ===\nPRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\n=== WRAPPER ===\n/usr/bin/ls: cannot access '/usr/local/bin/weblinux-browser': No such file or directory\n/usr/bin/id: ‘browser’: no such user\n=== BINARY ===\n-rwxr-xr-x 1 root root 166656 Jan 30  2025 /usr/bin/epiphany\nWeb 46.5",
+  "networkCheck": "=== DNS_HTTPS ===\n2606:4700:10::ac42:93f3 example.com\n2606:4700:10::6814:179a example.com\nHTTP/2 200 \n\ndate: Fri, 27 Nov 2026 09:47:11 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "launchOut": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /home/ubuntu/Downloads/example.html\n5cff6a1018225f9e1903810327590072e7358fdf3d3d3ccdaae48882d9aec2b6  /home/ubuntu/.config/p14-profile-marker.txt\nLAUNCHED_EPIPHANY_FALLBACK",
+  "processAndMemory": "=== PROCS ===\nroot       339     1 99 09:48 ?        00:00:50 /usr/bin/epiphany https://example.com\nroot       357   339  9 09:48 ?        00:00:03 /usr/lib/riscv64-linux-gnu/webkitgtk-6.0/WebKitNetworkProcess 2 10\n=== MEMORY ===\n               total        used        free      shared  buff/cache   available\nMem:            2009        1127         647           0         806         881\nSwap:              0           0           0\n=== BROWSER_LOG ===\n\n(epiphany:339): Gtk-WARNING **: 09:49:15.417: Unable to acquire the address of the accessibility bus: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files. If you are attempting to run GTK without a11y support, GTK_A11Y should be set to 'none'.\n\n** (epiphany:339): WARNING **: 09:49:25.852: webkit_settings_set_enable_dns_prefetching is deprecated and does nothing.",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 root root  36 Nov 27 09:48 /home/ubuntu/.config/p14-profile-marker.txt\n-rw-r--r-- 1 root root 577 Nov 27 09:48 /home/ubuntu/Downloads/example.html\nPHASE14_PERSIST_ubuntu-kde-epiphany\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /home/ubuntu/Downloads/example.html\n5cff6a1018225f9e1903810327590072e7358fdf3d3d3ccdaae48882d9aec2b6  /home/ubuntu/.config/p14-profile-marker.txt",
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-ubuntu-kde-epiphany-example.png",
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-ubuntu-kde-epiphany-persisted.png"
+  ],
+  "status": "PASS",
+  "error": null
+}

@@ -1,0 +1,18 @@
+{
+  "distroId": "opensuse-tumbleweed-kde",
+  "browserName": "Chromium",
+  "timestamp": "2026-11-27T09:56:46.906Z",
+  "coldBootSec": 21.6,
+  "warmReloadBootSec": 24.1,
+  "elfAndVersion": "=== OS ===\nPRETTY_NAME=\"openSUSE Tumbleweed\"\n=== WRAPPER ===\n-rwxr-xr-x 1 root root 586 Nov 27 08:59 /usr/local/bin/weblinux-browser\nuid=1000(browser) gid=1000(browser) groups=1000(browser)\n=== BINARY ===\nlrwxrwxrwx 1 root root 16 Oct 17 10:57 /usr/bin/chromium -> chromium-browser\n/usr/bin/chromium: Bourne-Again shell script, ASCII text executable\n/usr/bin/chromium: line 42: /dev/fd/63: No such file or directory\n/usr/bin/chromium: line 43: /dev/fd/63: No such file or directory\nChromium 155.0.8059.84 stable",
+  "networkCheck": "=== DNS_HTTPS ===\n2606:4700:10::ac42:93f3 example.com\n2606:4700:10::6814:179a example.com\nHTTP/2 200 \n\ndate: Fri, 27 Nov 2026 09:58:05 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "launchOut": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n32431be95ddb57ed7bad9d054495fb4eee8e2daf9ad9419f0a7f56c24de217c8  /root/browser-home/.config/p14-profile-marker.txt\nLAUNCHED_WRAPPER",
+  "processAndMemory": "=== PROCS ===\n=== MEMORY ===\n               total        used        free      shared  buff/cache   available\nMem:            2009         519        1271           0         565        1489\nSwap:              0           0           0\n=== BROWSER_LOG ===\n/bin/chromium: line 42: /dev/fd/63: No such file or directory\n/bin/chromium: line 43: /dev/fd/63: No such file or directory\nrv: cannot copy the guest from the parent of a fork\n[492:492:1127/095954.374035:ERROR:rd_party/crashpad/crashpad/util/file/filesystem_posix.cc:63] mkdir : No such file or directory (2)\n[492:492:1127/095954.381625:ERROR:ozone/platform/wayland/common/drm_render_node_path_finder.cc:40] drmGetDevices2() has not found any devices: No such file or directory (2)\n[492:492:1127/095954.397650:ERROR:chrome/app/chrome_main_delegate.cc:1692] NOTREACHED hit. \n[492:492:1127/095955.062690:FATAL:e/path_service.cc:264] Failed to get the path for 1001\nrv: illegal instruction 0x00000000 at pc 0x5d01722\nrv: illegal instruction 0x00000000 at pc 0x5d01722",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 browser browser  40 Nov 27 09:59 /root/browser-home/.config/p14-profile-marker.txt\n-rw-r--r-- 1 browser browser 577 Nov 27 09:59 /root/browser-home/Downloads/example.html\nPHASE14_PERSIST_opensuse-tumbleweed-kde\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n32431be95ddb57ed7bad9d054495fb4eee8e2daf9ad9419f0a7f56c24de217c8  /root/browser-home/.config/p14-profile-marker.txt",
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-opensuse-tumbleweed-kde-example.png",
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-opensuse-tumbleweed-kde-persisted.png"
+  ],
+  "status": "PASS",
+  "error": null
+}

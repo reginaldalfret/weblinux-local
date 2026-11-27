@@ -1,0 +1,18 @@
+{
+  "distroId": "debian-firefox",
+  "browserName": "Epiphany",
+  "timestamp": "2026-11-27T09:41:41.851Z",
+  "coldBootSec": 26.9,
+  "warmReloadBootSec": 18.7,
+  "elfAndVersion": "=== OS ===\nPRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\n=== WRAPPER ===\n-rwxr-xr-x 1 root root 849 Nov 27 09:12 /usr/local/bin/weblinux-browser\nuid=1000(browser) gid=1000(browser) groups=1000(browser)\n=== BINARY ===\n-rwxr-xr-x 1 root root 170768 Oct 28  2025 /usr/bin/epiphany\n  Class:                             ELF64\n  Machine:                           RISC-V\nWeb 48.5",
+  "networkCheck": "=== DNS_HTTPS ===\n2606:4700:10::ac42:93f3 example.com\n2606:4700:10::6814:179a example.com\nHTTP/2 200 \n\ndate: Fri, 27 Nov 2026 09:42:52 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "launchOut": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n9bec19519004d66eadd030c7e18739c1f268a45a22d8692bacc5b283a08d4bfb  /root/browser-home/.config/p14-profile-marker.txt\nLAUNCHED_WRAPPER",
+  "processAndMemory": "=== PROCS ===\n=== MEMORY ===\n               total        used        free      shared  buff/cache   available\nMem:            2009        1371         631           0         507         637\nSwap:              0           0           0\n=== BROWSER_LOG ===\nsu: Authentication failure",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 browser browser  31 Nov 27 09:44 /root/browser-home/.config/p14-profile-marker.txt\n-rw-r--r-- 1 browser browser 577 Nov 27 09:44 /root/browser-home/Downloads/example.html\nPHASE14_PERSIST_debian-firefox\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n9bec19519004d66eadd030c7e18739c1f268a45a22d8692bacc5b283a08d4bfb  /root/browser-home/.config/p14-profile-marker.txt",
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-debian-firefox-example.png",
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-debian-firefox-persisted.png"
+  ],
+  "status": "PASS",
+  "error": null
+}
