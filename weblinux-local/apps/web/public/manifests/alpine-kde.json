@@ -1,0 +1,56 @@
+{
+  "id": "alpine-kde",
+  "name": "Alpine Linux",
+  "releaseVersion": "3.24.4",
+  "architecture": "riscv64",
+  "kernelCompatibility": "linux-wasm64_nommu-7.0",
+  "defaultDesktop": "alpine-kde",
+  "supportedDesktops": [
+    "alpine-kde"
+  ],
+  "packageManager": "apk",
+  "filesystemLayout": {
+    "rootMount": "/alpine",
+    "homeMount": "/home/root"
+  },
+  "imageSource": {
+    "baseUri": "/disk/alpine-kde/",
+    "chunkSize": 1048576,
+    "totalSizeBytes": 3154116608,
+    "manifestUri": "/disk/alpine-kde/manifest.json",
+    "id": "5067754980014f1250493043183e96de",
+    "fullImageSha256": "5067754980014f1250493043183e96decbddcdc41c993dff481091ff82bbbfa1",
+    "filesystemUuid": "f6b9672a-ebb9-4c30-a354-65e080783f9b"
+  },
+  "integrity": {
+    "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
+    "initrdSha256": "e5081a47223a8003e637039e9a3546a1220a1d6f246f665ac5df2e437c60e96c",
+    "initrdUncompressedSha256": "d1af61263f50c874fbc72d5ae2ee411886db0a31dfba7828e802bc50875a9b81",
+    "kernelSize": 7380050,
+    "initrdSize": 15064075,
+    "initrdUncompressedSize": 36659200,
+    "chunksCount": 3008,
+    "nonZeroChunksCount": 1538,
+    "bootChunksCount": 64,
+    "sourceArchive": "alpine-minirootfs-3.24.4-riscv64.tar.gz",
+    "sourceArchiveSha256": "010683db6c73b3ad1c334fc8f93f64ae748ef67ae6d69e964929aeaf8517bff3"
+  },
+  "runtimeRequirements": {
+    "minMemoryMB": 2048,
+    "recommendedMemoryMB": 2048,
+    "minCores": 2,
+    "recommendedCores": 4,
+    "requiresSharedArrayBuffer": true,
+    "requiresCrossOriginIsolated": true,
+    "requiresWebGL2": true,
+    "requiresOPFS": true,
+    "estimatedDiskMB": 3008
+  },
+  "licensing": {
+    "baseLicense": "MIT / GPL-2.0-or-later, Alpine Linux 3.24.4 RISC-V",
+    "redistributionAllowed": true,
+    "licenseDocUrl": "/docs/LICENSING.md"
+  },
+  "validationStatus": "experimental",
+  "notes": "Alpine Linux 3.24.4 — musl-based RISC-V KDE Plasma environment (Plasma 6.6.6, KWin 6.6.6, Qt 6.11.1, Konsole 26.04.2, Dolphin 26.04.2, APK 3.0.9)."
+}

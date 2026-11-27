@@ -3,9 +3,9 @@
  * Provides an independent abstraction layer over the underlying WebAssembly Linux kernel.
  */
 
-export type DistributionId = 'debian' | 'debian-firefox' | 'ubuntu' | 'ubuntu-kde-epiphany' | 'fedora' | 'fedora-kde' | 'arch' | 'arch-kde' | 'opensuse-tumbleweed-kde' | 'kali-lab' | 'ubuntu-gnome' | 'ubuntu-kde';
+export type DistributionId = 'debian' | 'debian-firefox' | 'ubuntu' | 'ubuntu-kde-epiphany' | 'fedora' | 'fedora-kde' | 'arch' | 'arch-kde' | 'opensuse-tumbleweed-kde' | 'alpine-kde' | 'kali-lab' | 'ubuntu-gnome' | 'ubuntu-kde';
 
-export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce' | 'cli' | 'ubuntu-gnome' | 'ubuntu-kde' | 'arch-kde' | 'opensuse-tumbleweed-kde' | 'fedora-kde';
+export type DesktopEnvironmentId = 'kde-plasma' | 'gnome' | 'xfce' | 'cli' | 'ubuntu-gnome' | 'ubuntu-kde' | 'arch-kde' | 'opensuse-tumbleweed-kde' | 'fedora-kde' | 'alpine-kde';
 
 export type DesktopProfileStatus = 'validated' | 'experimental' | 'preview' | 'unavailable';
 

@@ -339,6 +339,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
       const isArchKde = options.manifest.id === 'arch-kde' && options.desktop === 'arch-kde';
       const isOpenSuseKde = options.manifest.id === 'opensuse-tumbleweed-kde' && options.desktop === 'opensuse-tumbleweed-kde';
       const isFedoraKde = options.manifest.id === 'fedora-kde' && options.desktop === 'fedora-kde';
+      const isAlpineKde = options.manifest.id === 'alpine-kde' && options.desktop === 'alpine-kde';
       const rootUrl = isUbuntuGnome
         ? '/disk/ubuntu-24.04-gnome/'
         : isUbuntuKdeEpiphany
@@ -353,6 +354,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? '/disk/opensuse-tumbleweed-kde/'
         : isFedoraKde
         ? '/disk/fedora-kde/'
+        : isAlpineKde
+        ? '/disk/alpine-kde/'
         : (options.manifest.imageSource.baseUri || '/disk/release/');
       const rootDiskId = isUbuntuGnome
         ? 'root-ubuntu-gnome'
@@ -368,6 +371,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? 'root-opensuse-tumbleweed-kde'
         : isFedoraKde
         ? 'root-fedora-kde'
+        : isAlpineKde
+        ? 'root-alpine-kde'
         : `root-${options.manifest.id}-${options.desktop}`;
       const homeDiskId = isArchKde
         ? 'home-arch-kde'
@@ -375,6 +380,8 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         ? 'home-opensuse-tumbleweed-kde'
         : isFedoraKde
         ? 'home-fedora-kde'
+        : isAlpineKde
+        ? 'home-alpine-kde'
         : `home-${(options.manifest.id === 'ubuntu-gnome' || options.manifest.id === 'ubuntu-kde' || options.manifest.id === 'ubuntu-kde-epiphany') ? 'ubuntu' : (options.manifest.id === 'debian-firefox' ? 'debian' : options.manifest.id)}`; // Persistent home shared across desktop sessions on /dev/wdb
 
       const diskConfig = [
@@ -464,7 +471,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         (window as any).linuxOs = this.activeOs;
 
         // Multi-Desktop Session Launch (Debian GNOME/XFCE, Ubuntu GNOME 46, Ubuntu KDE Plasma 5.27, Arch KDE 6, openSUSE Tumbleweed KDE 6, Fedora 45 KDE 6)
-        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde' || options.desktop === 'arch-kde' || options.desktop === 'opensuse-tumbleweed-kde' || options.desktop === 'fedora-kde') && options.autostartDesktop) {
+        if ((options.desktop === 'gnome' || options.desktop === 'xfce' || options.desktop === 'ubuntu-gnome' || options.desktop === 'ubuntu-kde' || options.desktop === 'arch-kde' || options.desktop === 'opensuse-tumbleweed-kde' || options.desktop === 'fedora-kde' || options.desktop === 'alpine-kde') && options.autostartDesktop) {
           const profile = DEBIAN_DESKTOP_PROFILES[options.desktop];
           this.log(`[Desktop Launcher] Waiting for guest shell readiness to launch ${profile?.name || options.desktop}...`);
           
@@ -478,7 +485,19 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
           // Provision dedicated session launcher scripts
           await this.provisionDesktopLaunchers();
 
-          if (options.desktop === 'fedora-kde') {
+          if (options.desktop === 'alpine-kde') {
+            this.log(`[Desktop Launcher] Executing verified Alpine 3.24.4 KDE Plasma 6 session script: /usr/local/bin/alpine-kde-session`);
+            const launchRes = await this.runCommand(`alpine-kde /usr/local/bin/alpine-kde-session`, 25000);
+            if (launchRes.exitCode !== 0) {
+              const errSummary = (launchRes.stderr || launchRes.stdout || 'Alpine KDE launcher returned non-zero exit code').trim();
+              this.log(`[Desktop Launcher Error] ${errSummary}`);
+              this.updateStatus({
+                state: 'error',
+                error: `${profile?.name || options.desktop} launch error: ${errSummary}`,
+              });
+              return;
+            }
+          } else if (options.desktop === 'fedora-kde') {
             this.log(`[Desktop Launcher] Executing verified Fedora 45 KDE Plasma 6 session script: /usr/local/bin/fedora-kde-session`);
             const launchRes = await this.runCommand(`fedora-kde /usr/local/bin/fedora-kde-session`, 25000);
             if (launchRes.exitCode !== 0) {
