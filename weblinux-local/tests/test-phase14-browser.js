@@ -12,7 +12,7 @@ const path = require('path');
 
 const DISTRO_CONFIGS = {
   'debian-firefox': {
-    selectorText: 'Debian GNU/Linux 13 (Trixie) + Firefox ESR',
+    selectorText: 'Debian GNU/Linux 13 (Trixie) + Epiphany Web',
     chrootCmd: 'debian',
     rootMount: '/debian',
     browserName: 'Epiphany',
@@ -80,7 +80,7 @@ const SCREENSHOT_DIR = path.join(__dirname, 'screenshots', 'phase14');
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 const PROFILE_DIR = path.join(__dirname, '..', `.tmp-edge-p14-${distroId}`);
 
-async function waitForBoot(page, timeoutSec = 150) {
+async function waitForBoot(page, timeoutSec = 240) {
   for (let i = 0; i < timeoutSec; i++) {
     await page.waitForTimeout(1000);
     const st = await page.evaluate(() => ({
@@ -94,7 +94,21 @@ async function waitForBoot(page, timeoutSec = 150) {
     }
     if (st.state === 'running' && st.shellReady) return st;
   }
-  throw new Error('Timed out waiting for guest shellReady');
+  const st = await page.evaluate(() => ({
+    state: window.weblinuxAdapter?.status?.state,
+    shellReady: window.weblinuxAdapter?.status?.shellReady,
+    waylandActive: window.weblinuxAdapter?.status?.waylandActive,
+    error: window.weblinuxAdapter?.status?.error,
+  }));
+  const adapterLogs = await page.evaluate(() => (window.weblinuxAdapter?.logs || []).slice(-40));
+  console.error('ADAPTER_LOGS:\n' + adapterLogs.join('\n'));
+  if (st.shellReady) {
+    const diag = await page.evaluate(async () => {
+      return await window.weblinuxAdapter.runCommand('cat /proc/partitions; dmesg | grep -iE "wd|blk|wasm" | tail -n 20', 10000);
+    }).catch((e) => ({ output: e.message }));
+    console.error('BOOT_TIMEOUT_DIAG:', diag.stdout || diag.output || '');
+  }
+  throw new Error('Timed out waiting for guest shellReady: ' + JSON.stringify(st));
 }
 
 async function selectAndLaunch(page) {
@@ -185,6 +199,12 @@ async function runGuest(page, innerCmd, timeoutMs = 45000) {
     });
     const page = ctx.pages()[0] || (await ctx.newPage());
     page.on('pageerror', (err) => console.error('PAGEERROR:', err.message));
+    page.on('console', (msg) => {
+      const t = msg.text();
+      if (msg.type() === 'error' || msg.type() === 'warning' || t.includes('integrity') || t.includes('OPFS') || t.includes('disk') || t.includes('Storage')) {
+        console.log('BROWSER_CONSOLE:', msg.type(), t);
+      }
+    });
 
     console.log(`[${distroId}] 1. Cold booting...`);
     const t0 = Date.now();
