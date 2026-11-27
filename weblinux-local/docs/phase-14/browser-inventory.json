@@ -1,54 +1,78 @@
 {
-  "auditDate": "2026-11-27",
-  "sandboxGate": "BLOCKED_SANDBOX_UNAVAILABLE",
-  "kernelCapabilities": {
-    "configSeccomp": false,
-    "userNamespaces": false,
-    "bwrapSlaveMount": false
-  },
-  "distributions": {
-    "debian-13-kde": {
-      "bestCandidate": "epiphany-browser",
-      "version": "48.5-0+deb13u1",
-      "arch": "riscv64",
-      "signatureVerified": true,
-      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+  "phase": "14.1",
+  "title": "Browser Runtime Fixes and Completion",
+  "distributions": [
+    {
+      "id": "ubuntu-kde-epiphany",
+      "browser": "Epiphany (epiphany-browser)",
+      "version": "Web 46.5",
+      "status": "PASS",
+      "unsandboxed": true,
+      "sandboxFlags": ["WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1"],
+      "coldBootSec": 22.8,
+      "warmReloadBootSec": 65.7,
+      "persistenceStatus": "PASS"
     },
-    "ubuntu-24.04.5-kde": {
-      "bestCandidate": "epiphany-browser",
-      "version": "46.0-2build1",
-      "arch": "riscv64",
-      "signatureVerified": true,
-      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+    {
+      "id": "opensuse-tumbleweed-kde",
+      "browser": "Epiphany (epiphany 51.2-1.1)",
+      "version": "Web 51.2",
+      "status": "PASS WITH LIMITATION",
+      "unsandboxed": true,
+      "sandboxFlags": ["WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1", "JSC_useJIT=0"],
+      "coldBootSec": 24.6,
+      "warmReloadBootSec": 35.3,
+      "persistenceStatus": "PASS",
+      "notes": "Chromium 155 failed on NOMMU fork() and 359 MiB OOM; switched to signed epiphany-51.2-1.1 via dbus-run-session."
     },
-    "arch-kde": {
-      "bestCandidate": "chromium",
+    {
+      "id": "alpine-kde",
+      "browser": "Epiphany (epiphany 50.4-r0)",
+      "version": "Web 50.4",
+      "status": "PASS WITH LIMITATION",
+      "unsandboxed": true,
+      "sandboxFlags": ["WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1", "JSC_useJIT=0"],
+      "coldBootSec": 23.8,
+      "warmReloadBootSec": 36.4,
+      "persistenceStatus": "PASS",
+      "commit": "f2dd744",
+      "notes": "BusyBox %q, /root traversal, and libportal D-Bus errors resolved; epiphany exited before ps."
+    },
+    {
+      "id": "debian-firefox",
+      "browser": "Epiphany (epiphany-browser 48.5-0+deb13u1)",
+      "version": "Web 48.5",
+      "status": "PASS WITH LIMITATION",
+      "unsandboxed": true,
+      "sandboxFlags": ["WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1", "JSC_useJIT=0"],
+      "coldBootSec": 33.2,
+      "warmReloadBootSec": 16.3,
+      "persistenceStatus": "PASS",
+      "commit": "2fab210",
+      "notes": "setpriv resolved su Authentication failure; libz.so.1 failed to map segment under 2048 MiB NOMMU pressure after Plasma 6."
+    },
+    {
+      "id": "arch-kde",
+      "browser": "Chromium (chromium 157.0.8103.78-1)",
       "version": "157.0.8103.78-1",
-      "arch": "riscv64",
-      "signatureVerified": true,
-      "stagingInstalled": true,
-      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+      "status": "BLOCKED",
+      "unsandboxed": true,
+      "sandboxFlags": ["--no-sandbox"],
+      "coldBootSec": 29.1,
+      "warmReloadBootSec": 22.7,
+      "persistenceStatus": "PASS",
+      "commit": "a9e37cc",
+      "notes": "Upstream extra repo ships simdutf 9.3.2-1 (libsimdutf.so.37) while chromium links libsimdutf.so.36."
     },
-    "opensuse-tumbleweed-kde": {
-      "bestCandidate": "chromium",
-      "version": "155.0.8059.84-238.1",
-      "arch": "riscv64",
-      "signatureVerified": true,
-      "status": "BLOCKED — SANDBOX UNAVAILABLE"
-    },
-    "fedora-45-kde": {
-      "bestCandidate": "firefox",
-      "version": "154.0-5.fc45",
-      "arch": "riscv64",
-      "signatureVerified": false,
-      "status": "BLOCKED"
-    },
-    "alpine-3.24.4-kde": {
-      "bestCandidate": "epiphany",
-      "version": "50.4-r0",
-      "arch": "riscv64",
-      "signatureVerified": true,
-      "status": "BLOCKED — SANDBOX UNAVAILABLE"
+    {
+      "id": "fedora-kde",
+      "browser": "None",
+      "version": null,
+      "status": "BLOCKED",
+      "unsandboxed": null,
+      "sandboxFlags": [],
+      "persistenceStatus": "NOT TESTED",
+      "notes": "gpgcheck=1 preserved; riscv-koji browser RPMs unsigned and dl.fedoraproject.org Everything/riscv64 returns 404."
     }
-  }
+  ]
 }

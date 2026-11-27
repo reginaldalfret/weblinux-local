@@ -1,7 +1,8 @@
 {
-  "distributionId": "debian-13-firefox",
-  "imageSize": 8589934592,
-  "chunkCount": 8192,
-  "nonZeroChunkCount": 4209,
-  "fullImageSha256": "93c5032899e33396c0e97c4800a508177df281678a80b92fc365894f4b08cde0"
+  "totalChunks": 8192,
+  "nonZeroChunks": 4486,
+  "bootChunks": 64,
+  "fullImageSha256": "f27136d32ca11174d11c54a318019d3c057b1a847201293a426393ac6958378c",
+  "imageSizeBytes": 8589934592,
+  "pieceSizeBytes": 1048576
 }

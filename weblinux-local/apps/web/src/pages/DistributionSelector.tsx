@@ -66,7 +66,7 @@ export const DistributionSelector: React.FC<DistributionSelectorProps> = ({
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-2xl">
                     {distro.id === 'debian' ? '🌀' :
-                     distro.id === 'debian-firefox' ? '🦊' :
+                     distro.id === 'debian-firefox' ? '🌐' :
                      distro.id === 'ubuntu' ? '🟠' :
                      distro.id === 'ubuntu-kde-epiphany' ? '🌐' :
                      distro.id === 'arch-kde' ? '🏹' :

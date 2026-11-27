@@ -1,0 +1,30 @@
+{
+  "distroId": "opensuse-tumbleweed-kde",
+  "browserName": "Epiphany",
+  "timestamp": "2026-11-27T19:52:30.085Z",
+  "coldBootSec": 33.6,
+  "warmReloadBootSec": 39.3,
+  "elfAndVersion": "=== OS ===\nPRETTY_NAME=\"openSUSE Tumbleweed\"\n=== RV_RUNTIME ===\nls: cannot access '/bin/rv': No such file or directory\n=== WRAPPER ===\n-rwxr-xr-x 1 root root 1495 Nov 27 12:01 /usr/local/bin/weblinux-browser\nWRAPPER_EXECUTABLE_OK\nuid=1000(browser) gid=1000(browser) groups=1000(browser)\n=== BINARY ===\nFOUND_BINARY=/usr/bin/epiphany\n-rwxr-xr-x 1 root root 4680224 Oct 29 17:11 /usr/bin/epiphany\n/usr/bin/epiphany: ELF 64-bit LSB pie executable, UCB RISC-V, RVC, double-float ABI, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-riscv64-lp64d.so.1, BuildID[sha1]=e9cb09f425a73f1be9ecbcf6fcec92a403917925, for GNU/Linux 4.15.0, stripped\nWeb 51.2",
+  "networkCheck": "=== DNS_HTTPS ===\n2606:4700:10::6814:179a example.com\n2606:4700:10::ac42:93f3 example.com\nHTTP/2 200 \n\ndate: Fri, 27 Nov 2026 19:53:49 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "initialSha256": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484",
+  "launchOut": "DOWNLOAD_SHA256=25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n32431be95ddb57ed7bad9d054495fb4eee8e2daf9ad9419f0a7f56c24de217c8  /root/browser-home/.config/p14-profile-marker.txt\nefa579ba9d2eeb7a80438806c6e17976b96119b51ad274befd6ac9a6c132bb68  /root/browser-home/.local/share/epiphany/p14-bookmark.txt\nLAUNCHED_WRAPPER_LOCAL\nLAUNCHED_WRAPPER_HTTPS",
+  "processAndMemory": "=== PROCS ===\nbrowser    421     1  1 19:56 ?        00:00:01 /usr/bin/dbus-run-session -- /usr/bin/epiphany file:///tmp/p14-test.html\nbrowser    441   421 58 19:56 ?        00:00:39 /usr/bin/epiphany file:///tmp/p14-test.html\nbrowser    530   441 27 19:57 ?        00:00:09 /usr/libexec/libwebkitgtk-6_0-0/WebKitNetworkProcess 2 9\n=== MEMORY ===\n               total        used        free      shared  buff/cache   available\nMem:            2009        1234         709           0         634         774\nSwap:              0           0           0\n=== BROWSER_LOG ===\ndbus-daemon[511]: [session uid=1000 pid=511] Activating service name='org.gtk.vfs.Daemon' requested by ':1.0' (uid=1000 pid=513 comm=\"/usr/bin/epiphany https://example.com   \")\ndbus-daemon[511]: [session uid=1000 pid=511] Successfully activated service 'org.gtk.vfs.Daemon'\nfuse: device /dev/fuse not found. Kernel module not loaded?\nrv: out of memory (the guest has 45 MiB and touched a page at 0x769b014 that had none yet)\nrv: segmentation fault: address 0x769b014 at pc 0x74e90fc\nrv: out of memory (the guest has 105 MiB and touched a page at 0x1feac0070 that had none yet)\nrv: segmentation fault: address 0x1feac0070 at pc 0xc39b91a\nA connection to the bus can't be made",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 browser browser  40 Nov 27 19:56 /root/browser-home/.config/p14-profile-marker.txt\n-rw-r--r-- 1 browser browser  61 Nov 27 19:56 /root/browser-home/.local/share/epiphany/p14-bookmark.txt\n-rw-r--r-- 1 browser browser 577 Nov 27 19:56 /root/browser-home/Downloads/example.html\nPHASE14_PERSIST_opensuse-tumbleweed-kde\nPHASE14_BOOKMARK_opensuse-tumbleweed-kde|https://example.com\nPERSISTED_SHA256=25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n32431be95ddb57ed7bad9d054495fb4eee8e2daf9ad9419f0a7f56c24de217c8  /root/browser-home/.config/p14-profile-marker.txt\nefa579ba9d2eeb7a80438806c6e17976b96119b51ad274befd6ac9a6c132bb68  /root/browser-home/.local/share/epiphany/p14-bookmark.txt",
+  "persistedSha256": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484",
+  "checks": {
+    "hasBinary": true,
+    "hasWrapper": true,
+    "hasNet": true,
+    "hasProcs": true,
+    "hasMarker": true,
+    "hasBookmark": true,
+    "hasDownloadSha": true
+  },
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-opensuse-tumbleweed-kde-local.png",
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-opensuse-tumbleweed-kde-example.png",
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-opensuse-tumbleweed-kde-persisted.png"
+  ],
+  "status": "PASS",
+  "error": null
+}

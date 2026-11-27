@@ -1,6 +1,6 @@
 {
   "id": "debian-firefox",
-  "name": "Debian GNU/Linux 13 (Trixie) + Firefox ESR",
+  "name": "Debian GNU/Linux 13 (Trixie) + Epiphany Web",
   "releaseVersion": "13 / trixie",
   "architecture": "riscv64",
   "kernelCompatibility": "linux-wasm64_nommu-6.1",
@@ -19,8 +19,8 @@
     "chunkSize": 1048576,
     "totalSizeBytes": 8589934592,
     "manifestUri": "/disk/debian-13-firefox/manifest.json",
-    "id": "7dc22da1c8d775bfa3c25156ac2da720",
-    "fullImageSha256": "7dc22da1c8d775bfa3c25156ac2da7206f7a4a1afc3684ada9d53cbf84799fd5"
+    "id": "f27136d32ca11174d11c54a318019d3c",
+    "fullImageSha256": "f27136d32ca11174d11c54a318019d3c057b1a847201293a426393ac6958378c"
   },
   "integrity": {
     "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
@@ -30,7 +30,7 @@
     "initrdSize": 15064075,
     "initrdUncompressedSize": 36659200,
     "chunksCount": 8192,
-    "nonZeroChunksCount": 4448,
+    "nonZeroChunksCount": 4486,
     "bootChunksCount": 64
   },
   "runtimeRequirements": {
@@ -43,7 +43,7 @@
     "requiresWebGL2": true,
     "requiresWebGPU": false,
     "requiresOPFS": true,
-    "estimatedDiskMB": 4448
+    "estimatedDiskMB": 4486
   },
   "licensing": {
     "baseLicense": "GPL-2.0-or-later, DFSG Compliant",
@@ -51,5 +51,5 @@
     "licenseDocUrl": "/docs/LICENSING.md"
   },
   "validationStatus": "experimental",
-  "notes": "Debian 13 Trixie riscv64 with KDE Plasma 6, native Firefox ESR (153.5.1esr), and Epiphany 48.5 (WebKitGTK 2.52.6, unsandboxed wrapper) configured for NOMMU execution."
+  "notes": "Debian 13 Trixie riscv64 with KDE Plasma 6 and Epiphany 48.5 (WebKitGTK 2.52.6, unsandboxed experimental NOMMU mode)."
 }
