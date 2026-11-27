@@ -1,14 +1,14 @@
 {
   "distroId": "alpine-kde",
   "browserName": "Epiphany",
-  "timestamp": "2026-11-27T09:35:30.991Z",
-  "coldBootSec": 25.1,
-  "warmReloadBootSec": 44.8,
-  "elfAndVersion": "=== OS ===\nPRETTY_NAME=\"Alpine Linux v3.24\"\n=== WRAPPER ===\n-rwxr-xr-x 1 root root 845 Nov 27 08:44 /usr/local/bin/weblinux-browser\nuid=1000(browser) gid=1000(browser) groups=1000(browser)\n=== BINARY ===\n-rwxr-xr-x 1 root root 4680000 Apr 27  2026 /usr/bin/epiphany\n/usr/bin/epiphany: ELF 64-bit LSB pie executable, UCB RISC-V, RVC, double-float ABI, version 1 (SYSV), dynamically linked, interpreter /lib/ld-musl-riscv64.so.1, BuildID[sha1]=d5d86f9e3852cc576abb8319db2a27d3d235c6b3, stripped\nWeb 50.4",
-  "networkCheck": "=== DNS_HTTPS ===\n2606:4700:10::6814:179a  example.com  example.com\nHTTP/2 200 \n\ndate: Fri, 27 Nov 2026 09:36:39 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "timestamp": "2026-11-27T11:25:40.773Z",
+  "coldBootSec": 23.8,
+  "warmReloadBootSec": 36.4,
+  "elfAndVersion": "=== OS ===\nPRETTY_NAME=\"Alpine Linux v3.24\"\n=== WRAPPER ===\n-rwxr-xr-x 1 root root 1497 Nov 27 11:24 /usr/local/bin/weblinux-browser\nuid=1000(browser) gid=1000(browser) groups=1000(browser)\n=== BINARY ===\n-rwxr-xr-x 1 root root 4680000 Apr 27  2026 /usr/bin/epiphany\n/usr/bin/epiphany: ELF 64-bit LSB pie executable, UCB RISC-V, RVC, double-float ABI, version 1 (SYSV), dynamically linked, interpreter /lib/ld-musl-riscv64.so.1, BuildID[sha1]=d5d86f9e3852cc576abb8319db2a27d3d235c6b3, stripped\nWeb 50.4",
+  "networkCheck": "=== DNS_HTTPS ===\n2606:4700:10::ac42:93f3  example.com  example.com\nHTTP/2 200 \n\ndate: Fri, 27 Nov 2026 11:26:52 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
   "launchOut": "25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n0072b932464bb312e8f9d7fe934284af1d83cb9e4fe67169eb0564ff2358e050  /root/browser-home/.config/p14-profile-marker.txt\nLAUNCHED_WRAPPER",
-  "processAndMemory": "=== PROCS ===\n=== MEMORY ===\n               total        used        free      shared  buff/cache   available\nMem:            2009        1177         623           0         868         831\nSwap:              0           0           0\n=== BROWSER_LOG ===\nsh: %q : invalid format\n\n(epiphany:508): libportal-CRITICAL **: 09:38:40.627: Failed to create XdpPortal instance: The connection is closed",
-  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 browser browser  27 Nov 27 09:38 /root/browser-home/.config/p14-profile-marker.txt\n-rw-r--r-- 1 browser browser 577 Nov 27 09:38 /root/browser-home/Downloads/example.html\nPHASE14_PERSIST_alpine-kde\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n0072b932464bb312e8f9d7fe934284af1d83cb9e4fe67169eb0564ff2358e050  /root/browser-home/.config/p14-profile-marker.txt",
+  "processAndMemory": "=== PROCS ===\n=== MEMORY ===\n               total        used        free      shared  buff/cache   available\nMem:            2009        1154         627           0         887         854\nSwap:              0           0           0\n=== BROWSER_LOG ===",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 browser browser  27 Nov 27 11:28 /root/browser-home/.config/p14-profile-marker.txt\n-rw-r--r-- 1 browser browser 577 Nov 27 11:28 /root/browser-home/Downloads/example.html\nPHASE14_PERSIST_alpine-kde\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /root/browser-home/Downloads/example.html\n0072b932464bb312e8f9d7fe934284af1d83cb9e4fe67169eb0564ff2358e050  /root/browser-home/.config/p14-profile-marker.txt",
   "screenshots": [
     "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-alpine-kde-example.png",
     "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase14\\p14-alpine-kde-persisted.png"

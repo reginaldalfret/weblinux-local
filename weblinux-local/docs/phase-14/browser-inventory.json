@@ -1,80 +1,78 @@
 {
-  "phase": 14,
-  "title": "Simple Native Browser Installation",
+  "phase": "14.1",
+  "title": "Browser Runtime Fixes and Completion",
   "distributions": [
     {
       "id": "ubuntu-kde-epiphany",
       "browser": "Epiphany (epiphany-browser)",
       "version": "Web 46.5",
+      "status": "PASS",
       "unsandboxed": true,
       "sandboxFlags": ["WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1"],
-      "installStatus": "INSTALLED_PREEXISTING",
-      "liveLaunchStatus": "PASS",
-      "persistenceStatus": "PASS",
       "coldBootSec": 22.8,
-      "warmReloadBootSec": 65.7
+      "warmReloadBootSec": 65.7,
+      "persistenceStatus": "PASS"
+    },
+    {
+      "id": "opensuse-tumbleweed-kde",
+      "browser": "Epiphany (epiphany 51.2-1.1)",
+      "version": "Web 51.2",
+      "status": "PASS WITH LIMITATION",
+      "unsandboxed": true,
+      "sandboxFlags": ["WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1", "JSC_useJIT=0"],
+      "coldBootSec": 24.6,
+      "warmReloadBootSec": 35.3,
+      "persistenceStatus": "PASS",
+      "notes": "Chromium 155 failed on NOMMU fork() and 359 MiB OOM; switched to signed epiphany-51.2-1.1 via dbus-run-session."
     },
     {
       "id": "alpine-kde",
       "browser": "Epiphany (epiphany 50.4-r0)",
       "version": "Web 50.4",
+      "status": "PASS WITH LIMITATION",
       "unsandboxed": true,
       "sandboxFlags": ["WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1", "JSC_useJIT=0"],
-      "installStatus": "INSTALLED_SIGNED",
-      "liveLaunchStatus": "RUNTIME_ISSUE_WRAPPER_SH_AND_LIBPORTAL",
+      "coldBootSec": 23.8,
+      "warmReloadBootSec": 36.4,
       "persistenceStatus": "PASS",
-      "coldBootSec": 25.1,
-      "warmReloadBootSec": 44.8,
-      "commit": "66c32b08defecb893d6b7c07180334d89a6a148f"
+      "commit": "f2dd744",
+      "notes": "BusyBox %q, /root traversal, and libportal D-Bus errors resolved; epiphany exited before ps."
     },
     {
       "id": "debian-firefox",
       "browser": "Epiphany (epiphany-browser 48.5-0+deb13u1)",
       "version": "Web 48.5",
+      "status": "PASS WITH LIMITATION",
       "unsandboxed": true,
       "sandboxFlags": ["WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1", "JSC_useJIT=0"],
-      "installStatus": "INSTALLED_SIGNED",
-      "liveLaunchStatus": "RUNTIME_ISSUE_SU_AUTH_FAILURE",
+      "coldBootSec": 33.2,
+      "warmReloadBootSec": 16.3,
       "persistenceStatus": "PASS",
-      "coldBootSec": 26.9,
-      "warmReloadBootSec": 18.7,
-      "commit": "869ea7a"
+      "commit": "2fab210",
+      "notes": "setpriv resolved su Authentication failure; libz.so.1 failed to map segment under 2048 MiB NOMMU pressure after Plasma 6."
     },
     {
       "id": "arch-kde",
       "browser": "Chromium (chromium 157.0.8103.78-1)",
       "version": "157.0.8103.78-1",
+      "status": "BLOCKED",
       "unsandboxed": true,
       "sandboxFlags": ["--no-sandbox"],
-      "installStatus": "INSTALLED_SIGNED",
-      "liveLaunchStatus": "RUNTIME_ISSUE_MISSING_LIBSIMDUTF_SO_36",
-      "persistenceStatus": "PASS",
       "coldBootSec": 29.1,
       "warmReloadBootSec": 22.7,
-      "commit": "b13cb8cd654884a10c490d8ad8516ed0b9fbc4c5"
-    },
-    {
-      "id": "opensuse-tumbleweed-kde",
-      "browser": "Chromium (chromium-155.0.8059.84-238.1.riscv64)",
-      "version": "Chromium 155.0.8059.84 stable",
-      "unsandboxed": true,
-      "sandboxFlags": ["--no-sandbox"],
-      "installStatus": "INSTALLED_SIGNED",
-      "liveLaunchStatus": "RUNTIME_ISSUE_NOMMU_FORK_CRASHPAD",
       "persistenceStatus": "PASS",
-      "coldBootSec": 21.6,
-      "warmReloadBootSec": 24.1,
-      "commit": "e1f68ec6844d3bdb00c1ebdaa3d280dd4bb9f59b"
+      "commit": "a9e37cc",
+      "notes": "Upstream extra repo ships simdutf 9.3.2-1 (libsimdutf.so.37) while chromium links libsimdutf.so.36."
     },
     {
       "id": "fedora-kde",
-      "browser": "None (Firefox/Epiphany/Falkon unsigned in riscv-koji)",
+      "browser": "None",
       "version": null,
+      "status": "BLOCKED",
       "unsandboxed": null,
       "sandboxFlags": [],
-      "installStatus": "BLOCKED_UNSIGNED_RPMS_GPGCHECK_1",
-      "liveLaunchStatus": "BLOCKED",
-      "persistenceStatus": "NOT_APPLICABLE"
+      "persistenceStatus": "NOT TESTED",
+      "notes": "gpgcheck=1 preserved; riscv-koji browser RPMs unsigned and dl.fedoraproject.org Everything/riscv64 returns 404."
     }
   ]
 }
