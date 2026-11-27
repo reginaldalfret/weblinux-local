@@ -1,0 +1,80 @@
+{
+  "release": {
+    "name": "Fedora Linux 45",
+    "architecture": "riscv64",
+    "abi": "RV64GC / LP64D",
+    "supportTier": "community-maintained secondary architecture",
+    "desktop": "KDE Plasma 6.7.4"
+  },
+  "rootfsProvenance": {
+    "artifact": "Fedora-Container-Base-Generic-45-20261022.0.riscv64.oci.tar.xz",
+    "sourceUrl": "https://dl.fedoraproject.org/pub/alt/risc-v/releases/45/Container/riscv64/images/Fedora-Container-Base-Generic-45-20261022.0.riscv64.oci.tar.xz",
+    "sha256": "bfc2ad635a352818a8d250fde1175193f76a96ace071b569f67abd3124020f8e",
+    "checksumVerification": "PASS",
+    "detachedOpenPgpSignature": "NOT_PUBLISHED",
+    "gaMatch": true,
+    "retainedBaseRootfs": true
+  },
+  "diskImage": {
+    "rootDiskId": "root-fedora-kde",
+    "homeDiskId": "home-fedora-kde",
+    "filesystemUuid": "14dca0d4-ba28-4de2-86df-ae7c470fa7bc",
+    "fullImageSha256": "852661e6fa2fbdec4b0e41a75daaf272a994bc3cb948cea63e7606406fe6a754",
+    "totalChunks": 3328,
+    "nonZeroChunks": 1969,
+    "e2fsckClean": true
+  },
+  "trustedKeys": [
+    {
+      "name": "Fedora (45) <fedora-45-primary@fedoraproject.org>",
+      "keyId": "rsa4096/655A4B02F577861E",
+      "fingerprint": "4F50 A611 4CD5 C697 6A7F 1179 655A 4B02 F577 861E",
+      "origin": "/usr/share/pki/rpm-gpg/RPM-GPG-KEY-fedora-45-primary (fedora-gpg-keys-45-0.5.2.riscv64.noarch)",
+      "verificationSource": "https://fedoraproject.org/ga/security/",
+      "importedInRpmDb": true,
+      "rpmDbEntry": "gpg-pubkey-4f50a6114cd5c6976a7f1179655a4b02f577861e-6888bc98",
+      "expirationState": "valid (created 2025-07-29, no expiry)",
+      "associatedRepos": [
+        "fedora"
+      ]
+    }
+  ],
+  "repositories": [
+    {
+      "id": "fedora",
+      "baseurl": "https://riscv-koji.fedoraproject.org/repos-dist/f$releasever/latest/$basearch/",
+      "enabled": true,
+      "gpgcheck": true,
+      "repoGpgcheck": false,
+      "sslverify": true,
+      "skipIfUnavailable": false,
+      "overrideFile": "/etc/dnf/repos.override.d/99-weblinux-security.repo"
+    },
+    {
+      "id": "fedora-staging",
+      "baseurl": "https://riscv-koji.fedoraproject.org/repos-dist/f$releasever-staging/latest/$basearch/",
+      "enabled": false,
+      "gpgcheck": true,
+      "repoGpgcheck": false,
+      "sslverify": true,
+      "overrideFile": "/etc/dnf/repos.override.d/99-weblinux-security.repo"
+    },
+    {
+      "id": "fedora-koji",
+      "baseurl": "https://riscv-koji.fedoraproject.org/repos/f$releasever-build/latest/$basearch/",
+      "enabled": false,
+      "gpgcheck": true,
+      "repoGpgcheck": false,
+      "sslverify": true,
+      "overrideFile": "/etc/dnf/repos.override.d/99-weblinux-security.repo"
+    }
+  ],
+  "packageSignatureEnforcement": "ENFORCED_FAIL_CLOSED",
+  "metadataSignatureEnforcement": "UNAVAILABLE_UPSTREAM (HTTPS TLS only; repomd.xml.asc 404)",
+  "knownLimitations": [
+    "riscv-koji.fedoraproject.org f45 and f45-staging repositories currently serve unsigned RPMs (0/717 installed signed) and unsigned repomd.xml.",
+    "dl.fedoraproject.org/pub/alt/risc-v/releases/45/ publishes .sha256 checksums without detached .asc OpenPGP signatures.",
+    "With gpgcheck=1 enforced, live dnf5 install/upgrade against riscv-koji fails closed rather than accepting unsigned packages."
+  ],
+  "finalQualificationStatus": "PASS_WITH_LIMITATION"
+}

@@ -39,9 +39,57 @@ done
 # Optional GL/EGL demo package if available
 dnf5 "${DNF_OPTS[@]}" install mesa-demos 2>/dev/null || true
 
-# Ensure /etc/yum.repos.d has the official Fedora RISC-V repos
-mkdir -p "$R/etc/yum.repos.d"
-cp -n "$R/usr/share/dnf5/repos.d/"*.repo "$R/etc/yum.repos.d/" 2>/dev/null || true
+# Verify Fedora 45 GPG key fingerprint and import into RPM DB
+KEY="$R/usr/share/pki/rpm-gpg/RPM-GPG-KEY-fedora-45-primary"
+EXPECTED_FP="4F50A6114CD5C6976A7F1179655A4B02F577861E"
+ACTUAL_FP=$(gpg --show-keys --with-colons "$KEY" | python3 -c 'import sys; print(next(l.split(":")[9] for l in sys.stdin if l.startswith("fpr:")))')
+if [ "$ACTUAL_FP" != "$EXPECTED_FP" ]; then
+  echo "ERROR: Fedora 45 GPG key fingerprint mismatch: $ACTUAL_FP != $EXPECTED_FP" >&2
+  exit 1
+fi
+rpmkeys --root "$R" --import "$KEY"
+
+# Harden DNF5 repository configuration via /etc/dnf/repos.override.d/ (keep /usr/share/dnf5/repos.d/ intact)
+rm -f "$R/etc/yum.repos.d/fedora.repo" "$R/etc/yum.repos.d/fedora-staging.repo" "$R/etc/yum.repos.d/fedora-koji.repo"
+mkdir -p "$R/etc/dnf/repos.override.d"
+cat <<'EOF' > "$R/etc/dnf/repos.override.d/99-weblinux-security.repo"
+[fedora]
+enabled=1
+gpgcheck=1
+sslverify=1
+skip_if_unavailable=0
+gpgkey=file:///usr/share/pki/rpm-gpg/RPM-GPG-KEY-fedora-45-primary
+
+[fedora-staging]
+enabled=0
+gpgcheck=1
+sslverify=1
+
+[fedora-koji]
+enabled=0
+gpgcheck=1
+sslverify=1
+
+[fedora-debuginfo]
+enabled=0
+gpgcheck=1
+sslverify=1
+
+[fedora-source]
+enabled=0
+gpgcheck=1
+sslverify=1
+
+[fedora-staging-debuginfo]
+enabled=0
+gpgcheck=1
+sslverify=1
+
+[fedora-staging-source]
+enabled=0
+gpgcheck=1
+sslverify=1
+EOF
 
 # Lock root password, ensure machine-id, clean dnf cache, capture package lock
 chroot "$R" /usr/bin/qemu-riscv64-static /usr/bin/bash -c "

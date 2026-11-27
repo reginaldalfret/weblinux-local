@@ -1,8 +1,8 @@
 {
   "totalChunks": 3328,
-  "nonZeroChunks": 1927,
+  "nonZeroChunks": 1969,
   "bootChunks": 64,
-  "fullImageSha256": "41ce9df26a9a1137ed159e78bae59b6ee39b05d6d462383ce74d61b426cb2bbc",
+  "fullImageSha256": "852661e6fa2fbdec4b0e41a75daaf272a994bc3cb948cea63e7606406fe6a754",
   "imageSizeBytes": 3489660928,
   "pieceSizeBytes": 1048576
 }
