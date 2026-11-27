@@ -16,11 +16,11 @@
   "imageSource": {
     "baseUri": "/disk/alpine-kde/",
     "chunkSize": 1048576,
-    "totalSizeBytes": 3154116608,
+    "totalSizeBytes": 3288334336,
     "manifestUri": "/disk/alpine-kde/manifest.json",
-    "id": "5067754980014f1250493043183e96de",
-    "fullImageSha256": "5067754980014f1250493043183e96decbddcdc41c993dff481091ff82bbbfa1",
-    "filesystemUuid": "f6b9672a-ebb9-4c30-a354-65e080783f9b"
+    "id": "addc411837962ffc862f8ffc3290d6ca",
+    "fullImageSha256": "addc411837962ffc862f8ffc3290d6cab35203619b2f7713e25ee58f89ae7d1f",
+    "filesystemUuid": "f4890b5e-26db-4fe7-8144-53aec9f63a5e"
   },
   "integrity": {
     "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
@@ -29,8 +29,8 @@
     "kernelSize": 7380050,
     "initrdSize": 15064075,
     "initrdUncompressedSize": 36659200,
-    "chunksCount": 3008,
-    "nonZeroChunksCount": 1538,
+    "chunksCount": 3136,
+    "nonZeroChunksCount": 1693,
     "bootChunksCount": 64,
     "sourceArchive": "alpine-minirootfs-3.24.4-riscv64.tar.gz",
     "sourceArchiveSha256": "010683db6c73b3ad1c334fc8f93f64ae748ef67ae6d69e964929aeaf8517bff3"
@@ -44,7 +44,7 @@
     "requiresCrossOriginIsolated": true,
     "requiresWebGL2": true,
     "requiresOPFS": true,
-    "estimatedDiskMB": 3008
+    "estimatedDiskMB": 3136
   },
   "licensing": {
     "baseLicense": "MIT / GPL-2.0-or-later, Alpine Linux 3.24.4 RISC-V",
