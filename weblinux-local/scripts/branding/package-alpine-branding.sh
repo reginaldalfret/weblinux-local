@@ -18,7 +18,7 @@ APPLY_SCRIPT="/mnt/e/Web-Linux/weblinux-local/scripts/branding/apply-alpine-bran
 
 mkdir -p "$WORKDIR" "$MNT"
 
-if [ -f "$SRC_IMG" ] && [ ! -f "$IMG" ]; then
+if [ -f "$SRC_IMG" ]; then
   echo "=== [1/5] Copying clean Phase 15 alpine-kde.ext4 ==="
   cp -f "$SRC_IMG" "$IMG"
 elif [ ! -f "$IMG" ]; then
@@ -193,14 +193,32 @@ X-KDE-autostart-phase=1
 NoDisplay=true
 EOF
 
-echo "=== [4/5] Applying branding & verifying inside chroot ==="
+echo "=== [4/5] Writing /etc/xdg defaults & verifying inside chroot ==="
+cat > "$MNT/etc/xdg/kdeglobals" <<'EOF'
+[General]
+AccentColor=13,89,127
+ColorScheme=BreezeDark
+fixed=DejaVu Sans Mono,10,-1,5,400,0,0,0,0,0
+font=DejaVu Sans,10,-1,5,400,0,0,0,0,0
+
+[Icons]
+Theme=breeze-dark
+
+[KDE]
+LookAndFeelPackage=org.kde.breezedark.desktop
+widgetStyle=Breeze
+EOF
+
+cat > "$MNT/etc/xdg/konsolerc" <<'EOF'
+[Desktop Entry]
+DefaultProfile=Alpine-WebLinux.profile
+EOF
+
 chroot "$MNT" /bin/sh -lc '
   set -e
   export HOME=/root
-  /usr/local/bin/weblinux-apply-alpine-branding --force
-  /usr/local/bin/weblinux-apply-alpine-branding --status
+  /usr/local/bin/weblinux-apply-alpine-branding --dry-run
   cat /etc/os-release | grep -E "^(NAME|VERSION_ID|ID)="
-  plasmashell --version || true
   apk info -e epiphany chromium firefox badwolf netsurf falkon 2>/dev/null || echo "NO_BROWSERS_OK"
 '
 
@@ -246,17 +264,22 @@ with open(img_path, "rb") as fp:
         else:
             hashes.append("")
 
+while len(present_bits) % 4 != 0:
+    present_bits.append(0)
+
 present_hex = "".join(
-    f"{sum(present_bits[i + b] << b for b in range(min(4, total - i))):x}"
-    for i in range(0, total, 4)
+    f"{(present_bits[i]<<3)|(present_bits[i+1]<<2)|(present_bits[i+2]<<1)|present_bits[i+3]:x}"
+    for i in range(0, len(present_bits), 4)
 )
 full_sha = full_hash.hexdigest()
+boot = list(range(min(64, total)))
 
 manifest = {
-    "id": "alpine-kde",
     "size": size,
     "piece": piece,
+    "id": full_sha[:32],
     "hashes": hashes,
+    "boot": boot,
     "present": present_hex,
 }
 integrity = {
