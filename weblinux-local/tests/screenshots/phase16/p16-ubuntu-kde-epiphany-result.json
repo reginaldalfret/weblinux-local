@@ -1,0 +1,20 @@
+{
+  "phase": "16",
+  "distroId": "ubuntu-kde-epiphany",
+  "timestamp": "2026-11-28T07:31:55.135Z",
+  "coldBootSec": 28.4,
+  "warmReloadBootSec": null,
+  "osReleaseCheck": "",
+  "brandingConfigCheck": "",
+  "browserRemovalCheck": "",
+  "networkCheck": "",
+  "initialSha256": "",
+  "persistedSha256": "",
+  "persistenceCheck": "",
+  "checks": {},
+  "screenshots": {
+    "desktop": "tests/screenshots/phase16/p16-ubuntu-kde-epiphany-01-desktop.png"
+  },
+  "status": "FAILED",
+  "error": "page.evaluate: Error: Linux runtime is not active. Cannot execute guest command.\n    at WasmLinuxAdapter.runCommand (http://localhost:3000/@fs/E:/Web-Linux/weblinux-local/runtime/adapters/WasmLinuxAdapter.ts:473:13)\n    at eval (eval at evaluate (:370:30), <anonymous>:2:36)\n    at UtilityScript.evaluate (<anonymous>:372:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+}

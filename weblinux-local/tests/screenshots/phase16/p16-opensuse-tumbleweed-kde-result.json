@@ -1,0 +1,41 @@
+{
+  "phase": "16",
+  "distroId": "opensuse-tumbleweed-kde",
+  "timestamp": "2026-11-28T08:20:59.895Z",
+  "coldBootSec": 26.1,
+  "warmReloadBootSec": 53.1,
+  "osReleaseCheck": "NAME=\"openSUSE Tumbleweed\"\n# VERSION=\"20261106\"\nID=\"opensuse-tumbleweed\"\nID_LIKE=\"opensuse suse\"\nVERSION_ID=\"20261106\"\nPRETTY_NAME=\"openSUSE Tumbleweed\"\nANSI_COLOR=\"0;32\"\n# CPE 2.3 format, boo#1217921\nCPE_NAME=\"cpe:2.3:o:opensuse:tumbleweed:20261106:*:*:*:*:*:*:*\"\n#CPE 2.2 format\n#CPE_NAME=\"cpe:/o:opensuse:tumbleweed:20261106\"\nBUG_REPORT_URL=\"https://bugzilla.opensuse.org\"\nSUPPORT_URL=\"https://bugs.opensuse.org\"\nHOME_URL=\"https://www.opensuse.org\"\nDOCUMENTATION_URL=\"https://en.opensuse.org/Portal:Tumbleweed\"\nLOGO=\"distributor-logo-Tumbleweed\"",
+  "brandingConfigCheck": "=== OS_RELEASE ===\nNAME=\"openSUSE Tumbleweed\"\n# VERSION=\"20261106\"\nID=\"opensuse-tumbleweed\"\nID_LIKE=\"opensuse suse\"\nVERSION_ID=\"20261106\"\nPRETTY_NAME=\"openSUSE Tumbleweed\"\nANSI_COLOR=\"0;32\"\n# CPE 2.3 format, boo#1217921\nCPE_NAME=\"cpe:2.3:o:opensuse:tumbleweed:20261106:*:*:*:*:*:*:*\"\n#CPE 2.2 format\n#CPE_NAME=\"cpe:/o:opensuse:tumbleweed:20261106\"\nBUG_REPORT_URL=\"https://bugzilla.opensuse.org\"\nSUPPORT_URL=\"https://bugs.opensuse.org\"\nHOME_URL=\"https://www.opensuse.org\"\nDOCUMENTATION_URL=\"https://en.opensuse.org/Portal:Tumbleweed\"\nLOGO=\"distributor-logo-Tumbleweed\"\n=== MIGRATION_MARKER ===\n-rw-r--r-- 1 root root 87 Nov 28 08:00 /root/.local/state/weblinux/branding-v1-applied\nversion=v1\ndistro=opensuse-tumbleweed\napplied_at=2026-11-28T08:00:54Z\nbackup_created=0\n=== KDEGLOBALS ===\n=== PLASMARC ===\n[Theme]\nname=openSUSE\n=== KWINRC ===\n[Desktops]\nNumber=2\nId_1=970aa743-cc19-4151-bcf3-3495c0918901\nId_2=9e80e5a5-01bc-44c9-9bd4-24d4782215e1\nRows=2\n\n[Plugins]\nshowpaintEnabled=false\n=== KCMINPUTRC ===\n[Mouse]\ncursorTheme=breeze_cursors\n=== WALLPAPER_CONFIG ===\n15:wallpaperplugin=org.kde.image\n24:wallpaperplugin=org.kde.image\n77:wallpaperplugin=org.kde.image\n=== BRANDING_ASSETS ===\ntotal 20\ndrwxr-xr-x   3 root root 4096 Nov 21 00:49 .\ndr-xr-xr-x 178 root root 4096 Nov 28 08:00 ..\nlrwxrwxrwx   1 root root   15 Jan 26  2026 SLEdefault -> openSUSEdefault\nlrwxrwxrwx   1 root root   22 Jan 26  2026 default.png -> openSUSEtumbleweed.png\n-rw-r--r--   1 root root   24 Jan 26  2026 default.png.desktop\ndrwxr-xr-x   3 root root 4096 Nov 21 00:49 openSUSEdefault\nlrwxrwxrwx   1 root root   43 Jan 26  2026 openSUSEtumbleweed.png -> openSUSEdefault/contents/images/default.png\n-rw-r--r--   1 root root  109 Jan 26  2026 openSUSEtumbleweed.png.desktop\n/usr/share/pixmaps/distribution-logos/light-dual-branding.svg",
+  "browserRemovalCheck": "=== BIN_CHECK ===\n=== PKG_CHECK ===\n=== WRAPPER_AND_DESKTOP ===\nNO_WRAPPER_OK\nNO_DESKTOP_OK",
+  "networkCheck": "=== DNS ===\n2606:4700:10::6814:179a example.com\n2606:4700:10::ac42:93f3 example.com\n=== CURL_HEAD ===\nHTTP/2 200 \n\ndate: Sat, 28 Nov 2026 08:27:22 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\nlast-modified: Wed, 25 Nov 2026 23:44:53 GMT\n\n=== CURL_BODY_SHA256 ===\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /tmp/p16-example.html\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "initialSha256": "373c4039b82662470d93de2562a482dccab038be82cdb58fc1bf04f1ada3a06c",
+  "persistedSha256": "373c4039b82662470d93de2562a482dccab038be82cdb58fc1bf04f1ada3a06c",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 root root 63 Nov 28 08:27 /root/p16-branding-persist.txt\nPHASE16_BRANDING_PERSIST_opensuse-tumbleweed-kde_1795854459258\nPERSISTED_SHA256=373c4039b82662470d93de2562a482dccab038be82cdb58fc1bf04f1ada3a06c\n=== REBOOT_BRANDING_MARKER ===\n-rw-r--r-- 1 root root 87 Nov 28 08:00 /root/.local/state/weblinux/branding-v1-applied",
+  "checks": {
+    "osReleaseMatches": true,
+    "brandingMarkerPresent": true,
+    "kdeglobalsConfigured": false,
+    "wallpaperConfigured": true,
+    "noBrowserBins": true,
+    "noBrowserPkgs": true,
+    "noWrapperOrDesktop": true,
+    "hasDns": true,
+    "hasCurlHead": true,
+    "hasCurlSha": true,
+    "hasRfc1918Blocked": true,
+    "hasPersistMarker": true,
+    "hasPersistSha": true,
+    "brandingMarkerPersisted": true,
+    "hasAllScreenshots": true
+  },
+  "screenshots": {
+    "desktop": "tests/screenshots/phase16/p16-opensuse-tumbleweed-kde-01-desktop.png",
+    "kickoff": "tests/screenshots/phase16/p16-opensuse-tumbleweed-kde-02-kickoff.png",
+    "konsole": "tests/screenshots/phase16/p16-opensuse-tumbleweed-kde-03-konsole.png",
+    "dolphin": "tests/screenshots/phase16/p16-opensuse-tumbleweed-kde-04-dolphin.png",
+    "systemSettings": "tests/screenshots/phase16/p16-opensuse-tumbleweed-kde-05-systemsettings.png",
+    "rebootedDesktop": "tests/screenshots/phase16/p16-opensuse-tumbleweed-kde-06-rebooted-desktop.png"
+  },
+  "status": "FAILED",
+  "error": null
+}
