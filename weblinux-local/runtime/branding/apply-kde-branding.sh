@@ -429,8 +429,15 @@ ini_set() {
   mkdir -p "$(dirname "$_file")"
 
   if command -v "$KWRITE_TOOL" >/dev/null 2>&1; then
-    "$KWRITE_TOOL" --file "$_file" --group "$_group" --key "$_key" "$_val"
-    return 0
+    case "$_group" in
+      *\]\[*)
+        # Nested KConfig group: use POSIX awk updater directly to avoid kwriteconfig ][ escaping
+        ;;
+      *)
+        "$KWRITE_TOOL" --file "$_file" --group "$_group" --key "$_key" "$_val"
+        return 0
+        ;;
+    esac
   fi
 
   # Fallback pure-POSIX awk INI updater
