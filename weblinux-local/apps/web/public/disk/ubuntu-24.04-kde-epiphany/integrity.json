@@ -1,9 +1,9 @@
 {
   "distributionId": "ubuntu-24.04-kde-epiphany",
   "totalChunks": 3584,
-  "nonZeroChunks": 1862,
+  "nonZeroChunks": 1892,
   "bootChunks": 52,
-  "fullImageSha256": "af0074751f4bd6a38810841531bc6fa5b2d47892605e2189917f4cbaa2e4aa1a",
+  "fullImageSha256": "a37cf7ae622761048399284451206b82505b515fb18275388f84f87fe1a8b2dc",
   "imageSizeBytes": 3758096384,
   "pieceSizeBytes": 1048576
 }
