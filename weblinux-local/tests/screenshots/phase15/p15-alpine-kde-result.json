@@ -1,0 +1,30 @@
+{
+  "distroId": "alpine-kde",
+  "timestamp": "2026-11-28T05:15:28.739Z",
+  "coldBootSec": 29.7,
+  "warmReloadBootSec": 34.9,
+  "browserRemovalCheck": "=== OS ===\nPRETTY_NAME=\"Alpine Linux v3.24\"\n=== BIN_CHECK ===\n=== PKG_CHECK ===\n=== WRAPPER_AND_DESKTOP ===\nNO_WRAPPER_OK\nNO_DESKTOP_OK",
+  "networkCheck": "=== DNS ===\n2606:4700:10::ac42:93f3  example.com  example.com\n=== CURL_HEAD ===\nHTTP/2 200 \n\ndate: Sat, 28 Nov 2026 05:16:14 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\nlast-modified: Thu, 26 Nov 2026 17:29:13 GMT\n\n=== CURL_BODY_SHA256 ===\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /tmp/p15-example.html\n=== GIT_LS_REMOTE ===\n/tmp/p15cmd.sh: line 13: git: not found\n=== PKG_META ===\n\u001b7[fetch https://dl-cdn.alpinelinux.org/alpine/v3.24/main/riscv64/APKINDEX.tar.gz]\u001b8\u001b[0K\u001b7[fetch https://dl-cdn.alpinelinux.org/alpine/v3.24/community/riscv64/APKINDEX.tar.gz]\u001b8\u001b[0Kv3.24.4-218-g42ba8ec62e0 [https://dl-cdn.alpinelinux.org/alpine/v3.24/main]\nv3.24.4-217-g6b6cfb31d4d [https://dl-cdn.alpinelinux.org/alpine/v3.24/community]\nOK: 26792 distinct packages available\nPKG_META_OK\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "initialSha256": "2f35228e66a02332385c48de7ea63d33d56a56f817ff1a6317c4b6edc78c6443",
+  "persistedSha256": "2f35228e66a02332385c48de7ea63d33d56a56f817ff1a6317c4b6edc78c6443",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 root root 47 Nov 28 05:18 /root/p15-user-preserve.txt\nPHASE15_USER_PRESERVE_alpine-kde_1795843112750\nPERSISTED_SHA256=2f35228e66a02332385c48de7ea63d33d56a56f817ff1a6317c4b6edc78c6443",
+  "checks": {
+    "noBrowserBins": true,
+    "noBrowserPkgs": true,
+    "noWrapperOrDesktop": true,
+    "hasDns": true,
+    "hasCurlHead": true,
+    "hasCurlSha": true,
+    "hasGitLsRemote": false,
+    "hasPkgMeta": true,
+    "hasRfc1918Blocked": true,
+    "hasDesktopShot": true,
+    "hasPersistMarker": true,
+    "hasPersistSha": true
+  },
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase15\\p15-alpine-kde-desktop.png"
+  ],
+  "status": "FAILED",
+  "error": null
+}

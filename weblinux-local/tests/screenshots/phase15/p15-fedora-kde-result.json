@@ -1,0 +1,30 @@
+{
+  "distroId": "fedora-kde",
+  "timestamp": "2026-11-28T05:19:59.394Z",
+  "coldBootSec": 26.6,
+  "warmReloadBootSec": 51.3,
+  "browserRemovalCheck": "=== OS ===\nPRETTY_NAME=\"Fedora Linux 45 (Container Image Prerelease)\"\n=== BIN_CHECK ===\n=== PKG_CHECK ===\n=== WRAPPER_AND_DESKTOP ===\nNO_WRAPPER_OK\nNO_DESKTOP_OK",
+  "networkCheck": "=== DNS ===\n2606:4700:10::6814:179a example.com\n2606:4700:10::ac42:93f3 example.com\n=== CURL_HEAD ===\nHTTP/2 200 \n\ndate: Sat, 28 Nov 2026 05:20:47 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\nlast-modified: Thu, 26 Nov 2026 17:29:13 GMT\n\n=== CURL_BODY_SHA256 ===\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /tmp/p15-example.html\n=== GIT_LS_REMOTE ===\nerror: RPC failed; curl 56 Recv failure: Connection reset by peer\nerror: 16 bytes of body are still expected\nfatal: expected flush after ref listing\n=== PKG_META ===\nrepo id                                               repo name                                                         \nfedora                                                Fedora RISC-V 45                                                  \nPKG_META_OK\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "initialSha256": "4dc8d55b695447dacd0369bf49c87769070656150218dd28b54d204199ea84ed",
+  "persistedSha256": "4dc8d55b695447dacd0369bf49c87769070656150218dd28b54d204199ea84ed",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 root root 47 Nov 28 05:23 /root/p15-user-preserve.txt\nPHASE15_USER_PRESERVE_fedora-kde_1795843441060\nPERSISTED_SHA256=4dc8d55b695447dacd0369bf49c87769070656150218dd28b54d204199ea84ed",
+  "checks": {
+    "noBrowserBins": true,
+    "noBrowserPkgs": true,
+    "noWrapperOrDesktop": true,
+    "hasDns": true,
+    "hasCurlHead": true,
+    "hasCurlSha": true,
+    "hasGitLsRemote": false,
+    "hasPkgMeta": true,
+    "hasRfc1918Blocked": true,
+    "hasDesktopShot": true,
+    "hasPersistMarker": true,
+    "hasPersistSha": true
+  },
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase15\\p15-fedora-kde-desktop.png"
+  ],
+  "status": "FAILED",
+  "error": null
+}

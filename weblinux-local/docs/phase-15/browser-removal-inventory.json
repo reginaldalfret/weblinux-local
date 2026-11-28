@@ -1,0 +1,205 @@
+{
+  "phase": "15",
+  "title": "Remove Graphical Browsers From All Six Linux Distributions",
+  "baselineCommit": "be81a42d9576003e7d295b6eac45651ffc62b031",
+  "branch": "feature/runtime-foundations",
+  "distributions": [
+    {
+      "id": "debian-firefox",
+      "displayName": "Debian GNU/Linux 13 (Trixie) KDE Plasma",
+      "removedPackages": [
+        "chromium-driver",
+        "chromium (145.0.7632.75-1~deb13u1revyos1)",
+        "epiphany-browser (48.5-0+deb13u1)",
+        "epiphany-browser-data",
+        "firefox-esr (140.15.0esr-1~deb13u1)",
+        "netsurf-gtk (3.11-2)"
+      ],
+      "removedCustomArtifacts": [
+        "/usr/local/bin/weblinux-browser",
+        "/usr/share/applications/weblinux-browser.desktop"
+      ],
+      "freedSpace": "525 MB",
+      "diskImage": {
+        "nonzeroChunks": "4494/8192",
+        "sha256": "864e731205d66b57347c4456086ae160552130402032ef3ff4cb1e3ba76afc48",
+        "e2fsckClean": true
+      },
+      "retainedTools": ["apt", "ca-certificates", "curl", "dbus", "git", "wget"],
+      "qaVerification": {
+        "bootSeconds": 36.6,
+        "reloadSeconds": 15.6,
+        "browserBinariesRemoved": true,
+        "browserPackagesRemoved": true,
+        "wrapperRemoved": true,
+        "desktopFileRemoved": true,
+        "dnsAndHttpsOk": true,
+        "curlSha256": "25ddf2c8...",
+        "packageManagerCheck": "apt-get update (16.4 MB, PKG_META_OK)",
+        "gitCheck": "transient curl 56 Connection reset by peer",
+        "rfc1918Blocked": true,
+        "opfsPersistenceSha256": "29288be4...",
+        "screenshot": "tests/screenshots/phase15/p15-debian-firefox-desktop.png"
+      }
+    },
+    {
+      "id": "ubuntu-kde-epiphany",
+      "displayName": "Ubuntu 24.04.5 LTS KDE Plasma",
+      "removedPackages": [],
+      "removedCustomArtifacts": [
+        "/usr/bin/epiphany",
+        "/usr/share/applications/org.gnome.Epiphany.desktop",
+        "/usr/local/bin/weblinux-browser",
+        "/usr/share/applications/weblinux-browser.desktop"
+      ],
+      "diskImage": {
+        "nonzeroChunks": "1862/3584",
+        "sha256": "af0074751f4bd6a38810841531bc6fa5b2d47892605e2189917f4cbaa2e4aa1a",
+        "e2fsckClean": true
+      },
+      "retainedTools": ["apt", "curl", "ca-certificates"],
+      "qaVerification": {
+        "bootSeconds": 25.3,
+        "reloadSeconds": 25.4,
+        "browserBinariesRemoved": true,
+        "browserPackagesRemoved": true,
+        "wrapperRemoved": true,
+        "desktopFileRemoved": true,
+        "dnsAndHttpsOk": true,
+        "curlSha256": "25ddf2c8...",
+        "packageManagerCheck": "apt-get update fetched InRelease files then hit pre-existing /usr/bin/apt-key error",
+        "gitCheck": "git: not found in chroot PATH",
+        "rfc1918Blocked": true,
+        "opfsPersistenceSha256": "fe064576...",
+        "screenshot": "tests/screenshots/phase15/p15-ubuntu-kde-epiphany-desktop.png"
+      }
+    },
+    {
+      "id": "arch-kde",
+      "displayName": "Arch Linux KDE Plasma",
+      "removedPackages": [
+        "epiphany-51.2-1"
+      ],
+      "removedCustomArtifacts": [
+        "/usr/local/bin/weblinux-browser",
+        "/usr/share/applications/weblinux-browser.desktop"
+      ],
+      "freedSpace": "17.47 MiB",
+      "diskImage": {
+        "nonzeroChunks": "3966/5120",
+        "sha256": "157b94b4db6114c76e78d309b24c4dccf49f6f0d0257bd3e019238044a55b767",
+        "e2fsckClean": true
+      },
+      "retainedTools": ["pacman", "curl", "dolphin", "konsole", "/root/browser-home"],
+      "qaVerification": {
+        "bootSeconds": 25.7,
+        "reloadSeconds": 25.6,
+        "browserBinariesRemoved": true,
+        "browserPackagesRemoved": true,
+        "wrapperRemoved": true,
+        "desktopFileRemoved": true,
+        "dnsAndHttpsOk": true,
+        "curlSha256": "25ddf2c8...",
+        "packageManagerCheck": "pacman -Sy synced core then extra.db timed out at 848 KiB",
+        "gitCheck": "git: command not found",
+        "rfc1918Blocked": true,
+        "opfsPersistenceSha256": "d08caf3f...",
+        "screenshot": "tests/screenshots/phase15/p15-arch-kde-desktop.png"
+      }
+    },
+    {
+      "id": "opensuse-tumbleweed-kde",
+      "displayName": "openSUSE Tumbleweed KDE Plasma",
+      "removedPackages": [
+        "MozillaFirefox-159.0.1-4.1",
+        "chromium-155.0.8059.84-238.1",
+        "epiphany-51.2-1.1",
+        "MozillaFirefox-branding-openSUSE-68-6.1",
+        "epiphany-branding-openSUSE-51.2-1.23"
+      ],
+      "removedCustomArtifacts": [
+        "/usr/local/bin/weblinux-browser",
+        "/usr/share/applications/weblinux-browser.desktop"
+      ],
+      "freedSpace": "719.4 MiB",
+      "diskImage": {
+        "nonzeroChunks": "4824/5632",
+        "sha256": "14c188114ac8c23a94f925b2964bbdc39b3a67fd601e4d77dd0ef3ffec6a365e",
+        "e2fsckClean": true
+      },
+      "retainedTools": ["zypper", "curl"],
+      "qaVerification": {
+        "bootSeconds": 27.5,
+        "reloadSeconds": null,
+        "browserBinariesRemoved": true,
+        "browserPackagesRemoved": true,
+        "wrapperRemoved": true,
+        "desktopFileRemoved": true,
+        "dnsAndHttpsOk": true,
+        "curlSha256": "25ddf2c8...",
+        "packageManagerCheck": "zypper refresh (Update, H264, Oss)",
+        "gitCheck": "not completed (reload step hit Execution context was destroyed)",
+        "rfc1918Blocked": "not completed in that run",
+        "opfsPersistenceSha256": null,
+        "screenshot": "tests/screenshots/phase15/p15-opensuse-tumbleweed-kde-desktop.png"
+      }
+    },
+    {
+      "id": "fedora-kde",
+      "displayName": "Fedora Linux 45 KDE Plasma",
+      "removedPackages": [],
+      "removedCustomArtifacts": [],
+      "notes": "Verified clean /root/fedora-build/rootfs with gpgcheck=1 and zero browser RPMs",
+      "retainedTools": ["dnf5-5.4.3.0-2.fc45", "curl-8.21.0-1.rvre0.fc45", "git-core-2.55.0-2.fc45"],
+      "qaVerification": {
+        "bootSeconds": 26.6,
+        "reloadSeconds": 51.3,
+        "browserBinariesRemoved": true,
+        "browserPackagesRemoved": true,
+        "wrapperRemoved": true,
+        "desktopFileRemoved": true,
+        "dnsAndHttpsOk": true,
+        "curlSha256": "25ddf2c8...",
+        "packageManagerCheck": "dnf5 repolist (PKG_META_OK)",
+        "gitCheck": "transient curl 56 Connection reset by peer",
+        "rfc1918Blocked": true,
+        "opfsPersistenceSha256": "4dc8d55b...",
+        "screenshot": "tests/screenshots/phase15/p15-fedora-kde-desktop.png"
+      }
+    },
+    {
+      "id": "alpine-kde",
+      "displayName": "Alpine Linux 3.24.4 KDE Plasma",
+      "removedPackages": [
+        "badwolf (1.4.0-r0)",
+        "epiphany (50.4-r0)"
+      ],
+      "removedCustomArtifacts": [
+        "/usr/local/bin/weblinux-browser",
+        "/usr/share/applications/weblinux-browser.desktop"
+      ],
+      "retainedPackageCount": 650,
+      "diskImage": {
+        "nonzeroChunks": "1820/3136",
+        "sha256": "4c9f39e521f9947a347110618909155989da8bceaf6d6210e6b07b9056c3defd",
+        "e2fsckClean": true
+      },
+      "retainedTools": ["apk", "curl", "dbus", "git", "gvfs", "wget"],
+      "qaVerification": {
+        "bootSeconds": 29.7,
+        "reloadSeconds": 34.9,
+        "browserBinariesRemoved": true,
+        "browserPackagesRemoved": true,
+        "wrapperRemoved": true,
+        "desktopFileRemoved": true,
+        "dnsAndHttpsOk": true,
+        "curlSha256": "25ddf2c8...",
+        "packageManagerCheck": "apk update (26792 pkgs)",
+        "gitCheck": "git: not found in chroot PATH",
+        "rfc1918Blocked": true,
+        "opfsPersistenceSha256": "2f35228e...",
+        "screenshot": "tests/screenshots/phase15/p15-alpine-kde-desktop.png"
+      }
+    }
+  ]
+}
