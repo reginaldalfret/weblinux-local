@@ -601,6 +601,9 @@ if is_known_or_empty_wallpaper "$CURRENT_WALLPAPER"; then
   if [ "$LOCKSCREEN_SUPPORTED" -eq 1 ]; then
     ini_set "$CONFIG_DIR/kscreenlockerrc" "Greeter][Wallpaper][org.kde.image][General" "Image" "$WALLPAPER_PATH"
   fi
+  if [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ] && command -v plasma-apply-wallpaperimage >/dev/null 2>&1; then
+    plasma-apply-wallpaperimage "$WALLPAPER_PATH" >/dev/null 2>&1 || true
+  fi
 else
   log_info "Preserving custom user wallpaper ($WALLPAPER_GROUP): '$CURRENT_WALLPAPER'"
 fi

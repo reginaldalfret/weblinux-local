@@ -148,23 +148,36 @@ chmod 0755 "${MNT}/usr/local/bin/weblinux-apply-kde-branding"
 cp -f "$PROBE_SRC" "${MNT}/usr/local/bin/weblinux-verify-compositor-readiness"
 chmod 0755 "${MNT}/usr/local/bin/weblinux-verify-compositor-readiness"
 
+cat > "${MNT}/usr/local/bin/weblinux-branding-v2-autostart" <<EOF
+#!/bin/sh
+i=0
+while [ "\$i" -lt 25 ]; do
+  if pidof plasmashell >/dev/null 2>&1; then
+    sleep 2
+    break
+  fi
+  i=\$((i + 1))
+  sleep 1
+done
+exec /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR}
+EOF
+chmod 0755 "${MNT}/usr/local/bin/weblinux-branding-v2-autostart"
+
 cat > "${MNT}/etc/xdg/autostart/weblinux-branding-v2.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=WebLinux Branding v2 Logo Wallpaper Migration
-Exec=/usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR}
+Exec=/usr/local/bin/weblinux-branding-v2-autostart
 OnlyShowIn=KDE;
-X-KDE-autostart-phase=1
+X-KDE-autostart-phase=2
 NoDisplay=true
 EOF
 
-echo "=== [$DISTRO] Running v2 wallpaper migration in chroot ==="
+echo "=== [$DISTRO] Validating v2 wallpaper migration in chroot (live autostart applies on first Plasma boot) ==="
 if [ "$DISTRO" = "alpine" ]; then
-  # Preserve Alpine clean /root/.config if absent; run --dry-run to validate, autostart handles first Plasma boot,
-  # and set fallback wallpaper symlink if Next exists
   chroot "$MNT" /bin/sh -lc "HOME=/root /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR} --dry-run"
 else
-  # Clean any prior kwriteconfig \x5d\x5b escaped containment section so awk writes the real containment
+  # Clean any prior kwriteconfig \x5d\x5b escaped containment section and remove v2 marker so first live Plasma session applies via plasma-apply-wallpaperimage
   if [ -f "${MNT}/root/.config/plasma-org.kde.plasma.desktop-appletsrc" ]; then
     python3 - "${MNT}/root/.config/plasma-org.kde.plasma.desktop-appletsrc" <<'PY'
 import sys
@@ -183,8 +196,7 @@ with open(p, "w", encoding="utf-8") as f:
 PY
   fi
   rm -f "${MNT}/root/.local/state/weblinux/branding-v2-logo-wallpaper-applied"
-  chroot "$MNT" /bin/sh -lc "HOME=/root /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR}"
-  chroot "$MNT" /bin/sh -lc "HOME=/root /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --status"
+  chroot "$MNT" /bin/sh -lc "HOME=/root /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR} --dry-run"
 fi
 
 cleanup

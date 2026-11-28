@@ -256,8 +256,8 @@ async function waitForDesktopReady(page, opts = {}) {
           lastGuest = { error: err.message, COMPOSITOR_READY: '0' };
         }
         const hasPlasmaDesktopWindow = Array.isArray(lastHost.windows) && lastHost.windows.some((w) => /plasmashell|Desktop/i.test(`${w.app || ''} ${w.title || ''}`));
-        const looksLikeDesktopNotSplash = hasPlasmaDesktopWindow || (lastCanvas.uniqueBuckets >= 80 && lastCanvas.lumaMean >= 45) || (Date.now() - start >= 65000);
-        if (lastGuest.COMPOSITOR_READY === '1' || (lastHost.frames >= 30 && lastCanvas.isRendered && looksLikeDesktopNotSplash)) {
+        const looksLikeDesktopNotSplash = hasPlasmaDesktopWindow || (lastCanvas.uniqueBuckets >= 80 && lastCanvas.lumaMean >= 45) || (Date.now() - start >= 75000);
+        if ((lastGuest.COMPOSITOR_READY === '1' || lastHost.frames >= 30) && lastCanvas.isRendered && looksLikeDesktopNotSplash) {
           return {
             ready: true,
             elapsedMs: Date.now() - start,
