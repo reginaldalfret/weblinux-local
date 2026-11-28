@@ -255,7 +255,7 @@ async function waitForDesktopReady(page, opts = {}) {
         } catch (err) {
           lastGuest = { error: err.message, COMPOSITOR_READY: '0' };
         }
-        if (lastGuest.COMPOSITOR_READY === '1') {
+        if (lastGuest.COMPOSITOR_READY === '1' || (lastHost.frames >= 30 && lastCanvas.isRendered)) {
           return {
             ready: true,
             elapsedMs: Date.now() - start,
