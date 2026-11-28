@@ -151,14 +151,23 @@ chmod 0755 "${MNT}/usr/local/bin/weblinux-verify-compositor-readiness"
 cat > "${MNT}/usr/local/bin/weblinux-branding-v2-autostart" <<EOF
 #!/bin/sh
 i=0
-while [ "\$i" -lt 25 ]; do
-  if pidof plasmashell >/dev/null 2>&1; then
-    sleep 2
+PLASMA_PID=""
+while [ "\$i" -lt 45 ]; do
+  PLASMA_PID=\$(pidof plasmashell 2>/dev/null | awk '{print \$1}')
+  if [ -n "\$PLASMA_PID" ] && [ -r "/proc/\$PLASMA_PID/environ" ]; then
+    sleep 3
     break
   fi
   i=\$((i + 1))
   sleep 1
 done
+if [ -n "\$PLASMA_PID" ] && [ -r "/proc/\$PLASMA_PID/environ" ]; then
+  eval \$(tr '\\0' '\\n' < "/proc/\$PLASMA_PID/environ" | grep -E '^(XDG_RUNTIME_DIR|WAYLAND_DISPLAY|DBUS_SESSION_BUS_ADDRESS|DISPLAY|HOME|USER)=' | sed "s/'/'\\\\\\\\''/g; s/=\\(.*\\)/='\\1'/; s/^/export /")
+fi
+export HOME="\${HOME:-/root}"
+export XDG_RUNTIME_DIR="\${XDG_RUNTIME_DIR:-/tmp/runtime-root}"
+export WAYLAND_DISPLAY="\${WAYLAND_DISPLAY:-wayland-0}"
+export DBUS_SESSION_BUS_ADDRESS="\${DBUS_SESSION_BUS_ADDRESS:-unix:path=\${XDG_RUNTIME_DIR}/bus}"
 exec /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR}
 EOF
 chmod 0755 "${MNT}/usr/local/bin/weblinux-branding-v2-autostart"

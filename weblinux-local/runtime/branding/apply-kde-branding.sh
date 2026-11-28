@@ -134,6 +134,14 @@ KNOWN_PREVIOUS_WALLPAPERS="
 /usr/share/wallpapers/Next/contents/images/5120x2880.png
 /usr/share/wallpapers/Breeze
 /usr/share/wallpapers/Breeze/contents/images/1920x1080.png
+DebianTheme
+Ceratopsian
+UbuntuNoble
+ArchLinux
+openSUSEdefault
+F45
+Next
+Breeze
 "
 
 normalize_wallpaper_path() {
@@ -178,66 +186,101 @@ ini_get_awk() {
   ' "$_file"
 }
 
-# Find current wallpaper group & value in appletsrc.
-# Sets WALLPAPER_GROUP and CURRENT_WALLPAPER.
-detect_appletsrc_wallpaper() {
-  WALLPAPER_GROUP="Containments][1][Wallpaper][org.kde.image][General"
-  CURRENT_WALLPAPER=""
-
+# List all desktop containment wallpaper groups & values in appletsrc (excluding panels).
+# Outputs tab-separated lines: <containment_id>\t<wallpaper_group>\t<current_image>
+list_desktop_wallpaper_targets() {
   if [ ! -f "$APPLETS_RC" ]; then
+    printf '1\tContainments][1][Wallpaper][org.kde.image][General\t\n'
     return 0
   fi
 
-  if [ -n "${KREAD_TOOL:-}" ] && command -v "$KREAD_TOOL" >/dev/null 2>&1; then
-    CURRENT_WALLPAPER=$("$KREAD_TOOL" --file "$APPLETS_RC" --group "$WALLPAPER_GROUP" --key "Image" 2>/dev/null || true)
-  fi
+  awk '
+    /^\[Containments\]\[[0-9]+\]$/ {
+      cid = substr($0, 16, length($0) - 16)
+      if (!(cid in seen)) {
+        seen[cid] = 1
+        order[++n] = cid
+      }
+      mode = "root"
+      cur_cid = cid
+      next
+    }
+    /^\[Containments\]\[[0-9]+\]\[Wallpaper\]\[org\.kde\.image\]\[General\]$/ {
+      s = substr($0, 16)
+      p = index(s, "]")
+      cid = substr(s, 1, p - 1)
+      if (!(cid in seen)) {
+        seen[cid] = 1
+        order[++n] = cid
+      }
+      has_wp_grp[cid] = 1
+      mode = "wp"
+      cur_cid = cid
+      next
+    }
+    /^\[.*\]$/ {
+      mode = ""
+      cur_cid = ""
+      next
+    }
+    mode == "root" && cur_cid != "" {
+      if ($0 ~ /^plugin=/) {
+        val = substr($0, 8)
+        if (val == "org.kde.panel" || val == "org.kde.plasma.panel") {
+          is_panel[cur_cid] = 1
+        }
+        if (val == "org.kde.plasma.folder" || val == "org.kde.plasma.desktop") {
+          is_desktop[cur_cid] = 1
+        }
+      } else if ($0 ~ /^formfactor=(2|3)$/) {
+        is_panel[cur_cid] = 1
+      } else if ($0 ~ /^wallpaperplugin=/) {
+        wp_plugin[cur_cid] = substr($0, 17)
+        if (wp_plugin[cur_cid] == "org.kde.image") {
+          has_img_plugin[cur_cid] = 1
+        }
+      }
+      next
+    }
+    mode == "wp" && cur_cid != "" {
+      if ($0 ~ /^Image=/) {
+        img[cur_cid] = substr($0, 7)
+      }
+      next
+    }
+    END {
+      printed = 0
+      for (i = 1; i <= n; i++) {
+        cid = order[i]
+        if (is_panel[cid]) {
+          continue
+        }
+        if (has_wp_grp[cid] || has_img_plugin[cid] || (is_desktop[cid] && wp_plugin[cid] == "")) {
+          printf "%s\tContainments][%s][Wallpaper][org.kde.image][General\t%s\n", cid, cid, (cid in img ? img[cid] : "")
+          printed++
+        }
+      }
+      if (printed == 0) {
+        printf "1\tContainments][1][Wallpaper][org.kde.image][General\t\n"
+      }
+    }
+  ' "$APPLETS_RC"
+}
 
-  if [ -z "$CURRENT_WALLPAPER" ]; then
-    CURRENT_WALLPAPER=$(ini_get_awk "$APPLETS_RC" "$WALLPAPER_GROUP" "Image")
-  fi
-
-  if [ -z "$CURRENT_WALLPAPER" ]; then
-    _detected=$(awk '
-      /^\[Containments\]\[[0-9]+\]\[Wallpaper\]\[org\.kde\.image\]\[General\]$/ {
-        grp = substr($0, 2, length($0) - 2)
-        next
-      }
-      /^\[.*\]$/ {
-        grp = ""
-        next
-      }
-      grp != "" && /^Image=/ {
-        val = substr($0, 7)
-        if (val != "") {
-          print grp "\t" val
-          exit
-        }
-      }
-    ' "$APPLETS_RC")
-    if [ -n "$_detected" ]; then
-      WALLPAPER_GROUP=$(printf '%s' "$_detected" | cut -f1)
-      CURRENT_WALLPAPER=$(printf '%s' "$_detected" | cut -f2-)
-    else
-      _cid=$(awk '
-        /^\[Containments\]\[[0-9]+\]$/ {
-          cid = $0
-          gsub(/^\[Containments\]\[|\].*$/, "", cid)
-          next
-        }
-        /^\[.*\]$/ {
-          cid = ""
-          next
-        }
-        cid != "" && /^wallpaperplugin=org\.kde\.image/ {
-          print cid
-          exit
-        }
-      ' "$APPLETS_RC")
-      if [ -n "$_cid" ]; then
-        WALLPAPER_GROUP="Containments][${_cid}][Wallpaper][org.kde.image][General"
-      fi
+any_containment_needs_wallpaper_repair() {
+  _targets=$(list_desktop_wallpaper_targets)
+  _tab=$(printf '\t')
+  _needs=1
+  while IFS="$_tab" read -r _cid _grp _img; do
+    [ -n "$_grp" ] || continue
+    if is_known_or_empty_wallpaper "$_img"; then
+      _needs=0
+      break
     fi
-  fi
+  done <<EOF
+$_targets
+EOF
+  return "$_needs"
 }
 
 if [ "$STATUS_ONLY" -eq 1 ]; then
@@ -253,8 +296,14 @@ if [ "$STATUS_ONLY" -eq 1 ]; then
   else
     log_info "v2 Logo Wallpaper Not applied (marker absent: $MARKER_V2)"
   fi
-  detect_appletsrc_wallpaper
-  log_info "Current appletsrc wallpaper ($WALLPAPER_GROUP): ${CURRENT_WALLPAPER:-<empty>}"
+  _status_targets=$(list_desktop_wallpaper_targets)
+  _tab=$(printf '\t')
+  while IFS="$_tab" read -r _cid _grp _img; do
+    [ -n "$_grp" ] || continue
+    log_info "Current appletsrc wallpaper ($_grp): ${_img:-<empty>}"
+  done <<EOF
+$_status_targets
+EOF
   exit 0
 fi
 
@@ -337,11 +386,6 @@ case "$PROFILE_ARG" in
     exit 1
     ;;
 esac
-
-if [ -f "$MARKER_V1" ] && [ -f "$MARKER_V2" ] && [ "$FORCE" -eq 0 ]; then
-  log_info "Branding v1 and v2 already applied ($MARKER_V1, $MARKER_V2 exist). Use --force to re-apply."
-  exit 0
-fi
 
 # Profile metadata defaults (Phase 16.1 distribution-logo wallpapers)
 PLASMA_MAJOR=6
@@ -432,6 +476,72 @@ if [ "$PLASMA_MAJOR" -eq 5 ]; then
   KWRITE_TOOL="kwriteconfig5"
   KREAD_TOOL="kreadconfig5"
 fi
+
+if [ -f "$MARKER_V1" ] && [ -f "$MARKER_V2" ] && [ "$FORCE" -eq 0 ]; then
+  if any_containment_needs_wallpaper_repair; then
+    log_info "Detected desktop containment(s) with default or empty wallpaper despite v2 marker; repairing wallpaper configuration."
+  else
+    log_info "Branding v1 and v2 already applied ($MARKER_V1, $MARKER_V2 exist). Use --force to re-apply."
+    exit 0
+  fi
+fi
+
+apply_live_wallpaper() {
+  _wp_path="$1"
+  [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ] || return 0
+
+  _js_path=$(printf '%s' "$_wp_path" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  _js_script="var allDesktops = desktops(); for (var i = 0; i < allDesktops.length; i++) { var d = allDesktops[i]; d.wallpaperPlugin = \"org.kde.image\"; d.currentConfigGroup = [\"Wallpaper\", \"org.kde.image\", \"General\"]; d.writeConfig(\"Image\", \"file://${_js_path}\"); }"
+
+  if [ "$PLASMA_MAJOR" -eq 5 ]; then
+    if command -v qdbus >/dev/null 2>&1; then
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "[dry-run] qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript <plasma5-wallpaper-script>"
+      else
+        qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$_js_script" >/dev/null 2>&1 || true
+      fi
+    elif command -v qdbus-qt5 >/dev/null 2>&1; then
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "[dry-run] qdbus-qt5 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript <plasma5-wallpaper-script>"
+      else
+        qdbus-qt5 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$_js_script" >/dev/null 2>&1 || true
+      fi
+    elif command -v dbus-send >/dev/null 2>&1; then
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "[dry-run] dbus-send --session --type=method_call --dest=org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript <plasma5-wallpaper-script>"
+      else
+        dbus-send --session --type=method_call --dest=org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "string:${_js_script}" >/dev/null 2>&1 || true
+      fi
+    fi
+  else
+    if command -v plasma-apply-wallpaperimage >/dev/null 2>&1; then
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "[dry-run] plasma-apply-wallpaperimage $_wp_path"
+      else
+        plasma-apply-wallpaperimage "$_wp_path" >/dev/null 2>&1 || true
+      fi
+    fi
+    if command -v qdbus6 >/dev/null 2>&1; then
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "[dry-run] qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript <plasma6-wallpaper-script>"
+      else
+        qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$_js_script" >/dev/null 2>&1 || true
+      fi
+    elif command -v qdbus >/dev/null 2>&1; then
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "[dry-run] qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript <plasma6-wallpaper-script>"
+      else
+        qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$_js_script" >/dev/null 2>&1 || true
+      fi
+    elif command -v dbus-send >/dev/null 2>&1; then
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "[dry-run] dbus-send --session --type=method_call --dest=org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript <plasma6-wallpaper-script>"
+      else
+        dbus-send --session --type=method_call --dest=org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "string:${_js_script}" >/dev/null 2>&1 || true
+      fi
+    fi
+  fi
+}
 
 # Portable INI setter: uses kwriteconfig5/6 if present, otherwise POSIX awk
 ini_set() {
@@ -588,24 +698,53 @@ else
   log_info "Retaining v1 branding ($MARKER_V1 exists); running v2 logo-wallpaper migration for $CANONICAL_PROFILE"
 fi
 
-# Step 6: v2 Distribution-Logo Wallpaper Migration (safe & custom-wallpaper-preserving)
-detect_appletsrc_wallpaper
+# Step 6: v2 Distribution-Logo Wallpaper Migration (safe, multi-containment & custom-wallpaper-preserving)
 WALLPAPER_ACTION="preserved_custom"
+REPLACED_COUNT=0
+PRESERVED_COUNT=0
+ALREADY_SET_COUNT=0
+PREV_WALLPAPER_SUMMARY=""
+_norm_target=$(normalize_wallpaper_path "$WALLPAPER_PATH")
+_wp_targets=$(list_desktop_wallpaper_targets)
+_tab=$(printf '\t')
 
-if is_known_or_empty_wallpaper "$CURRENT_WALLPAPER"; then
+while IFS="$_tab" read -r _cid _grp _img; do
+  [ -n "$_grp" ] || continue
+  _norm_img=$(normalize_wallpaper_path "$_img")
+  if [ "$_norm_img" = "$_norm_target" ]; then
+    ALREADY_SET_COUNT=$((ALREADY_SET_COUNT + 1))
+    log_info "Wallpaper already up to date ($_grp): '$_img'"
+  elif is_known_or_empty_wallpaper "$_img"; then
+    REPLACED_COUNT=$((REPLACED_COUNT + 1))
+    if [ -z "$PREV_WALLPAPER_SUMMARY" ]; then
+      PREV_WALLPAPER_SUMMARY="$_img"
+    fi
+    log_info "Updating wallpaper ($_grp): '${_img:-<empty>}' -> '$WALLPAPER_PATH'"
+    ini_set "$APPLETS_RC" "$_grp" "Image" "$WALLPAPER_PATH"
+    ini_set "$APPLETS_RC" "$_grp" "Color" "$FALLBACK_COLOR"
+    ini_set "$APPLETS_RC" "$_grp" "FillMode" "2"
+  else
+    PRESERVED_COUNT=$((PRESERVED_COUNT + 1))
+    if [ -z "$PREV_WALLPAPER_SUMMARY" ]; then
+      PREV_WALLPAPER_SUMMARY="$_img"
+    fi
+    log_info "Preserving custom user wallpaper ($_grp): '$_img'"
+  fi
+done <<EOF
+$_wp_targets
+EOF
+
+if [ "$REPLACED_COUNT" -gt 0 ]; then
   WALLPAPER_ACTION="replaced"
-  log_info "Updating wallpaper ($WALLPAPER_GROUP): '${CURRENT_WALLPAPER:-<empty>}' -> '$WALLPAPER_PATH'"
-  ini_set "$APPLETS_RC" "$WALLPAPER_GROUP" "Image" "$WALLPAPER_PATH"
-  ini_set "$APPLETS_RC" "$WALLPAPER_GROUP" "Color" "$FALLBACK_COLOR"
-  ini_set "$APPLETS_RC" "$WALLPAPER_GROUP" "FillMode" "2"
   if [ "$LOCKSCREEN_SUPPORTED" -eq 1 ]; then
     ini_set "$CONFIG_DIR/kscreenlockerrc" "Greeter][Wallpaper][org.kde.image][General" "Image" "$WALLPAPER_PATH"
   fi
-  if [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ] && command -v plasma-apply-wallpaperimage >/dev/null 2>&1; then
-    plasma-apply-wallpaperimage "$WALLPAPER_PATH" >/dev/null 2>&1 || true
+  apply_live_wallpaper "$WALLPAPER_PATH"
+elif [ "$ALREADY_SET_COUNT" -gt 0 ] && [ "$PRESERVED_COUNT" -eq 0 ]; then
+  WALLPAPER_ACTION="already_applied"
+  if [ "$FORCE" -eq 1 ] || [ ! -f "$MARKER_V2" ]; then
+    apply_live_wallpaper "$WALLPAPER_PATH"
   fi
-else
-  log_info "Preserving custom user wallpaper ($WALLPAPER_GROUP): '$CURRENT_WALLPAPER'"
 fi
 
 # Step 7: Write idempotent state markers
@@ -629,7 +768,7 @@ profile=${CANONICAL_PROFILE}
 alias_used=${PROFILE_ARG}
 plasma_major=${PLASMA_MAJOR}
 wallpaper_action=${WALLPAPER_ACTION}
-previous_wallpaper=${CURRENT_WALLPAPER}
+previous_wallpaper=${PREV_WALLPAPER_SUMMARY}
 new_wallpaper=${WALLPAPER_PATH}
 applied_at=${TIMESTAMP}
 backup_dir=${BACKUP_DIR}
