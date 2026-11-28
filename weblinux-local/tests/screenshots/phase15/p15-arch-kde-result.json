@@ -1,0 +1,30 @@
+{
+  "distroId": "arch-kde",
+  "timestamp": "2026-11-28T05:35:03.849Z",
+  "coldBootSec": 25.7,
+  "warmReloadBootSec": 25.6,
+  "browserRemovalCheck": "=== OS ===\nPRETTY_NAME=\"Arch Linux\"\n=== BIN_CHECK ===\n=== PKG_CHECK ===\n\u001b[?25l\u001b[?25h=== WRAPPER_AND_DESKTOP ===\nNO_WRAPPER_OK\nNO_DESKTOP_OK",
+  "networkCheck": "=== DNS ===\n2606:4700:10::6814:179a example.com\n2606:4700:10::ac42:93f3 example.com\n=== CURL_HEAD ===\nHTTP/2 200 \n\ndate: Sat, 28 Nov 2026 05:35:53 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\nlast-modified: Thu, 26 Nov 2026 17:29:13 GMT\n\n=== CURL_BODY_SHA256 ===\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /tmp/p15-example.html\n=== GIT_LS_REMOTE ===\n/tmp/p15cmd.sh: line 13: git: command not found\n=== PKG_META ===\n\u001b[?25l:: Synchronizing package databases...\n core\n extra\n\u001b[1F extra                                         0.0   B  0.00   B/s --:-- [----------------------------------------]   0%\n extra                                        48.0 KiB  80.0 KiB/s 00:38 [----------------------------------------]   1%\n\u001b[1F core is up to date\u001b[K\u001b[1E extra                                       111.9 KiB   124 KiB/s 00:24 [#---------------------------------------]   3%\n extra                                       223.9 KiB   270 KiB/s 00:10 [##--------------------------------------]   7%\n extra                                       319.9 KiB   245 KiB/s 00:11 [####------------------------------------]  10%\n extra                                       560.0 KiB   563 KiB/s 00:04 [######----------------------------------]  17%\n extra                                       848.0 KiB   459 KiB/s 00:04 [##########------------------------------]  27%\n extra                                       848.0 KiB   306 KiB/s 00:07 [##########------------------------------]  27%\n extra                                       848.0 KiB   204 KiB/s 00:11 [##########------------------------------]  27%\n extra                                       848.0 KiB   136 KiB/s 00:16 [##########------------------------------]  27%\n extra                                       848.0 KiB  90.7 KiB/s 00:25 [##########------------------------------]  27%\n extra                                       848.0 KiB  60.5 KiB/s 00:37 [##########------------------------------]  27%\n extra                                       848.0 KiB  40.3 KiB/s 00:56 [##########------------------------------]  27%\n extra                                       848.0 KiB  26.9 KiB/s 01:24 [##########------------------------------]  27%\n extra                                       848.0 KiB  17.9 KiB/s 02:06 [##########------------------------------]  27%\n extra                                       848.0 KiB  11.9 KiB/s 03:10 [##########------------------------------]  27%\n extra                                       848.0 KiB  7.96 KiB/s 04:45 [##########------------------------------]  27%\n extra                                       848.0 KiB  5.31 KiB/s 07:08 [##########------------------------------]  27%\n extra                                       848.0 KiB  3.54 KiB/s 10:42 [##########------------------------------]  27%\n extra                                       848.0 KiB  2.36 KiB/s 16:03 [##########------------------------------]  27%\n extra                                       848.0 KiB  1610   B/s 24:05 [##########------------------------------]  27%\n extra                                       848.0 KiB  1073   B/s 36:08 [##########------------------------------]  27%\n extra                                       848.0 KiB   715   B/s 54:12 [##########------------------------------]  27%\n extra.db failed to download\u001b[K\u001b[1Eerror: failed retrieving file 'extra.db' from riscv.mirror.pkgbuild.com : Operation too slow. Less than 1 bytes/sec transferred the last 10 seconds\nerror: failed to synchronize all databases (download library error)\n\u001b[?25hPKG_META_FAIL\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "initialSha256": "d08caf3f12af727dc65543419c9931eb5435eec60870eb6015de7b0c55aaa63b",
+  "persistedSha256": "d08caf3f12af727dc65543419c9931eb5435eec60870eb6015de7b0c55aaa63b",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 root root 45 Nov 28 05:38 /root/p15-user-preserve.txt\nPHASE15_USER_PRESERVE_arch-kde_1795844301757\nPERSISTED_SHA256=d08caf3f12af727dc65543419c9931eb5435eec60870eb6015de7b0c55aaa63b",
+  "checks": {
+    "noBrowserBins": true,
+    "noBrowserPkgs": false,
+    "noWrapperOrDesktop": true,
+    "hasDns": true,
+    "hasCurlHead": true,
+    "hasCurlSha": true,
+    "hasGitLsRemote": false,
+    "hasPkgMeta": false,
+    "hasRfc1918Blocked": true,
+    "hasDesktopShot": true,
+    "hasPersistMarker": true,
+    "hasPersistSha": true
+  },
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase15\\p15-arch-kde-desktop.png"
+  ],
+  "status": "FAILED",
+  "error": null
+}

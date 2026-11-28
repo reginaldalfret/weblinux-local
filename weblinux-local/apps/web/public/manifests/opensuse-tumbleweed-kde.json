@@ -18,8 +18,8 @@
     "chunkSize": 1048576,
     "totalSizeBytes": 5905580032,
     "manifestUri": "/disk/opensuse-tumbleweed-kde/manifest.json",
-    "id": "522a94eccbca2ada14bac7021f98e9c9",
-    "fullImageSha256": "522a94eccbca2ada14bac7021f98e9c9392c2136e2b457dde00a9b0d64b49795",
+    "id": "14c188114ac8c23a94f925b2964bbdc3",
+    "fullImageSha256": "14c188114ac8c23a94f925b2964bbdc39b3a67fd601e4d77dd0ef3ffec6a365e",
     "filesystemUuid": "0518e3f7-8cda-4948-9aeb-06b76856e9d6"
   },
   "integrity": {
@@ -30,7 +30,7 @@
     "initrdSize": 15064075,
     "initrdUncompressedSize": 36659200,
     "chunksCount": 5632,
-    "nonZeroChunksCount": 4821,
+    "nonZeroChunksCount": 4824,
     "bootChunksCount": 64,
     "sourceArchive": "openSUSE-Tumbleweed-RISC-V-KDE.riscv64-rootfs.riscv64-2026.07.14-Snapshot20261106.tar.xz",
     "sourceArchiveSha256": "94062099bd52c92eb2bbfc37d3aea8e3adab285ffaa5c666bae686820f7ca607"

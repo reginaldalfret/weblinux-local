@@ -18,8 +18,8 @@
     "chunkSize": 1048576,
     "totalSizeBytes": 5368709120,
     "manifestUri": "/disk/arch-kde/manifest.json",
-    "id": "c753a4f41ccf15538b9b79a94163df93",
-    "fullImageSha256": "c753a4f41ccf15538b9b79a94163df93fdd90634d99214c68f5ea9393c583dda",
+    "id": "157b94b4db6114c76e78d309b24c4dcc",
+    "fullImageSha256": "157b94b4db6114c76e78d309b24c4dccf49f6f0d0257bd3e019238044a55b767",
     "filesystemUuid": "ea1a336a-4121-4de5-a8b0-afcc924d2389"
   },
   "integrity": {
@@ -30,7 +30,7 @@
     "initrdSize": 15064075,
     "initrdUncompressedSize": 36659200,
     "chunksCount": 5120,
-    "nonZeroChunksCount": 3958,
+    "nonZeroChunksCount": 3966,
     "bootChunksCount": 64,
     "sourceArchive": "archriscv-2026-08-27.tar.zst",
     "sourceArchiveSha256": "a2045c8b62232db2f60d8e4db610dbb5d9e12856dab0ba08634ad3d7cb7ad498"

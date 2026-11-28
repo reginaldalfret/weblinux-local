@@ -1,6 +1,6 @@
 {
   "id": "ubuntu-kde-epiphany",
-  "name": "Ubuntu 24.04.5 LTS KDE + Epiphany Web",
+  "name": "Ubuntu 24.04.5 LTS KDE Plasma",
   "releaseVersion": "24.04.5 LTS",
   "architecture": "riscv64",
   "kernelCompatibility": "linux-wasm64_nommu-7.0",
@@ -18,8 +18,8 @@
     "baseUri": "/disk/ubuntu-24.04-kde-epiphany/",
     "chunkSize": 1048576,
     "totalSizeBytes": 3758096384,
-    "id": "7321ea53b91a9c396a8262a7015dd79479b120dcec0389166455813e7626c266",
-    "fullImageSha256": "7321ea53b91a9c396a8262a7015dd79479b120dcec0389166455813e7626c266"
+    "id": "af0074751f4bd6a38810841531bc6fa5",
+    "fullImageSha256": "af0074751f4bd6a38810841531bc6fa5b2d47892605e2189917f4cbaa2e4aa1a"
   },
   "integrity": {
     "kernelSha256": "31287a56f4d80f5767dc2e07abf1986a3722a6fb6f1bef72d714d189a2e65c49",
@@ -51,5 +51,5 @@
     "licenseDocUrl": "/docs/LICENSING.md"
   },
   "validationStatus": "experimental",
-  "notes": "Ubuntu 24.04.5 LTS KDE Plasma 5.27 with native RISC-V 64-bit Epiphany Web (WebKitGTK 6) browser."
+  "notes": "Ubuntu 24.04.5 LTS riscv64 with KDE Plasma 5.27 configured for NOMMU execution."
 }

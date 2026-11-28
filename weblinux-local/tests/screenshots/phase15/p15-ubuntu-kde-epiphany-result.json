@@ -1,0 +1,30 @@
+{
+  "distroId": "ubuntu-kde-epiphany",
+  "timestamp": "2026-11-28T05:29:59.373Z",
+  "coldBootSec": 25.3,
+  "warmReloadBootSec": 25.4,
+  "browserRemovalCheck": "=== OS ===\nPRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\n=== BIN_CHECK ===\n=== PKG_CHECK ===\n=== WRAPPER_AND_DESKTOP ===\nNO_WRAPPER_OK\nNO_DESKTOP_OK",
+  "networkCheck": "=== DNS ===\n2606:4700:10::6814:179a example.com\n2606:4700:10::ac42:93f3 example.com\n=== CURL_HEAD ===\nHTTP/2 200 \n\ndate: Sat, 28 Nov 2026 05:30:40 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\nlast-modified: Thu, 26 Nov 2026 17:29:13 GMT\n\n=== CURL_BODY_SHA256 ===\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /tmp/p15-example.html\n=== GIT_LS_REMOTE ===\n/tmp/p15cmd.sh: 13: git: not found\n=== PKG_META ===\n\n0% [Working]\n            \nGet:1 http://ports.ubuntu.com/ubuntu-ports noble InRelease [256 kB]\n\n0% [1 InRelease 0 B/256 kB 0%]\n0% [1 InRelease 43.3 kB/256 kB 17%]\n                                   \n0% [1 InRelease 127 kB/256 kB 50%]\n                                  \n0% [Working]\n            \nGet:2 http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease [126 kB]\n\n0% [Waiting for headers]\n                        \nGet:3 http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease [126 kB]\n\n0% [3 InRelease 0 B/126 kB 0%]\n                              \n0% [Working]\n            \nGet:4 http://ports.ubuntu.com/ubuntu-ports noble-security InRelease [126 kB]\n\n0% [4 InRelease 14.9 kB/126 kB 12%]\n                                   \nErr:1 http://ports.ubuntu.com/ubuntu-ports noble InRelease\n  Couldn't execute /usr/bin/apt-key to check /var/lib/apt/lists/partial/ports.ubuntu.com_ubuntu-ports_dists_noble_InRelease\n\n0% [4 InRelease 126 kB/126 kB 100%]\n                                   \n0% [Working]\n0% [Working]\n            \nErr:2 http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease\n  Couldn't execute /usr/bin/apt-key to check /var/lib/apt/lists/partial/ports.ubuntu.com_ubuntu-ports_dists_noble-updates_InRelease\n\n0% [Working]\n            \nErr:3 http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease\n  Couldn't execute /usr/bin/apt-key to check /var/lib/apt/lists/partial/ports.ubuntu.com_ubuntu-ports_dists_noble-backports_InRelease\n\n0% [Working]\n            \nErr:4 http://ports.ubuntu.com/ubuntu-ports noble-security InRelease\n  Couldn't execute /usr/bin/apt-key to check /var/lib/apt/lists/partial/ports.ubuntu.com_ubuntu-ports_dists_noble-security_InRelease\n\n0% [Working]\n            \n\nReading package lists... 0%\n\nReading package lists... 0%\n\nReading package lists... 11%\n\nReading package lists... 34%\n\nReading package lists... Done\n\nW: GPG error: http://ports.ubuntu.com/ubuntu-ports noble InRelease: Couldn't execute /usr/bin/apt-key to check /var/lib/apt/lists/partial/ports.ubuntu.com_ubuntu-ports_dists_noble_InRelease\nE: The repository 'http://ports.ubuntu.com/ubuntu-ports noble InRelease' is not signed.\nN: Updating from such a repository can't be done securely, and is therefore disabled by default.\nN: See apt-secure(8) manpage for repository creation and user configuration details.\nW: GPG error: http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease: Couldn't execute /usr/bin/apt-key to check /var/lib/apt/lists/partial/ports.ubuntu.com_ubuntu-ports_dists_noble-updates_InRelease\nE: The repository 'http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease' is not signed.\nN: Updating from such a repository can't be done securely, and is therefore disabled by default.\nN: See apt-secure(8) manpage for repository creation and user configuration details.\nW: GPG error: http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease: Couldn't execute /usr/bin/apt-key to check /var/lib/apt/lists/partial/ports.ubuntu.com_ubuntu-ports_dists_noble-backports_InRelease\nE: The repository 'http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease' is not signed.\nN: Updating from such a repository can't be done securely, and is therefore disabled by default.\nN: See apt-secure(8) manpage for repository creation and user configuration details.\nW: GPG error: http://ports.ubuntu.com/ubuntu-ports noble-security InRelease: Couldn't execute /usr/bin/apt-key to check /var/lib/apt/lists/partial/ports.ubuntu.com_ubuntu-ports_dists_noble-security_InRelease\nE: The repository 'http://ports.ubuntu.com/ubuntu-ports noble-security InRelease' is not signed.\nN: Updating from such a repository can't be done securely, and is therefore disabled by default.\nN: See apt-secure(8) manpage for repository creation and user configuration details.\nPKG_META_FAIL\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "initialSha256": "fe0645760f7f9ea9be6c265d80b9365da6255e0c301b1fde24b561142ea3ff67",
+  "persistedSha256": "fe0645760f7f9ea9be6c265d80b9365da6255e0c301b1fde24b561142ea3ff67",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 root root 56 Nov 28 05:32 /home/ubuntu/p15-user-preserve.txt\nPHASE15_USER_PRESERVE_ubuntu-kde-epiphany_1795843954897\nPERSISTED_SHA256=fe0645760f7f9ea9be6c265d80b9365da6255e0c301b1fde24b561142ea3ff67",
+  "checks": {
+    "noBrowserBins": true,
+    "noBrowserPkgs": true,
+    "noWrapperOrDesktop": true,
+    "hasDns": true,
+    "hasCurlHead": true,
+    "hasCurlSha": true,
+    "hasGitLsRemote": false,
+    "hasPkgMeta": false,
+    "hasRfc1918Blocked": true,
+    "hasDesktopShot": true,
+    "hasPersistMarker": true,
+    "hasPersistSha": true
+  },
+  "screenshots": [
+    "E:\\Web-Linux\\weblinux-local\\tests\\screenshots\\phase15\\p15-ubuntu-kde-epiphany-desktop.png"
+  ],
+  "status": "FAILED",
+  "error": null
+}
