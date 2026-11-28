@@ -164,6 +164,24 @@ if [ "$DISTRO" = "alpine" ]; then
   # and set fallback wallpaper symlink if Next exists
   chroot "$MNT" /bin/sh -lc "HOME=/root /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR} --dry-run"
 else
+  # Clean any prior kwriteconfig \x5d\x5b escaped containment section so awk writes the real containment
+  if [ -f "${MNT}/root/.config/plasma-org.kde.plasma.desktop-appletsrc" ]; then
+    python3 - "${MNT}/root/.config/plasma-org.kde.plasma.desktop-appletsrc" <<'PY'
+import sys
+p = sys.argv[1]
+with open(p, "r", encoding="utf-8", errors="replace") as f:
+    lines = f.readlines()
+out = []
+skip = False
+for ln in lines:
+    if ln.startswith("["):
+        skip = ("\\x5d" in ln or "\\x5b" in ln)
+    if not skip:
+        out.append(ln)
+with open(p, "w", encoding="utf-8") as f:
+    f.writelines(out)
+PY
+  fi
   rm -f "${MNT}/root/.local/state/weblinux/branding-v2-logo-wallpaper-applied"
   chroot "$MNT" /bin/sh -lc "HOME=/root /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR}"
   chroot "$MNT" /bin/sh -lc "HOME=/root /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --status"

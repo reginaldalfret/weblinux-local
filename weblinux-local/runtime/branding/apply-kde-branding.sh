@@ -217,6 +217,25 @@ detect_appletsrc_wallpaper() {
     if [ -n "$_detected" ]; then
       WALLPAPER_GROUP=$(printf '%s' "$_detected" | cut -f1)
       CURRENT_WALLPAPER=$(printf '%s' "$_detected" | cut -f2-)
+    else
+      _cid=$(awk '
+        /^\[Containments\]\[[0-9]+\]$/ {
+          cid = $0
+          gsub(/^\[Containments\]\[|\].*$/, "", cid)
+          next
+        }
+        /^\[.*\]$/ {
+          cid = ""
+          next
+        }
+        cid != "" && /^wallpaperplugin=org\.kde\.image/ {
+          print cid
+          exit
+        }
+      ' "$APPLETS_RC")
+      if [ -n "$_cid" ]; then
+        WALLPAPER_GROUP="Containments][${_cid}][Wallpaper][org.kde.image][General"
+      fi
     fi
   fi
 }
