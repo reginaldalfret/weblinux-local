@@ -31,9 +31,27 @@ export type DesktopLayoutPreset =
 export interface WallpaperConfig {
   id: string;
   path: string;
+  svgPath: string;
+  pngPath: string;
+  svgFilename: string;
+  pngFilename: string;
+  previousPaths: string[];
   fallbackColor: string;
   fillMode: 'PreserveAspectCrop' | 'PreserveAspectFit' | 'Stretch' | 'Tile';
   previewAssetUri: string;
+}
+
+export interface WallpaperRegistryEntry {
+  profileId: BrandingProfileId;
+  aliases: BrandingAliasId[];
+  wallpaperId: string;
+  svgFilename: string;
+  pngFilename: string;
+  svgPath: string;
+  pngPath: string;
+  fallbackColor: string;
+  previewAssetUri: string;
+  previousPaths: string[];
 }
 
 export interface KdeThemeConfig {
@@ -82,6 +100,7 @@ export interface PlasmaConfigPaths {
 
 export interface BrandingMigrationPolicy {
   stateMarkerPath: string;
+  v2WallpaperMarkerPath: string;
   backupBaseDir: string;
   idempotent: boolean;
   preserveUserData: boolean;

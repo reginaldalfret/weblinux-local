@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Deep navy/black base background -->
+    <linearGradient id="bg-base" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B1018"/>
+      <stop offset="50%" stop-color="#0F1722"/>
+      <stop offset="100%" stop-color="#0B1018"/>
+    </linearGradient>
+
+    <!-- Subtle central depth vignette -->
+    <radialGradient id="center-depth" cx="50%" cy="47.2%" r="55%" fx="50%" fy="47.2%">
+      <stop offset="0%" stop-color="#132236" stop-opacity="0.65"/>
+      <stop offset="45%" stop-color="#0F1722" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#0B1018" stop-opacity="0.0"/>
+    </radialGradient>
+
+    <!-- Subtle Arch Blue ambient glow behind centerpiece -->
+    <radialGradient id="arch-glow" cx="50%" cy="47.2%" r="28%" fx="50%" fy="47.2%">
+      <stop offset="0%" stop-color="#1793D1" stop-opacity="0.16"/>
+      <stop offset="45%" stop-color="#1793D1" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#1793D1" stop-opacity="0.0"/>
+    </radialGradient>
+
+    <!-- Sharp geometric line gradients for clean fade-out at edges -->
+    <linearGradient id="line-fade-h" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1793D1" stop-opacity="0"/>
+      <stop offset="22%" stop-color="#1793D1" stop-opacity="0.18"/>
+      <stop offset="50%" stop-color="#1793D1" stop-opacity="0.32"/>
+      <stop offset="78%" stop-color="#1793D1" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#1793D1" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="line-fade-diag-1" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#1793D1" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#1793D1" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#1793D1" stop-opacity="0.35"/>
+      <stop offset="70%" stop-color="#1793D1" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#1793D1" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="line-fade-diag-2" x1="80%" y1="0%" x2="20%" y2="100%">
+      <stop offset="0%" stop-color="#1793D1" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#1793D1" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#1793D1" stop-opacity="0.35"/>
+      <stop offset="70%" stop-color="#1793D1" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#1793D1" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="facet-fill-1" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#1793D1" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#1793D1" stop-opacity="0.01"/>
+    </linearGradient>
+
+    <!-- Subtle drop glow for the authentic Arch symbol -->
+    <filter id="logo-shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#04080F" flood-opacity="0.75"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#1793D1" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <!-- Base canvas -->
+  <rect width="1920" height="1080" fill="url(#bg-base)"/>
+  <rect width="1920" height="1080" fill="url(#center-depth)"/>
+  <rect width="1920" height="1080" fill="url(#arch-glow)"/>
+
+  <!-- Sharp minimal geometric framing lines (60-degree / Arch-inspired angular geometry) -->
+  <g fill="none" stroke-linecap="square" stroke-linejoin="miter">
+    <!-- Subtle outer structural polygon / prism -->
+    <polygon points="960,118 1348,790 572,790" stroke="#1793D1" stroke-width="1" stroke-opacity="0.14" fill="url(#facet-fill-1)"/>
+    <polygon points="960,168 1304,764 616,764" stroke="#1793D1" stroke-width="1" stroke-opacity="0.22"/>
+
+    <!-- Inverted subtle inner geometric triangle -->
+    <polygon points="960,842 1196,434 724,434" stroke="#1793D1" stroke-width="1" stroke-opacity="0.10"/>
+
+    <!-- Sharp diagonal architectural vectors passing cleanly through center -->
+    <line x1="360" y1="1080" x2="1040" y2="-98" stroke="url(#line-fade-diag-2)" stroke-width="1.25"/>
+    <line x1="1560" y1="1080" x2="880" y2="-98" stroke="url(#line-fade-diag-1)" stroke-width="1.25"/>
+
+    <!-- Secondary parallel offset hairlines -->
+    <line x1="420" y1="1080" x2="1100" y2="-98" stroke="#1793D1" stroke-width="0.75" stroke-opacity="0.09"/>
+    <line x1="1500" y1="1080" x2="820" y2="-98" stroke="#1793D1" stroke-width="0.75" stroke-opacity="0.09"/>
+
+    <!-- Clean horizontal structural datum lines -->
+    <line x1="180" y1="510" x2="1740" y2="510" stroke="url(#line-fade-h)" stroke-width="1"/>
+    <line x1="320" y1="764" x2="1600" y2="764" stroke="url(#line-fade-h)" stroke-width="0.85" stroke-opacity="0.7"/>
+
+    <!-- Vertical center axis hairline (broken cleanly around logo) -->
+    <line x1="960" y1="64" x2="960" y2="270" stroke="#1793D1" stroke-width="1" stroke-opacity="0.24"/>
+    <line x1="960" y1="740" x2="960" y2="960" stroke="#1793D1" stroke-width="1" stroke-opacity="0.18"/>
+
+    <!-- Minimal precision corner brackets (kept subtle for clean desktop icon readability) -->
+    <path d="M 56 84 L 56 56 L 84 56" stroke="#1793D1" stroke-width="1.25" stroke-opacity="0.28"/>
+    <path d="M 1836 56 L 1864 56 L 1864 84" stroke="#1793D1" stroke-width="1.25" stroke-opacity="0.28"/>
+    <path d="M 56 996 L 56 1024 L 84 1024" stroke="#1793D1" stroke-width="1.25" stroke-opacity="0.28"/>
+    <path d="M 1836 1024 L 1864 1024 L 1864 996" stroke="#1793D1" stroke-width="1.25" stroke-opacity="0.28"/>
+  </g>
+
+  <!-- Precision geometric vertex markers -->
+  <g fill="#1793D1">
+    <circle cx="960" cy="118" r="2.2" fill-opacity="0.45"/>
+    <circle cx="960" cy="168" r="2.5" fill-opacity="0.65"/>
+    <circle cx="616" cy="764" r="2.2" fill-opacity="0.45"/>
+    <circle cx="1304" cy="764" r="2.2" fill-opacity="0.45"/>
+    <rect x="958.5" y="508.5" width="3" height="3" fill-opacity="0.25" transform="rotate(45 960 510)"/>
+  </g>
+
+  <!-- Authentic Arch Linux Symbol (embedded verbatim from apps/web/public/branding/arch/archlinux-logo.svg) -->
+  <g transform="translate(774.4, 324.4) scale(1.45)" filter="url(#logo-shadow)">
+    <g fill="#1793d1">
+      <path d="m127.98 12.07c-10.316 25.309-16.543 41.855-28.031 66.41 7.043 7.4609 15.691 16.156 29.734 25.977-15.098-6.207-25.395-12.445-33.094-18.918-14.703 30.68-37.742 74.391-84.492 158.39 36.746-21.219 65.23-34.293 91.773-39.289-1.1406-4.8945-1.7852-10.195-1.7422-15.734l0.042969-1.1719c0.58203-23.551 12.828-41.645 27.336-40.418 14.508 1.2266 25.781 21.316 25.199 44.867-0.10938 4.4219-0.60938 8.6914-1.4805 12.641 26.258 5.1328 54.438 18.18 90.684 39.105-7.1484-13.156-13.527-25.016-19.621-36.316-9.5938-7.4336-19.605-17.117-40.023-27.594 14.035 3.6406 24.082 7.8516 31.914 12.555-61.941-115.32-66.957-130.66-88.199-180.5z" fill-rule="evenodd"/>
+      <path d="m235.17 210.61v-5.832h-2.1758v-0.78125h5.2383v0.78125h-2.1875v5.832h-0.875"/>
+      <path d="m239.14 210.61v-6.6133h1.3164l1.5664 4.6836c0.14453 0.43359 0.24609 0.76172 0.3125 0.97656 0.078125-0.23828 0.19531-0.59375 0.35156-1.0586l1.5859-4.6016h1.1758v6.6133h-0.84375v-5.5352l-1.9219 5.5352h-0.78906l-1.9102-5.6289v5.6289h-0.84375"/>
+    </g>
+  </g>
+</svg>

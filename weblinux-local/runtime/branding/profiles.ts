@@ -16,7 +16,9 @@ import {
   PlasmaConfigPaths,
   PlasmaMajorVersion,
   PlasmaToolingInfo,
+  WallpaperConfig,
 } from './types';
+import { WALLPAPER_REGISTRY, WALLPAPER_V2_MIGRATION_MARKER } from './wallpapers';
 
 export const DEFAULT_CONFIG_PATHS: PlasmaConfigPaths = {
   kdeglobals: '~/.config/kdeglobals',
@@ -30,10 +32,27 @@ export const DEFAULT_CONFIG_PATHS: PlasmaConfigPaths = {
 
 export const DEFAULT_MIGRATION_POLICY: BrandingMigrationPolicy = {
   stateMarkerPath: '~/.local/state/weblinux/branding-v1-applied',
+  v2WallpaperMarkerPath: WALLPAPER_V2_MIGRATION_MARKER,
   backupBaseDir: '~/.local/state/weblinux/backups',
   idempotent: true,
   preserveUserData: true,
 };
+
+function buildWallpaperConfig(profileId: BrandingProfileId): WallpaperConfig {
+  const entry = WALLPAPER_REGISTRY[profileId];
+  return {
+    id: entry.wallpaperId,
+    path: entry.pngPath,
+    svgPath: entry.svgPath,
+    pngPath: entry.pngPath,
+    svgFilename: entry.svgFilename,
+    pngFilename: entry.pngFilename,
+    previousPaths: entry.previousPaths,
+    fallbackColor: entry.fallbackColor,
+    fillMode: 'PreserveAspectCrop',
+    previewAssetUri: entry.previewAssetUri,
+  };
+}
 
 export const BRANDING_PROFILE_ALIASES: Record<string, BrandingProfileId> = {
   'debian-kde': 'debian-kde',
@@ -78,13 +97,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     kwriteconfigTool: 'kwriteconfig6',
     kreadconfigTool: 'kreadconfig6',
     configPaths: DEFAULT_CONFIG_PATHS,
-    wallpaper: {
-      id: 'debian-ceratopsian-weblinux',
-      path: '/usr/share/wallpapers/WebLinux-Debian/contents/images/1920x1080.png',
-      fallbackColor: '#a80030',
-      fillMode: 'PreserveAspectCrop',
-      previewAssetUri: '/branding/debian/wallpaper.png',
-    },
+    wallpaper: buildWallpaperConfig('debian-kde'),
     theme: {
       lookAndFeel: 'org.kde.breezedark.desktop',
       colorScheme: 'BreezeDark',
@@ -112,7 +125,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     layoutPreset: 'breeze-classic',
     lockScreen: {
       supported: true,
-      path: '/usr/share/wallpapers/WebLinux-Debian/contents/images/1920x1080.png',
+      path: WALLPAPER_REGISTRY['debian-kde'].pngPath,
       themePlugin: 'org.kde.breeze.desktop',
     },
     splashScreen: {
@@ -135,13 +148,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     kwriteconfigTool: 'kwriteconfig5',
     kreadconfigTool: 'kreadconfig5',
     configPaths: DEFAULT_CONFIG_PATHS,
-    wallpaper: {
-      id: 'ubuntu-noble-weblinux',
-      path: '/usr/share/wallpapers/WebLinux-Ubuntu/contents/images/1920x1080.png',
-      fallbackColor: '#77216f',
-      fillMode: 'PreserveAspectCrop',
-      previewAssetUri: '/branding/ubuntu/wallpaper.png',
-    },
+    wallpaper: buildWallpaperConfig('ubuntu-kde'),
     theme: {
       lookAndFeel: 'org.kde.breezedark.desktop',
       colorScheme: 'BreezeDark',
@@ -169,7 +176,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     layoutPreset: 'ubuntu-dock',
     lockScreen: {
       supported: true,
-      path: '/usr/share/wallpapers/WebLinux-Ubuntu/contents/images/1920x1080.png',
+      path: WALLPAPER_REGISTRY['ubuntu-kde'].pngPath,
       themePlugin: 'org.kde.breeze.desktop',
       notes: 'Plasma 5.27 kscreenlockerrc Greeter configuration',
     },
@@ -193,13 +200,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     kwriteconfigTool: 'kwriteconfig6',
     kreadconfigTool: 'kreadconfig6',
     configPaths: DEFAULT_CONFIG_PATHS,
-    wallpaper: {
-      id: 'arch-weblinux',
-      path: '/usr/share/wallpapers/WebLinux-Arch/contents/images/1920x1080.png',
-      fallbackColor: '#1793d1',
-      fillMode: 'PreserveAspectCrop',
-      previewAssetUri: '/branding/arch/wallpaper.png',
-    },
+    wallpaper: buildWallpaperConfig('arch-kde'),
     theme: {
       lookAndFeel: 'org.kde.breezedark.desktop',
       colorScheme: 'BreezeDark',
@@ -227,7 +228,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     layoutPreset: 'arch-minimal',
     lockScreen: {
       supported: true,
-      path: '/usr/share/wallpapers/WebLinux-Arch/contents/images/1920x1080.png',
+      path: WALLPAPER_REGISTRY['arch-kde'].pngPath,
       themePlugin: 'org.kde.breeze.desktop',
     },
     splashScreen: {
@@ -249,13 +250,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     kwriteconfigTool: 'kwriteconfig6',
     kreadconfigTool: 'kreadconfig6',
     configPaths: DEFAULT_CONFIG_PATHS,
-    wallpaper: {
-      id: 'opensuse-tumbleweed-weblinux',
-      path: '/usr/share/wallpapers/WebLinux-openSUSE/contents/images/1920x1080.png',
-      fallbackColor: '#173f4f',
-      fillMode: 'PreserveAspectCrop',
-      previewAssetUri: '/branding/opensuse/wallpaper.png',
-    },
+    wallpaper: buildWallpaperConfig('opensuse-tumbleweed-kde'),
     theme: {
       lookAndFeel: 'org.openSUSE.desktop',
       colorScheme: 'BreezeDark',
@@ -283,7 +278,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     layoutPreset: 'opensuse-emerald',
     lockScreen: {
       supported: true,
-      path: '/usr/share/wallpapers/WebLinux-openSUSE/contents/images/1920x1080.png',
+      path: WALLPAPER_REGISTRY['opensuse-tumbleweed-kde'].pngPath,
       themePlugin: 'org.kde.breeze.desktop',
     },
     splashScreen: {
@@ -305,13 +300,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     kwriteconfigTool: 'kwriteconfig6',
     kreadconfigTool: 'kreadconfig6',
     configPaths: DEFAULT_CONFIG_PATHS,
-    wallpaper: {
-      id: 'fedora-45-weblinux',
-      path: '/usr/share/wallpapers/WebLinux-Fedora/contents/images/1920x1080.png',
-      fallbackColor: '#294172',
-      fillMode: 'PreserveAspectCrop',
-      previewAssetUri: '/branding/fedora/wallpaper.png',
-    },
+    wallpaper: buildWallpaperConfig('fedora-kde'),
     theme: {
       lookAndFeel: 'org.fedoraproject.fedora.desktop',
       colorScheme: 'BreezeDark',
@@ -339,7 +328,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     layoutPreset: 'fedora-workstation',
     lockScreen: {
       supported: true,
-      path: '/usr/share/wallpapers/WebLinux-Fedora/contents/images/1920x1080.png',
+      path: WALLPAPER_REGISTRY['fedora-kde'].pngPath,
       themePlugin: 'org.kde.breeze.desktop',
     },
     splashScreen: {
@@ -361,13 +350,7 @@ export const BRANDING_PROFILES: Record<BrandingProfileId, KdeBrandingProfile> = 
     kwriteconfigTool: 'kwriteconfig6',
     kreadconfigTool: 'kreadconfig6',
     configPaths: DEFAULT_CONFIG_PATHS,
-    wallpaper: {
-      id: 'alpine-324-weblinux',
-      path: '/usr/share/wallpapers/WebLinux-Alpine/contents/images/1920x1080.png',
-      fallbackColor: '#0d597f',
-      fillMode: 'PreserveAspectCrop',
-      previewAssetUri: '/branding/alpine/wallpaper.png',
-    },
+    wallpaper: buildWallpaperConfig('alpine-kde'),
     theme: {
       lookAndFeel: 'org.kde.breezedark.desktop',
       colorScheme: 'BreezeDark',
