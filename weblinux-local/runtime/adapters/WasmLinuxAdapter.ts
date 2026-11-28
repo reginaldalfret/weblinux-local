@@ -607,7 +607,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         networkConnected: options.enableNetworking,
       });
 
-      // For KDE Plasma 5/6: monitor compositor readiness timeout
+      // For KDE Plasma 5/6: monitor compositor readiness timeout & trigger idempotent v2 branding migration
       if (isKde) {
         setTimeout(() => {
           if (this.status.state === 'booting' && !this.status.waylandActive) {
@@ -615,6 +615,20 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
             this.updateStatus({ state: 'running' });
           }
         }, 25000);
+        const chrootTarget =
+          options.desktop === 'ubuntu-kde' ? 'ubuntu-kde' :
+          options.desktop === 'arch-kde' ? 'arch-root' :
+          options.desktop === 'opensuse-tumbleweed-kde' ? 'opensuse-root' :
+          options.desktop === 'fedora-kde' ? 'fedora-root' :
+          options.desktop === 'alpine-kde' ? 'alpine-root' : 'debian';
+        setTimeout(() => {
+          if (this.activeOs && this.status.shellReady) {
+            this.runCommand(
+              `${chrootTarget} /bin/sh -c '[ -x /usr/local/bin/weblinux-branding-v2-autostart ] && nohup /usr/local/bin/weblinux-branding-v2-autostart >/tmp/weblinux-branding-v2.log 2>&1 </dev/null &'`,
+              8000
+            ).catch(() => {});
+          }
+        }, 18000);
       } else if (options.desktop === 'cli' || options.manifest.id === 'ubuntu') {
         setTimeout(() => {
           if (this.status.state === 'booting' || this.status.state === 'shell_ready') {

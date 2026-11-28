@@ -184,8 +184,15 @@ if [ "$DBUS_BUS_OK" -eq 1 ]; then
     qdbus org.kde.plasmashell /MainApplication >/dev/null 2>&1 && DBUS_PLASMASHELL_OK=1
   fi
 fi
+KSPLASH_ACTIVE=0
+for p in /proc/[0-9]*/cmdline; do
+  [ -r "$p" ] || continue
+  if tr '\\0' ' ' < "$p" 2>/dev/null | grep -qE '(^|/)ksplashqml(\\s|$)'; then
+    KSPLASH_ACTIVE=1; break
+  fi
+done
 COMPOSITOR_READY=0
-if [ "$WAYLAND_SOCKET_OK" -eq 1 ] && [ "$COMPOSITOR_OK" -eq 1 ] && [ "$PLASMASHELL_OK" -eq 1 ] && [ "$DBUS_PLASMASHELL_OK" -eq 1 ]; then
+if [ "$WAYLAND_SOCKET_OK" -eq 1 ] && [ "$COMPOSITOR_OK" -eq 1 ] && [ "$PLASMASHELL_OK" -eq 1 ] && [ "$DBUS_PLASMASHELL_OK" -eq 1 ] && [ "$KSPLASH_ACTIVE" -eq 0 ]; then
   COMPOSITOR_READY=1
 fi
 echo "WAYLAND_SOCKET_OK=$WAYLAND_SOCKET_OK"
@@ -193,6 +200,7 @@ echo "COMPOSITOR_OK=$COMPOSITOR_OK"
 echo "PLASMASHELL_OK=$PLASMASHELL_OK"
 echo "DBUS_BUS_OK=$DBUS_BUS_OK"
 echo "DBUS_PLASMASHELL_OK=$DBUS_PLASMASHELL_OK"
+echo "KSPLASH_ACTIVE=$KSPLASH_ACTIVE"
 echo "COMPOSITOR_READY=$COMPOSITOR_READY"
 `;
 

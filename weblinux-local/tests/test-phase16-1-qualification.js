@@ -740,7 +740,14 @@ async function runLiveQualification(rawDistroId, forceRelaunch) {
     console.log(`[${distroId}] Booted in ${result.coldBootSec}s`);
 
     // 2. Wait for real compositor frame & Plasma readiness
-    result.compositorReadiness = await waitForCompositorAndDesktopReady(page, distroId, cfg, cfg.plasmaWaitMs);
+    result.compositorReadiness = await waitForCompositorAndDesktopReady(page, distroId, cfg, Math.max(cfg.plasmaWaitMs, 150000));
+    await runGuest(
+      page,
+      cfg,
+      buildPlasmaLaunchScript(`[ -x /usr/local/bin/weblinux-apply-kde-branding ] && HOME="${cfg.homeDir}" /usr/local/bin/weblinux-apply-kde-branding --profile "${cfg.canonicalId}" || true`),
+      25000
+    );
+    await page.waitForTimeout(3000);
     const desktopShot = path.join(evidenceDir, '01-desktop.png');
     if (await safeScreenshot(page, desktopShot)) {
       result.screenshots.desktop = desktopShot;
