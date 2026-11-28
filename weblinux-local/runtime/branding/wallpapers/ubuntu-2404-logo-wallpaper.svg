@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <!-- Base aubergine background gradient -->
+    <linearGradient id="bg-aubergine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E0014"/>
+      <stop offset="48%" stop-color="#2C001E"/>
+      <stop offset="100%" stop-color="#3E0B32"/>
+    </linearGradient>
+
+    <!-- Layered purple-to-aubergine geometric gradients -->
+    <linearGradient id="grad-purple-sweep" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#77216F" stop-opacity="0.72"/>
+      <stop offset="55%" stop-color="#5E1653" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#2C001E" stop-opacity="0.0"/>
+    </linearGradient>
+
+    <linearGradient id="grad-purple-fold" x1="0%" y1="100%" x2="100%" y2="10%">
+      <stop offset="0%" stop-color="#2C001E" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#77216F" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#9E2B6B" stop-opacity="0.35"/>
+    </linearGradient>
+
+    <linearGradient id="grad-orange-ribbon" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#77216F" stop-opacity="0.15"/>
+      <stop offset="45%" stop-color="#C83E2B" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#E95420" stop-opacity="0.82"/>
+    </linearGradient>
+
+    <linearGradient id="grad-orange-edge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E95420" stop-opacity="0.65"/>
+      <stop offset="60%" stop-color="#77216F" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#2C001E" stop-opacity="0.0"/>
+    </linearGradient>
+
+    <!-- Ambient radial glows -->
+    <radialGradient id="glow-center" cx="50%" cy="50%" r="48%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#E95420" stop-opacity="0.30"/>
+      <stop offset="38%" stop-color="#77216F" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#2C001E" stop-opacity="0.0"/>
+    </radialGradient>
+
+    <radialGradient id="glow-bottom-right" cx="84%" cy="86%" r="42%">
+      <stop offset="0%" stop-color="#E95420" stop-opacity="0.34"/>
+      <stop offset="55%" stop-color="#77216F" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#2C001E" stop-opacity="0.0"/>
+    </radialGradient>
+
+    <!-- Subtle vignette for crisp desktop icon readability -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="72%">
+      <stop offset="58%" stop-color="#2C001E" stop-opacity="0.0"/>
+      <stop offset="100%" stop-color="#14000D" stop-opacity="0.55"/>
+    </radialGradient>
+
+    <!-- Soft drop shadow for the Ubuntu emblem -->
+    <filter id="emblem-shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="14" stdDeviation="24" flood-color="#12000C" flood-opacity="0.65"/>
+    </filter>
+
+    <!-- Rounded-square clip for the embedded 32x32 Ubuntu tag -->
+    <clipPath id="emblem-clip">
+      <rect x="856" y="436" width="208" height="208" rx="28" ry="28"/>
+    </clipPath>
+  </defs>
+
+  <!-- Layer 0: Base Aubergine Canvas -->
+  <rect width="1920" height="1080" fill="url(#bg-aubergine)"/>
+
+  <!-- Layer 1: Large Geometric Waves & Facets (Ubuntu Purple & Aubergine) -->
+  <path d="M 0,0 L 1180,0 C 980,320 760,540 380,1080 L 0,1080 Z" fill="#2C001E" opacity="0.65"/>
+  <path d="M 520,0 L 1920,0 L 1920,820 C 1460,640 1040,420 520,0 Z" fill="url(#grad-purple-sweep)"/>
+  <path d="M 0,1080 L 0,620 C 480,520 980,680 1560,1080 Z" fill="url(#grad-purple-fold)"/>
+
+  <!-- Layer 2: Intersecting Diagonal Architectural Planes -->
+  <polygon points="1920,140 1920,1080 960,1080 1420,420" fill="#77216F" opacity="0.22"/>
+  <polygon points="0,340 680,0 1120,0 240,1080 0,1080" fill="#2C001E" opacity="0.34"/>
+  <path d="M 760,1080 C 1020,740 1380,460 1920,240 L 1920,540 C 1540,700 1260,880 1080,1080 Z" fill="url(#grad-orange-ribbon)"/>
+  <path d="M 1180,0 L 1640,0 C 1440,360 1220,620 920,1080 L 660,1080 C 920,660 1060,340 1180,0 Z" fill="url(#grad-orange-edge)" opacity="0.45"/>
+
+  <!-- Layer 3: Subtle Ambient Glows -->
+  <rect width="1920" height="1080" fill="url(#glow-center)"/>
+  <rect width="1920" height="1080" fill="url(#glow-bottom-right)"/>
+
+  <!-- Layer 4: Subtle Concentric Framing Rings -->
+  <g fill="none" stroke="#FFFFFF" transform="translate(960, 540)">
+    <circle r="210" stroke-width="1" stroke-opacity="0.10"/>
+    <circle r="310" stroke-width="1" stroke-opacity="0.06"/>
+    <circle r="440" stroke-width="1" stroke-opacity="0.035"/>
+  </g>
+
+  <!-- Subtle diagonal accent hairlines -->
+  <line x1="260" y1="1080" x2="1340" y2="0" stroke="#E95420" stroke-width="1.5" stroke-opacity="0.16"/>
+  <line x1="620" y1="1080" x2="1700" y2="0" stroke="#FFFFFF" stroke-width="1" stroke-opacity="0.06"/>
+
+  <!-- Layer 5: Edge Vignette for Desktop Icon Readability -->
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+
+  <!-- Layer 6: Exact Authentic Ubuntu Circle of Friends Logo (from apps/web/public/branding/ubuntu/ubuntu-logo.svg) -->
+  <g filter="url(#emblem-shadow)">
+    <g clip-path="url(#emblem-clip)">
+      <svg x="856" y="436" width="208" height="208" viewBox="0 0 32 32">
+        <defs>
+          <style>.cof-bg{fill:#e95420;}.cof-fg{fill:#fff;}</style>
+        </defs>
+        <rect class="cof-bg" width="32" height="32"/>
+        <circle class="cof-fg" cx="7.18" cy="15.82" r="3.35"/>
+        <circle class="cof-fg" cx="21.1" cy="8.48" r="3.35"/>
+        <path class="cof-fg" d="M14.73,24.42a8.08,8.08,0,0,1-5.55-4.25,4.83,4.83,0,0,1-2.85.35,10.87,10.87,0,0,0,7.85,6.58,11,11,0,0,0,2.37.25,4.71,4.71,0,0,1-1-2.8A2.89,2.89,0,0,1,14.73,24.42Z"/>
+        <circle class="cof-fg" cx="20.35" cy="24.45" r="3.35"/>
+        <path class="cof-fg" d="M25,23.23a11,11,0,0,0,.55-12.83,4.85,4.85,0,0,1-1.88,2.2,8.22,8.22,0,0,1,.78,5.55,8.08,8.08,0,0,1-1.05,2.6A4.58,4.58,0,0,1,25,23.23Z"/>
+        <path class="cof-fg" d="M6.9,11h.25a4.65,4.65,0,0,1,1,.1,4.84,4.84,0,0,1,1.52.63,8.12,8.12,0,0,1,6.58-3.52,6.42,6.42,0,0,1,.1-.75,4.63,4.63,0,0,1,.92-1.95A11,11,0,0,0,6.9,11Z"/>
+      </svg>
+    </g>
+    <!-- Subtle inner border highlight -->
+    <rect x="856" y="436" width="208" height="208" rx="28" ry="28" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.22"/>
+  </g>
+</svg>

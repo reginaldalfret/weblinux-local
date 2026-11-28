@@ -1,0 +1,18 @@
+{
+  "phase": "16",
+  "distroId": "alpine-kde",
+  "timestamp": "2026-11-28T08:59:25.218Z",
+  "coldBootSec": null,
+  "warmReloadBootSec": null,
+  "osReleaseCheck": "",
+  "brandingConfigCheck": "",
+  "browserRemovalCheck": "",
+  "networkCheck": "",
+  "initialSha256": "",
+  "persistedSha256": "",
+  "persistenceCheck": "",
+  "checks": {},
+  "screenshots": {},
+  "status": "FAILED",
+  "error": "Boot error: Alpine Linux KDE Plasma 6 launch error: alpine-kde: KDE Plasma not found in /alpine"
+}

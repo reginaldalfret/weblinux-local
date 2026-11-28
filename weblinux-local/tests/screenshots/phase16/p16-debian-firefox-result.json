@@ -1,0 +1,41 @@
+{
+  "phase": "16",
+  "distroId": "debian-firefox",
+  "timestamp": "2026-11-28T08:44:45.749Z",
+  "coldBootSec": 35.9,
+  "warmReloadBootSec": 21.5,
+  "osReleaseCheck": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.7\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"",
+  "brandingConfigCheck": "=== OS_RELEASE ===\nPRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.7\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n=== MIGRATION_MARKER ===\n-rw-r--r-- 1 root root 66 Nov 28 07:11 /root/.local/state/weblinux/branding-v1-applied\napplied_at=2026-11-28T07:11:25Z\ndistro=debian-13-trixie\nversion=1\n=== KDEGLOBALS ===\n=== PLASMARC ===\n=== KWINRC ===\n[Desktops]\nNumber=1\nId_1=36a14deb-3d39-4275-86ae-dabb1f94521d\nRows=1\n=== KCMINPUTRC ===\n=== WALLPAPER_CONFIG ===\n16:wallpaperplugin=org.kde.image\n28:wallpaperplugin=org.kde.image\n90:wallpaperplugin=org.kde.image\n=== BRANDING_ASSETS ===\ntotal 12\ndrwxr-xr-x   3 root root 4096 Nov 28 07:09 .\ndrwxr-xr-x 167 root root 4096 Nov 28 07:11 ..\nlrwxrwxrwx   1 root root   43 Nov 28 07:09 DebianTheme -> /etc/alternatives/desktop-plasma5-wallpaper\nlrwxrwxrwx   1 root root   47 Aug 28  2025 FuturePrototype -> ../desktop-base/futureprototype-theme/wallpaper\nlrwxrwxrwx   1 root root   56 Aug 28  2025 FuturePrototypeWithLogo -> ../desktop-base/futureprototype-theme/wallpaper-withlogo\nlrwxrwxrwx   1 root root   35 Aug 28  2025 Joy -> ../desktop-base/joy-theme/wallpaper\nlrwxrwxrwx   1 root root   44 Aug 28  2025 JoyInksplat -> ../desktop-base/joy-inksplat-theme/wallpaper\nlrwxrwxrwx   1 root root   36 Aug 28  2025 JoyLockScreen -> ../desktop-base/joy-theme/lockscreen\nlrwxrwxrwx   1 root root   37 Aug 28  2025 Lines -> ../desktop-base/lines-theme/wallpaper\nlrwxrwxrwx   1 root root   38 Aug 28  2025 LinesLockScreen -> ../desktop-base/lines-theme/lockscreen\nlrwxrwxrwx   1 root root   42 Aug 28  2025 MoonlightLockScreen -> ../desktop-base/moonlight-theme/lockscreen\ndrwxr-xr-x   3 root root 4096 Oct  5 03:52 Next\nlrwxrwxrwx   1 root root   41 Aug 28  2025 SoftWaves -> ../desktop-base/softwaves-theme/wallpaper\nlrwxrwxrwx   1 root root   42 Aug 28  2025 SoftWavesLockScreen -> ../desktop-base/softwaves-theme/lockscreen\nlrwxrwxrwx   1 root root   40 Aug 28  2025 SpaceFun -> ../desktop-base/spacefun-theme/wallpaper\nlrwxrwxrwx   1 root root   43 Aug 28  2025 ceratopsian -> ../desktop-base/ceratopsian-theme/wallpaper\nlrwxrwxrwx   1 root root   43 Aug 28  2025 ceratopsian_wallpaper -> ../desktop-base/ceratopsian-theme/wallpaper\nlrwxrwxrwx   1 root root   39 Aug 28  2025 emerald -> ../desktop-base/emerald-theme/wallpaper\nlrwxrwxrwx   1 root root   39 Aug 28  2025 emerald_wallpaper -> ../desktop-base/emerald-theme/wallpaper",
+  "browserRemovalCheck": "=== BIN_CHECK ===\n=== PKG_CHECK ===\n=== WRAPPER_AND_DESKTOP ===\nNO_WRAPPER_OK\nNO_DESKTOP_OK",
+  "networkCheck": "=== DNS ===\n2606:4700:10::6814:179a example.com\n2606:4700:10::ac42:93f3 example.com\n=== CURL_HEAD ===\nHTTP/2 200 \n\ndate: Sat, 28 Nov 2026 08:48:28 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\nlast-modified: Wed, 25 Nov 2026 23:44:53 GMT\n\n=== CURL_BODY_SHA256 ===\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /tmp/p16-example.html\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "initialSha256": "656649e1d74de67a2b6705b5acb336452e54a276dcd97d49ab3d429c14a4d13a",
+  "persistedSha256": "656649e1d74de67a2b6705b5acb336452e54a276dcd97d49ab3d429c14a4d13a",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 root root 54 Nov 28 08:48 /root/p16-branding-persist.txt\nPHASE16_BRANDING_PERSIST_debian-firefox_1795855710176\nPERSISTED_SHA256=656649e1d74de67a2b6705b5acb336452e54a276dcd97d49ab3d429c14a4d13a\n=== REBOOT_BRANDING_MARKER ===\n-rw-r--r-- 1 root root 66 Nov 28 07:11 /root/.local/state/weblinux/branding-v1-applied",
+  "checks": {
+    "osReleaseMatches": true,
+    "brandingMarkerPresent": true,
+    "kdeglobalsConfigured": false,
+    "wallpaperConfigured": true,
+    "noBrowserBins": true,
+    "noBrowserPkgs": true,
+    "noWrapperOrDesktop": true,
+    "hasDns": true,
+    "hasCurlHead": true,
+    "hasCurlSha": true,
+    "hasRfc1918Blocked": true,
+    "hasPersistMarker": true,
+    "hasPersistSha": true,
+    "brandingMarkerPersisted": true,
+    "hasAllScreenshots": true
+  },
+  "screenshots": {
+    "desktop": "tests/screenshots/phase16/p16-debian-firefox-01-desktop.png",
+    "kickoff": "tests/screenshots/phase16/p16-debian-firefox-02-kickoff.png",
+    "konsole": "tests/screenshots/phase16/p16-debian-firefox-03-konsole.png",
+    "dolphin": "tests/screenshots/phase16/p16-debian-firefox-04-dolphin.png",
+    "systemSettings": "tests/screenshots/phase16/p16-debian-firefox-05-systemsettings.png",
+    "rebootedDesktop": "tests/screenshots/phase16/p16-debian-firefox-06-rebooted-desktop.png"
+  },
+  "status": "FAILED",
+  "error": null
+}

@@ -1,0 +1,41 @@
+{
+  "phase": "16",
+  "distroId": "arch-kde",
+  "timestamp": "2026-11-28T08:12:05.501Z",
+  "coldBootSec": 24.9,
+  "warmReloadBootSec": 60.5,
+  "osReleaseCheck": "NAME=\"Arch Linux\"\nPRETTY_NAME=\"Arch Linux\"\nID=arch\nBUILD_ID=rolling\nANSI_COLOR=\"38;2;23;147;209\"\nHOME_URL=\"https://archlinux.org/\"\nDOCUMENTATION_URL=\"https://wiki.archlinux.org/\"\nSUPPORT_URL=\"https://bbs.archlinux.org/\"\nBUG_REPORT_URL=\"https://gitlab.archlinux.org/groups/archlinux/-/issues\"\nPRIVACY_POLICY_URL=\"https://terms.archlinux.org/docs/privacy-policy/\"\nLOGO=archlinux-logo",
+  "brandingConfigCheck": "=== OS_RELEASE ===\nNAME=\"Arch Linux\"\nPRETTY_NAME=\"Arch Linux\"\nID=arch\nBUILD_ID=rolling\nANSI_COLOR=\"38;2;23;147;209\"\nHOME_URL=\"https://archlinux.org/\"\nDOCUMENTATION_URL=\"https://wiki.archlinux.org/\"\nSUPPORT_URL=\"https://bbs.archlinux.org/\"\nBUG_REPORT_URL=\"https://gitlab.archlinux.org/groups/archlinux/-/issues\"\nPRIVACY_POLICY_URL=\"https://terms.archlinux.org/docs/privacy-policy/\"\nLOGO=archlinux-logo\n=== MIGRATION_MARKER ===\n-rw-r--r-- 1 root root 70 Nov 28 07:12 /root/.local/state/weblinux/branding-v1-applied\nversion=1\ndistro=arch\nplasma=6.8.3\napplied_at=20261128T071238Z\nMARKER\n=== KDEGLOBALS ===\n[General]\nAccentColor=23,147,209\nColorScheme=ArchBreezeDark\n\n[Icons]\nTheme=breeze-dark\n\n[KDE]\nLookAndFeelPackage=org.kde.breezedark.desktop\nwidgetStyle=Breeze\n=== PLASMARC ===\n[Theme]\nname=breeze-dark\n=== KWINRC ===\n[org.kde.kdecoration2]\nlibrary=org.kde.breeze\ntheme=Breeze\n\n[Desktops]\nNumber=1\nId_1=28b01488-3120-4cc0-965b-d08e26e9ef5e\nRows=1\n=== KCMINPUTRC ===\n[Mouse]\ncursorTheme=breeze_cursors\n=== WALLPAPER_CONFIG ===\n16:wallpaperplugin=org.kde.image\n25:wallpaperplugin=org.kde.image\n64:wallpaperplugin=org.kde.image\n=== BRANDING_ASSETS ===\ntotal 16\ndrwxr-xr-x   4 root root 4096 Nov 28 07:12 .\ndrwxr-xr-x 159 root root 4096 Nov 28 07:12 ..\ndrwxr-xr-x   3 root root 4096 Nov 28 07:12 ArchLinux\ndrwxr-xr-x   3 root root 4096 Nov 26 12:41 Next",
+  "browserRemovalCheck": "=== BIN_CHECK ===\n=== PKG_CHECK ===\n\u001b[?25l\u001b[?25h=== WRAPPER_AND_DESKTOP ===\nNO_WRAPPER_OK\nNO_DESKTOP_OK",
+  "networkCheck": "=== DNS ===\n2606:4700:10::ac42:93f3 example.com\n2606:4700:10::6814:179a example.com\n=== CURL_HEAD ===\nHTTP/2 200 \n\ndate: Sat, 28 Nov 2026 08:17:17 GMT\n\ncontent-type: text/html; charset=utf-8\n\nserver: cloudflare\n\nlast-modified: Thu, 26 Nov 2026 17:29:13 GMT\n\n=== CURL_BODY_SHA256 ===\n25ddf2c883e0d1958ea971d279a7e4f0fd446724ee3db7db19dadabd4a62e484  /tmp/p16-example.html\n=== RFC1918 ===\nRFC1918_BLOCKED_OK",
+  "initialSha256": "400ed4ae5e00db909b09f17e33441111c8bcc85385f13baf0e5b5641a5994ccf",
+  "persistedSha256": "400ed4ae5e00db909b09f17e33441111c8bcc85385f13baf0e5b5641a5994ccf",
+  "persistenceCheck": "=== PERSIST_CHECK ===\n-rw-r--r-- 1 root root 48 Nov 28 08:17 /root/p16-branding-persist.txt\nPHASE16_BRANDING_PERSIST_arch-kde_1795853850879\nPERSISTED_SHA256=400ed4ae5e00db909b09f17e33441111c8bcc85385f13baf0e5b5641a5994ccf\n=== REBOOT_BRANDING_MARKER ===\n-rw-r--r-- 1 root root 70 Nov 28 07:12 /root/.local/state/weblinux/branding-v1-applied",
+  "checks": {
+    "osReleaseMatches": true,
+    "brandingMarkerPresent": true,
+    "kdeglobalsConfigured": true,
+    "wallpaperConfigured": true,
+    "noBrowserBins": true,
+    "noBrowserPkgs": false,
+    "noWrapperOrDesktop": true,
+    "hasDns": true,
+    "hasCurlHead": true,
+    "hasCurlSha": true,
+    "hasRfc1918Blocked": true,
+    "hasPersistMarker": true,
+    "hasPersistSha": true,
+    "brandingMarkerPersisted": true,
+    "hasAllScreenshots": true
+  },
+  "screenshots": {
+    "desktop": "tests/screenshots/phase16/p16-arch-kde-01-desktop.png",
+    "kickoff": "tests/screenshots/phase16/p16-arch-kde-02-kickoff.png",
+    "konsole": "tests/screenshots/phase16/p16-arch-kde-03-konsole.png",
+    "dolphin": "tests/screenshots/phase16/p16-arch-kde-04-dolphin.png",
+    "systemSettings": "tests/screenshots/phase16/p16-arch-kde-05-systemsettings.png",
+    "rebootedDesktop": "tests/screenshots/phase16/p16-arch-kde-06-rebooted-desktop.png"
+  },
+  "status": "FAILED",
+  "error": null
+}
