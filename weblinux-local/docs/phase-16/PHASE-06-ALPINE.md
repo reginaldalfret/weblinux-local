@@ -20,7 +20,7 @@ Official Alpine Linux logos + restrained WebLinux presentation wallpaper using o
 - **Migration:** Idempotent `/usr/local/bin/weblinux-apply-alpine-branding` (`~/.local/state/weblinux/branding-v1-applied`, `plasma_major=6`, `plasma_version=6.6.6`)
 
 ## Rootfs Packaging & Integrity
-- **e2fsck -fy:** Clean (`65806/200800 files, 436901/802816 blocks`)
-- **Total Chunks:** `3136` (`1827` non-zero, `bootChunks: 64`)
-- **Full Image SHA-256:** `ab8e6e5782a327f6d53d795b379ffe6ec3132cec07a3e938389e02c3798bc5b0`
+- **e2fsck -fy:** Clean (`65766/200800 files, 436859/802816 blocks`)
+- **Total Chunks:** `3136` (`1820` non-zero, `bootChunks: 64`)
+- **Full Image SHA-256:** `bfb9a1c60b6185e23fb6c8ed0353054353c6bd156a2a824a2950351b248a0fe2`
 - **Graphical Browsers:** None installed (`NO_BROWSERS_OK`, musl userspace & APK signatures preserved)
