@@ -633,7 +633,7 @@ async function waitForCompositorAndDesktopReady(page, distroId, cfg, maxWaitMs) 
         chrootCmd: cfg.chrootCmd,
         rootMount: cfg.rootMount,
         timeoutMs: maxWaitMs,
-        runGuest: (cmd, t) => runGuest(page, cfg, cmd, t),
+        runGuest: (_p, cmd, t) => runGuest(page, cfg, cmd, t),
       });
     }
   }
