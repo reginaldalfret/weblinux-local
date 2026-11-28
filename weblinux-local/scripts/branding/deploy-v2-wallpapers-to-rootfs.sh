@@ -152,10 +152,9 @@ cat > "${MNT}/usr/local/bin/weblinux-branding-v2-autostart" <<EOF
 #!/bin/sh
 i=0
 PLASMA_PID=""
-while [ "\$i" -lt 45 ]; do
+while [ "\$i" -lt 60 ]; do
   PLASMA_PID=\$(pidof plasmashell 2>/dev/null | awk '{print \$1}')
   if [ -n "\$PLASMA_PID" ] && [ -r "/proc/\$PLASMA_PID/environ" ]; then
-    sleep 3
     break
   fi
   i=\$((i + 1))
@@ -168,6 +167,21 @@ export HOME="\${HOME:-/root}"
 export XDG_RUNTIME_DIR="\${XDG_RUNTIME_DIR:-/tmp/runtime-root}"
 export WAYLAND_DISPLAY="\${WAYLAND_DISPLAY:-wayland-0}"
 export DBUS_SESSION_BUS_ADDRESS="\${DBUS_SESSION_BUS_ADDRESS:-unix:path=\${XDG_RUNTIME_DIR}/bus}"
+
+# Wait until org.kde.plasmashell is registered on D-Bus (so desktop containments are initialized)
+j=0
+while [ "\$j" -lt 45 ]; do
+  if command -v dbus-send >/dev/null 2>&1; then
+    if dbus-send --session --dest=org.freedesktop.DBus --type=method_call --print-reply /org/freedesktop/DBus org.freedesktop.DBus.NameHasOwner string:org.kde.plasmashell 2>/dev/null | grep -q 'boolean true'; then
+      sleep 4
+      break
+    fi
+  elif [ "\$j" -ge 15 ]; then
+    break
+  fi
+  j=\$((j + 1))
+  sleep 1
+done
 exec /usr/local/bin/weblinux-apply-kde-branding --profile ${PROFILE_ID} --plasma-major ${PLASMA_MAJOR}
 EOF
 chmod 0755 "${MNT}/usr/local/bin/weblinux-branding-v2-autostart"

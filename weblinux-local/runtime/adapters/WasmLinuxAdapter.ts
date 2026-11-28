@@ -628,7 +628,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
               8000
             ).catch(() => {});
           }
-        }, 18000);
+        }, 35000);
       } else if (options.desktop === 'cli' || options.manifest.id === 'ubuntu') {
         setTimeout(() => {
           if (this.status.state === 'booting' || this.status.state === 'shell_ready') {
