@@ -49,6 +49,7 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   private cachedKernelBuffer: ArrayBuffer | null = null;
   private cachedInitrdBuffer: ArrayBuffer | null = null;
   private graphicsMode: GraphicsMode = 'automatic';
+  private shutdownPromise: Promise<void> | null = null;
 
   public static getInstance(): WasmLinuxAdapter {
     if (!WasmLinuxAdapter.instance) {
@@ -260,6 +261,11 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   }
 
   public async boot(options: BootOptions): Promise<void> {
+    if (this.activeOs) {
+      this.log(`[Runtime] Active session detected prior to boot; shutting down previous instance cleanly...`);
+      await this.shutdown();
+    }
+
     this.updateStatus({
       state: 'booting',
       distribution: options.manifest.id,
@@ -295,7 +301,13 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
 
       // 2. Build kernel commandline
       const epoch = Math.floor(Date.now() / 1000);
-      const isKde = options.desktop === 'kde-plasma';
+      const isKde =
+        options.desktop === 'kde-plasma' ||
+        options.desktop === 'ubuntu-kde' ||
+        options.desktop === 'arch-kde' ||
+        options.desktop === 'opensuse-tumbleweed-kde' ||
+        options.desktop === 'fedora-kde' ||
+        options.desktop === 'alpine-kde';
 
       let bootCmdline = `maxcpus=3 nohz_full=0,2-63 rcu_nocbs=0,2-63 root=/dev/ram0 rootfstype=ramfs init=/init console=hvc console=ttyS0 epoch=${epoch} rvtab=${this.tabId} term=120x30 wasm_pool=${pool} mem=${memoryMB}M wasm_cache_max=256 distro=${options.manifest.id}`;
 
@@ -595,11 +607,11 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
         networkConnected: options.enableNetworking,
       });
 
-      // For KDE Plasma 6: monitor compositor readiness timeout
+      // For KDE Plasma 5/6: monitor compositor readiness timeout
       if (isKde) {
         setTimeout(() => {
           if (this.status.state === 'booting' && !this.status.waylandActive) {
-            this.log(`[Runtime] Boot sequence settling into active state.`);
+            this.log(`[Runtime Warning] Wayland compositor not yet active after 25s; transitioning to running while compositor settles.`);
             this.updateStatus({ state: 'running' });
           }
         }, 25000);
@@ -682,59 +694,73 @@ export class WasmLinuxAdapter implements IRuntimeAdapter {
   }
 
   public async shutdown(): Promise<void> {
-    this.updateStatus({ state: 'shutting_down' });
-    this.log(`[Shutdown] Sending sync and poweroff to guest...`);
-
-    if (this.uptimeTimer) {
-      clearInterval(this.uptimeTimer);
-      this.uptimeTimer = null;
+    if (this.shutdownPromise) {
+      return this.shutdownPromise;
     }
 
-    if (this.status.shellReady && this.activeOs) {
-      try {
-        await this.runCommand(
-          'killall -9 plasmashell kbuildsycoca6 dolphin konsole kioworker dbus-daemon 2>/dev/null; sleep 0.5; sync; umount /fedora/root 2>/dev/null || mount -o remount,ro /fedora/root 2>/dev/null; umount /opensuse/root 2>/dev/null || mount -o remount,ro /opensuse/root 2>/dev/null; umount /arch/root 2>/dev/null || mount -o remount,ro /arch/root 2>/dev/null; umount /ubuntu/root 2>/dev/null || mount -o remount,ro /ubuntu/root 2>/dev/null; umount /debian/root 2>/dev/null || mount -o remount,ro /debian/root 2>/dev/null; sync',
-          8000
-        );
-      } catch {
-        // Fallback to raw key_input below
+    this.shutdownPromise = (async () => {
+      this.updateStatus({ state: 'shutting_down' });
+      this.log(`[Shutdown] Sending sync and coordinated worker teardown to guest...`);
+
+      if (this.uptimeTimer) {
+        clearInterval(this.uptimeTimer);
+        this.uptimeTimer = null;
       }
-    }
+
+      if (this.status.shellReady && this.activeOs && this.status.state !== 'error') {
+        try {
+          await this.runCommand(
+            'killall -9 plasmashell kbuildsycoca5 kbuildsycoca6 dolphin konsole systemsettings systemsettings5 kioworker kwin_wayland dbus-daemon 2>/dev/null; sleep 0.5; sync; umount /fedora/root 2>/dev/null || mount -o remount,ro /fedora/root 2>/dev/null; umount /opensuse/root 2>/dev/null || mount -o remount,ro /opensuse/root 2>/dev/null; umount /arch/root 2>/dev/null || mount -o remount,ro /arch/root 2>/dev/null; umount /ubuntu/root 2>/dev/null || mount -o remount,ro /ubuntu/root 2>/dev/null; umount /debian/root 2>/dev/null || mount -o remount,ro /debian/root 2>/dev/null; sync',
+            4000
+          );
+        } catch {
+          // Fallback to raw key_input below
+        }
+      }
+
+      try {
+        if (this.activeOs && this.activeOs.key_input) {
+          this.activeOs.key_input('sync\r');
+        }
+      } catch {
+        // Ignore
+      }
+
+      if (this.displayChannel) {
+        this.displayChannel.close();
+        this.displayChannel = null;
+      }
+
+      // Allow guest kernel sync to issue flush before coordinated OPFS shutdown
+      await new Promise(r => setTimeout(r, 1500));
+
+      if (this.activeOs && typeof this.activeOs.terminate === 'function') {
+        try {
+          this.log(`[Shutdown] Flushing OPFS disks, closing handles, and releasing locks...`);
+          await this.activeOs.terminate();
+        } catch (termErr) {
+          console.warn('[Shutdown] activeOs.terminate error:', termErr);
+        }
+      }
+
+      this.activeOs = null;
+      this.resolveShellReady = null;
+      this.shellReadyPromise = null;
+      this.updateStatus({
+        state: 'stopped',
+        uptimeSeconds: 0,
+        networkConnected: false,
+        waylandActive: false,
+        shellReady: false,
+      });
+      this.log(`[Shutdown Complete] Machine halted.`);
+    })();
 
     try {
-      if (this.activeOs && this.activeOs.key_input) {
-        this.activeOs.key_input('sync\r');
-      }
-    } catch {
-      // Ignore
+      await this.shutdownPromise;
+    } finally {
+      this.shutdownPromise = null;
     }
-
-    if (this.displayChannel) {
-      this.displayChannel.close();
-      this.displayChannel = null;
-    }
-
-    // Allow guest kernel sync to issue flush before coordinated OPFS shutdown
-    await new Promise(r => setTimeout(r, 1500));
-
-    if (this.activeOs && typeof this.activeOs.terminate === 'function') {
-      try {
-        this.log(`[Shutdown] Flushing OPFS disks, closing handles, and releasing locks...`);
-        await this.activeOs.terminate();
-      } catch (termErr) {
-        console.warn('[Shutdown] activeOs.terminate error:', termErr);
-      }
-    }
-
-    this.activeOs = null;
-    this.updateStatus({
-      state: 'stopped',
-      uptimeSeconds: 0,
-      networkConnected: false,
-      waylandActive: false,
-      shellReady: false,
-    });
-    this.log(`[Shutdown Complete] Machine halted.`);
   }
 
   public async provisionDesktopLaunchers(): Promise<void> {
@@ -976,16 +1002,15 @@ fi`;
         // 3. Clean up Wayland runtime sockets
         await this.runCommand('rm -f /tmp/runtime-root/wayland-* /run/wlserver/wayland-* 2>/dev/null || true', 3000);
 
-        // 4. Power off / reset session safely
-        if (this.activeOs.stop) {
-          try { this.activeOs.stop(); } catch {}
-        }
+        // 4. Power off / reset session safely via coordinated worker & OPFS teardown
+        await this.shutdown();
       } catch {
         // Ignore session teardown errors
       }
+    } else if (this.activeOs) {
+      await this.shutdown();
     }
 
-    this.activeOs = null;
     this.updateStatus({ state: 'stopped', waylandActive: false, desktop: targetDesktop });
     this.log(`[Desktop Switch] Previous session stopped cleanly. Storage synced.`);
   }
