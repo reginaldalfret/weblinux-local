@@ -246,8 +246,8 @@ ini_set "$CONFIG_DIR/plasmarc" "Theme" "name" "$PLASMA_THEME"
 ini_set "$CONFIG_DIR/kwinrc" "org.kde.kdecoration2" "library" "org.kde.breeze"
 ini_set "$CONFIG_DIR/kwinrc" "org.kde.kdecoration2" "theme" "Breeze"
 
-ini_set "$CONFIG_DIR/ksplashrc" "KSplash" "Engine" "KSplashQML"
-ini_set "$CONFIG_DIR/ksplashrc" "KSplash" "Theme" "org.kde.breeze.desktop"
+ini_set "$CONFIG_DIR/ksplashrc" "KSplash" "Engine" "none"
+ini_set "$CONFIG_DIR/ksplashrc" "KSplash" "Theme" "None"
 
 # Konsole profile with Alpine colorscheme
 ini_set "$CONFIG_DIR/konsolerc" "Desktop Entry" "DefaultProfile" "${TERMINAL_PROFILE}.profile"
